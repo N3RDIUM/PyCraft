@@ -4,14 +4,15 @@ from pyglet.gl import *
 from Classes.player import *
 from Classes.chunk import *
 
+
 class Window(pyglet.window.Window):
 
-    def push(self,pos,rot):
+    def push(self, pos, rot):
         glPushMatrix()
         rot = self.player.rot
         pos = self.player.pos
-        glRotatef(-rot[0],1,0,0)
-        glRotatef(-rot[1],0,1,0)
+        glRotatef(-rot[0], 1, 0, 0)
+        glRotatef(-rot[1], 0, 1, 0)
         glTranslatef(-pos[0], -pos[1], -pos[2])
 
     def Projection(self):
@@ -37,20 +38,21 @@ class Window(pyglet.window.Window):
         self.set_exclusive_mouse(state)
 
     lock = False
-    mouse_lock = property(lambda self:self.lock, setLock)
+    mouse_lock = property(lambda self: self.lock, setLock)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.set_minimum_size(800,500)
+        self.set_minimum_size(800, 500)
         self.keys = key.KeyStateHandler()
         self.push_handlers(self.keys)
         pyglet.clock.schedule(self.update)
 
         self.model = Chunk()
-        self.player = Player((0.5,1.5,1.5),(-30,0))
+        self.player = Player((0.5, 1.5, 1.5), (-30, 0))
 
-    def on_mouse_motion(self,x,y,dx,dy):
-        if self.mouse_lock: self.player.mouse_motion(dx,dy)
+    def on_mouse_motion(self, x, y, dx, dy):
+        if self.mouse_lock:
+            self.player.mouse_motion(dx, dy)
 
     def on_key_press(self, KEY, _MOD):
         if KEY == key.ESCAPE:
@@ -64,13 +66,14 @@ class Window(pyglet.window.Window):
     def on_draw(self):
         self.clear()
         self.set3d()
-        self.push(self.player.pos,self.player.rot)
+        self.push(self.player.pos, self.player.rot)
         self.model.draw()
         glPopMatrix()
 
+
 if __name__ == '__main__':
-    window = Window(width=400, height=300, caption='My caption',resizable=True)
-    glClearColor(0.5,0.7,1,1)
+    window = Window(width=400, height=300, caption='PyCraft', resizable=True)
+    glClearColor(0.5, 0.7, 1, 1)
     glEnable(GL_DEPTH_TEST)
-    #glEnable(GL_CULL_FACE)
+    # glEnable(GL_CULL_FACE)
     pyglet.app.run()
