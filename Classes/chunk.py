@@ -26,9 +26,9 @@ class Chunk:
 
     def __init__(self):
 
-        self.top = self.get_tex('grass_top.jfif')
-        self.side = self.get_tex('grass_side.png')
-        self.bottom = self.get_tex('dirt.png')
+        self.top = self.get_tex('assets/grass_top.jfif')
+        self.side = self.get_tex('assets/grass_side.png')
+        self.bottom = self.get_tex('assets/dirt.png')
 
         self.batch = pyglet.graphics.Batch()
 

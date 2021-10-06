@@ -41,7 +41,7 @@ class Window(pyglet.window.Window):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.set_minimum_size(300,200)
+        self.set_minimum_size(800,500)
         self.keys = key.KeyStateHandler()
         self.push_handlers(self.keys)
         pyglet.clock.schedule(self.update)
