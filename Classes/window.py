@@ -1,5 +1,6 @@
 import pyglet
 from pyglet.gl import *
+from pyglet.window import key
 
 class Window(pyglet.window.Window):
 
@@ -36,7 +37,7 @@ class Window(pyglet.window.Window):
     lock = False
     mouse_lock = property(lambda self: self.lock, setLock)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, Chunk, Player, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_minimum_size(800, 500)
         self.keys = key.KeyStateHandler()
