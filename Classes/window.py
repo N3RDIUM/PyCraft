@@ -1,3 +1,6 @@
+import pyglet
+from pyglet.gl import *
+
 class Window(pyglet.window.Window):
 
     def push(self, pos, rot):
