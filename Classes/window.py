@@ -44,7 +44,7 @@ class Window(pyglet.window.Window):
         self.push_handlers(self.keys)
         pyglet.clock.schedule(self.update)
 
-        self.model = Chunk()
+        self.model = Chunk(0,0,0)
         self.player = Player((0.5, 1.5, 1.5), (-30, 0))
 
     def on_mouse_motion(self, x, y, dx, dy):

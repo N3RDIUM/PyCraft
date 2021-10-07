@@ -18,7 +18,7 @@ class Player:
             self.rot[0] = -90
 
     def update(self,dt,keys):
-        sens = 0.1
+        sens = 0.3
         s = dt*10
         rotY = -self.rot[1]/180*math.pi
         dx, dz = s*math.sin(rotY), math.cos(rotY)
