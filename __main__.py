@@ -5,14 +5,10 @@ from Classes.player import *
 from Classes.chunk import *
 from Classes.window import *
 
-def move_chunk(dt):
-    window.model.X += 1
-
 if __name__ == '__main__':
     window = Window(width=400, height=300, caption='PyCraft', resizable=True, Chunk=Chunk, Player=Player)
     glClearColor(0.5, 0.7, 1, 1)
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_CULL_FACE)
     glCullFace(GL_BACK)
-    pyglet.clock.schedule_interval(move_chunk, 1)
     pyglet.app.run()

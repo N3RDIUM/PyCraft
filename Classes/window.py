@@ -5,7 +5,6 @@ from pyglet.window import key
 class Window(pyglet.window.Window):
 
     def push(self, pos, rot):
-        glPushMatrix()
         rot = self.player.rot
         pos = self.player.pos
         glRotatef(-rot[0], 1, 0, 0)
@@ -65,5 +64,4 @@ class Window(pyglet.window.Window):
         self.set3d()
         self.push(self.player.pos, self.player.rot)
         self.model.draw()
-        glPopMatrix()
         

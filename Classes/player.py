@@ -8,10 +8,8 @@ class Player:
         self.rot = list(rot)
 
     def mouse_motion(self, dx, dy):
-        dx/= 8
-        dy/= 8
-        self.rot[0] += dy
-        self.rot[1] -= dx
+        self.rot[0] += dy/10
+        self.rot[1] -= dx/10
         if self.rot[0]>90:
             self.rot[0] = 90
         elif self.rot[0] < -90:
