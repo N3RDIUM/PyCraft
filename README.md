@@ -1,4 +1,5 @@
-# PyCraft
-A minecraft clone written in python and pyglet.
-##### Please don't make this public yet, work is in progress!
-##### The project will be worked on soon.
+# <p align = 'center'> PyCraft </p>
+
+### <p align = "center"> A minecraft clone written in python and pyglet. </p>
+
+![image](https://user-images.githubusercontent.com/74598401/136592857-0b08ae7c-2187-450f-9ad5-0eda6d68138d.png)
