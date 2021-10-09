@@ -29,7 +29,8 @@ class Chunk:
 
         self.blocks = random.sample(self.blocks,len(self.blocks))
 
-    def get_tex(self,file):
+    @staticmethod
+    def get_tex(file):
         tex = pyglet.image.load(file).texture
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
