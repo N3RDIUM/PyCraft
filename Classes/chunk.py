@@ -35,7 +35,6 @@ class Chunk:
         self.X = self.X*self.CHUNK_DIST
         self.Z = self.Z*self.CHUNK_DIST
 
-<<<<<<< HEAD
         for x in range(int(self.X), int(self.X+self.CHUNK_DIST)):
             for y in range(int(self.Z), int(self.Z+self.CHUNK_DIST)):
                 self.blocks.append(
@@ -43,21 +42,6 @@ class Chunk:
                 self.add_block(x=x-self.X, y=int(
                     simplex.noise2d(x/10, y/10)*5), z=y-self.Z, batch=self.batch)
         self.generated = True
-=======
-        for x in range(-int(self.CHUNK_DIST/2),int(self.CHUNK_DIST/2)):
-            for y in range(-int(self.CHUNK_DIST/2),int(self.CHUNK_DIST/2)):
-                    self.blocks.append((x,int(simplex.noise2d(x/10,y/10)*5),y))
-                    self.add_block(x,int(simplex.noise2d(x/10,y/10)*5),y)
-
-        self.blocks = random.sample(self.blocks,len(self.blocks))
-
-    @staticmethod
-    def get_tex(file):
-        tex = pyglet.image.load(file).texture
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        return pyglet.graphics.TextureGroup(tex)
->>>>>>> f1c1c881217844ab9891218a61b6b5ccbe17fbd0
 
     def add_block(self, x, y, z, batch=None):
         X, Y, Z = x+1, y+1, z+1

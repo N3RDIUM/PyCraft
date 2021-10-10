@@ -1,7 +1,7 @@
 import pyglet
 from pyglet.gl import *
 from pyglet.window import key
-import random
+import threading
 
 class Window(pyglet.window.Window):
     def __init__(self, Chunk, World, Player, *args, **kwargs):
@@ -55,7 +55,7 @@ class Window(pyglet.window.Window):
 
     def on_key_press(self, KEY, _MOD):
         if KEY == key.ESCAPE:
-            self.close()
+            pass
         elif KEY == key.E:
             self.mouse_lock = not self.mouse_lock
 

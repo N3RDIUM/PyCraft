@@ -20,13 +20,12 @@ class World:
         for i in range(-self.chunk_distance, self.chunk_distance):
             temp = []
             for j in range(-self.chunk_distance, self.chunk_distance):
-                print(f'Generating chunk at {i+self.x},{j+self.z}')
                 try:
                     c = self.Chunk(i+self.x, j+self.z, self)
                     c.generate()
                     temp.append(c)
                 except:
-                    print("Failed to generate chunk")
+                    pass
             self.chunks.append(temp)
 
     def draw(self):
@@ -38,15 +37,18 @@ class World:
         x = self.player.pos[0]
         z = self.player.pos[2]
 
-        if x > self.x + self.chunk_distance:
+        # Nothin' to do with this
+        dt
+
+        if x > self.x*16 + self.chunk_distance-1:
             self.x += 1
             self.generate()
-        elif x < self.x - self.chunk_distance:
+        elif x < self.x*16 - self.chunk_distance-1:
             self.x -= 1
             self.generate()
-        elif z > self.z + self.chunk_distance:
+        elif z > self.z*16 + self.chunk_distance-1:
             self.z += 1
             self.generate()
-        elif z < self.z - self.chunk_distance:
+        elif z < self.z*16 - self.chunk_distance-1:
             self.z -= 1
             self.generate()
