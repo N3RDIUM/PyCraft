@@ -1,8 +1,19 @@
 import pyglet
 from pyglet.gl import *
 from pyglet.window import key
+import random
 
 class Window(pyglet.window.Window):
+    def __init__(self, Chunk, World, Player, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_minimum_size(800, 500)
+        self.keys = key.KeyStateHandler()
+        self.push_handlers(self.keys)
+        pyglet.clock.schedule(self.update)
+
+        self.player = Player((0.5, 1.5, 1.5), (-30, 0))
+        self.model = World(Chunk,self.player)
+        pyglet.clock.schedule(self.model.update)
 
     def push(self, pos, rot):
         rot = self.player.rot
@@ -35,16 +46,6 @@ class Window(pyglet.window.Window):
 
     lock = False
     mouse_lock = property(lambda self: self.lock, setLock)
-
-    def __init__(self, Chunk, Player, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_minimum_size(800, 500)
-        self.keys = key.KeyStateHandler()
-        self.push_handlers(self.keys)
-        pyglet.clock.schedule(self.update)
-
-        self.model = Chunk(0,0,0)
-        self.player = Player((0.5, 1.5, 1.5), (-30, 0))
 
     def on_mouse_motion(self, x, y, dx, dy):
         if self.mouse_lock:

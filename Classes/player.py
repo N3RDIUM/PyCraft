@@ -6,6 +6,11 @@ class Player:
     def __init__(self, pos=(0, 0, 0), rot=(0, 0)):
         self.pos = list(pos)
         self.rot = list(rot)
+        self.x = 0
+        self.y = 0
+        self.z = 0
+        self.rotY = 0
+        self.rotX = 0
 
     def mouse_motion(self, dx, dy):
         self.rot[0] += dy/10
@@ -36,3 +41,10 @@ class Player:
             self.pos[1] += s
         if keys[key.LSHIFT]:
             self.pos[1] -= s
+
+        self.x = self.pos[0]
+        self.y = self.pos[2]
+        self.z = self.pos[1]
+
+        self.rotY = self.rot[0]
+        self.rotX = self.rot[1]
