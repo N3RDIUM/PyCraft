@@ -20,7 +20,8 @@
         "doc",
         "infra",
         "content",
-        "maintenance"
+        "maintenance",
+        "userTesting"
       ]
     }
   ],
