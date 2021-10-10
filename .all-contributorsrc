@@ -1,10 +1,27 @@
 {
-  "files": ["README.md"],
+  "files": [
+    "README.md"
+  ],
   "imageSize": 100,
   "contributorsPerLine": 7,
   "contributorsSortAlphabetically": false,
   "badgeTemplate": "[![All Contributors](https://img.shields.io/badge/all_contributors-<%= contributors.length %>-green.svg?style=flat-square)](#contributors)",
   "contributorTemplate": "<a href=\"<%= contributor.profile %>\"><img src=\"<%= contributor.avatar_url %>\" width=\"<%= options.imageSize %>px;\" alt=\"\"/><br /><sub><b><%= contributor.name %></b></sub></a>",
-  "skipCi": "true",
-  "contributors": []
+  "skipCi": true,
+  "contributors": [
+    {
+      "login": "somePythonProgrammer",
+      "name": "somePythonProgrammer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/74598401?v=4",
+      "profile": "https://github.com/somePythonProgrammer",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
+    }
+  ],
+  "projectName": "PyCraft",
+  "projectOwner": "TheWebCrafters",
+  "repoType": "github",
+  "repoHost": "https://github.com"
 }
