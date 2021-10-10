@@ -1,4 +1,5 @@
 # <p align = 'center'> PyCraft </p>
+##### [![DeepSource](https://deepsource.io/gh/TheWebCrafters/PyCraft.svg/?label=active+issues&show_trend=true&token=4Etoi3bOhBMRoKUWGDpPJFvS)](https://deepsource.io/gh/TheWebCrafters/PyCraft/?ref=repository-badge) [![DeepSource](https://deepsource.io/gh/TheWebCrafters/PyCraft.svg/?label=resolved+issues&show_trend=true&token=4Etoi3bOhBMRoKUWGDpPJFvS)](https://deepsource.io/gh/TheWebCrafters/PyCraft/?ref=repository-badge)
 
 ### <p align = "center"> A Minecraft clone written in python and pyglet. </p>
 
