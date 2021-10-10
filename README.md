@@ -7,6 +7,13 @@
 
 # Contributors
 
-<a href = "https://github.com/TheWebCrafters/PyCraft/graphs/contributors">
-  <img src = "https://contrib.rocks/image?repo = TheWebCrafters/PyCraft"/>
-</a>
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
