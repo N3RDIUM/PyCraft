@@ -22,11 +22,13 @@ class Window(pyglet.window.Window):
         glRotatef(-rot[1], 0, 1, 0)
         glTranslatef(-pos[0], -pos[1], -pos[2])
 
-    def Projection(self):
+    @staticmethod
+    def Projection():
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
 
-    def Model(self):
+    @staticmethod
+    def Model():
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 
