@@ -13,7 +13,7 @@ class Window(pyglet.window.Window):
 
         self.player = Player((0.5, 1.5, 1.5), (-30, 0))
         self.model = World(Chunk,self.player)
-        pyglet.clock.schedule(self.model.update)
+        pyglet.clock.schedule_interval(self.model.update, 1/60)
 
     def push(self, pos, rot):
         rot = self.player.rot

@@ -6,6 +6,8 @@ from Classes.chunk import *
 from Classes.world import *
 from Classes.window import *
 
+# Still working on threading...
+
 if __name__ == '__main__':
     window = Window(width=400, height=300, caption='PyCraft',
                     resizable=True, Chunk=Chunk, Player=Player, World=World)

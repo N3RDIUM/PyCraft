@@ -18,6 +18,39 @@ top = get_tex('assets/grass_top.png')
 side = get_tex('assets/grass_side.png')
 bottom = get_tex('assets/dirt.png')
 
+class PrepareBatch(threading.Thread):
+    def __init__(self, chunk, XYZ):
+        threading.Thread.__init__(self)
+        self.setDaemon(True)
+        self.chunk = chunk
+        self.xyz = XYZ
+        self.start()
+
+    def start(self):
+        threading.Thread.start(self)
+        x = self.xyz[0]
+        y = self.xyz[1]
+        z = self.xyz[2]
+        X, Y, Z = x+1, y+1, z+1
+
+        tex_coords = ('t2f', (0, 0, 1, 0, 1, 1, 0, 1))
+
+        self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (X, y,
+                       z,  x, y, z,  x, Y, z,  X, Y, z)), tex_coords)  # back
+        self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (x, y,
+                       Z,  X, y, Z,  X, Y, Z,  x, Y, Z)), tex_coords)  # front
+
+        self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (x, y,
+                       z,  x, y, Z,  x, Y, Z,  x, Y, z)), tex_coords)  # left
+        self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (X, y,
+                       Z,  X, y, z,  X, Y, z,  X, Y, Z)), tex_coords)  # right
+
+        self.chunk.batch.add(4, GL_QUADS, bottom, ('v3f', (x, y,
+                       z,  X, y, z,  X, y, Z,  x, y, Z)), tex_coords)  # bottom
+        self.chunk.batch.add(4, GL_QUADS, top,    ('v3f', (x, Y,
+                       Z,  X, Y, Z,  X, Y, z,  x, Y, z)), tex_coords)  # top
+
+
 class Chunk:
     def __init__(self, X, Z, parent):
         self.parent = parent
@@ -37,32 +70,10 @@ class Chunk:
 
         for x in range(int(self.X), int(self.X+self.CHUNK_DIST)):
             for y in range(int(self.Z), int(self.Z+self.CHUNK_DIST)):
-                self.blocks.append(
-                    (x, int(simplex.noise2d(x/10, y/10)*5), y))
-                self.add_block(x=x-self.X, y=int(
-                    simplex.noise2d(x/10, y/10)*5), z=y-self.Z, batch=self.batch)
+                PrepareBatch(self,(x-self.X, int(
+                    simplex.noise2d(x/10, y/10)*5), y-self.Z))
         self.generated = True
-
-    def add_block(self, x, y, z, batch=None):
-        X, Y, Z = x+1, y+1, z+1
-
-        tex_coords = ('t2f', (0, 0, 1, 0, 1, 1, 0, 1))
-
-        batch.add(4, GL_QUADS, side,   ('v3f', (X, y,
-                       z,  x, y, z,  x, Y, z,  X, Y, z)), tex_coords)  # back
-        batch.add(4, GL_QUADS, side,   ('v3f', (x, y,
-                       Z,  X, y, Z,  X, Y, Z,  x, Y, Z)), tex_coords)  # front
-
-        batch.add(4, GL_QUADS, side,   ('v3f', (x, y,
-                       z,  x, y, Z,  x, Y, Z,  x, Y, z)), tex_coords)  # left
-        batch.add(4, GL_QUADS, side,   ('v3f', (X, y,
-                       Z,  X, y, z,  X, Y, z,  X, Y, Z)), tex_coords)  # right
-
-        batch.add(4, GL_QUADS, bottom, ('v3f', (x, y,
-                       z,  X, y, z,  X, y, Z,  x, y, Z)), tex_coords)  # bottom
-        batch.add(4, GL_QUADS, top,    ('v3f', (x, Y,
-                       Z,  X, Y, Z,  X, Y, z,  x, Y, z)), tex_coords)  # top
-
+        
     def draw(self):
         if self.generated:
             glPushMatrix()
