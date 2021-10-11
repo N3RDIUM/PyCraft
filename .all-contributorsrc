@@ -21,7 +21,8 @@
         "infra",
         "content",
         "maintenance",
-        "userTesting"
+        "userTesting",
+        "bug"
       ]
     }
   ],
