@@ -24,6 +24,15 @@
         "userTesting",
         "bug"
       ]
+    },
+    {
+      "login": "deepsourcebot",
+      "name": "DeepSource Bot",
+      "avatar_url": "https://avatars.githubusercontent.com/u/60907429?v=4",
+      "profile": "https://deepsource.io",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "projectName": "PyCraft",
