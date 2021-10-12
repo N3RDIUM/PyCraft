@@ -11,6 +11,9 @@
     git clone https://github.com/TheWebCrafters/PyCraft.git
     cd PyCraft
     python __main__.py
+    
+## Known issues
+1. The game hangs while generating chunks. (will be fixed soon.)
 
 ## Contributors
 ##### (Someone please make all-contributors appear here)
