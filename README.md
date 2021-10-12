@@ -13,7 +13,9 @@
     python __main__.py
     
 ## Known issues
-1. The game hangs while generating chunks. (will be fixed soon.)
+- [x]  = Will be fixed soon.
+#####
+- [x] 1. The game hangs while generating chunks.
 
 ## Contributors
 ##### (Someone please make all-contributors appear here)
