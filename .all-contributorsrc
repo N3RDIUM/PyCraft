@@ -44,6 +44,16 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "e-coders",
+      "name": "E - Coders (Aasheesh Agarwal)",
+      "avatar_url": "https://avatars.githubusercontent.com/u/83082760?v=4",
+      "profile": "https://github.com/e-coders",
+      "contributions": [
+        "bug",
+        "ideas"
+      ]
     }
   ],
   "projectName": "PyCraft",
