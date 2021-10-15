@@ -1,11 +1,20 @@
 import pyglet
 from pyglet.gl import *
 from pyglet.window import key
-import threading
+import time
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
+
+def log(source, message):
+    now = time.strftime("%H:%M:%S")
+    logging.debug(f"({now}) [{source}]: {message}")
 
 class Window(pyglet.window.Window):
     def __init__(self, Chunk, World, Player, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        log("Window", "Initializing window")
         self.set_minimum_size(800, 500)
         self.keys = key.KeyStateHandler()
         self.push_handlers(self.keys)
