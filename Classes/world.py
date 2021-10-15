@@ -2,8 +2,6 @@ import threading
 import time
 import logging
 
-from pyglet.window.key import E, S
-
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -24,14 +22,13 @@ class TaskScheduler:
         self.tasks = []
         self.task_lock = threading.Lock()
         self._frame = 0
-        self._default_add_frame = 20
 
     def add_task(self, task):
         # Calculate the appropriate frame to run the task
-        APPROPRIATE_FRAME = self._frame + self._default_add_frame
+        APPROPRIATE_FRAME = self._frame + 50
         for i in self.tasks:
             if i[1] == APPROPRIATE_FRAME:
-                APPROPRIATE_FRAME += self._default_add_frame
+                APPROPRIATE_FRAME += 50
 
         with self.task_lock:
             self.tasks.append([task, APPROPRIATE_FRAME])
@@ -80,16 +77,6 @@ class World:
         self.chunks[index[0]].append(self.Chunk(xz[0], xz[1], self))
         self._scheduler.add_task(self.chunks[index[0]][len(self.chunks[index[0]])-1].generate)
 
-    def add_row_x(self, x):
-        self.x += x
-        for i in range(self.chunk_distance*2+1):
-            self.make_chunk((self.x+i, self.z), (len(self.chunks), i))
-
-    def add_row_z(self, z):
-        self.z += z
-        for i in range(self.chunk_distance*2+1):
-            self.make_chunk((self.x, self.z+i), (self.chunk_distance, i+self.chunk_distance))   
-
     def update(self, dt):
         x = self.player.pos[0]
         z = self.player.pos[2]
@@ -98,10 +85,14 @@ class World:
         dt
 
         if x > self.x*16 + self.chunk_distance-1:
-            self.add_row_x(1)
+            self.x += 1
+            self.generate()
         elif x < self.x*16 - self.chunk_distance-1:
-            self.add_row_x(-1)
+            self.x -= 1
+            self.generate()
         elif z > self.z*16 + self.chunk_distance-1:
-            self.add_row_z(1)
+            self.z += 1
+            self.generate()
         elif z < self.z*16 - self.chunk_distance-1:
-            self.add_row_z(-1)
+            self.z -= 1
+            self.generate()
