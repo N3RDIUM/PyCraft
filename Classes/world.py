@@ -80,6 +80,16 @@ class World:
         self.chunks[index[0]].append(self.Chunk(xz[0], xz[1], self))
         self._scheduler.add_task(self.chunks[index[0]][len(self.chunks[index[0]])-1].generate)
 
+    def add_row_x(self, x):
+        self.x += x
+        for i in range(self.chunk_distance*2+1):
+            self.make_chunk((self.x+i, self.z), (len(self.chunks), i))
+
+    def add_row_z(self, z):
+        self.z += z
+        for i in range(self.chunk_distance*2+1):
+            self.make_chunk((self.x, self.z+i), (self.chunk_distance, i+self.chunk_distance))   
+
     def update(self, dt):
         x = self.player.pos[0]
         z = self.player.pos[2]
@@ -88,14 +98,10 @@ class World:
         dt
 
         if x > self.x*16 + self.chunk_distance-1:
-            self.x += 1
-            self.generate()
+            self.add_row_x(1)
         elif x < self.x*16 - self.chunk_distance-1:
-            self.x -= 1
-            self.generate()
+            self.add_row_x(-1)
         elif z > self.z*16 + self.chunk_distance-1:
-            self.z += 1
-            self.generate()
+            self.add_row_z(1)
         elif z < self.z*16 - self.chunk_distance-1:
-            self.z -= 1
-            self.generate()
+            self.add_row_z(-1)

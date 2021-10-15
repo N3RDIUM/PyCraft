@@ -72,7 +72,6 @@ class Chunk:
         self.generated = False
 
     def generate(self):
-        log("Chunk Generator", "Generating chunk at: " + str(self.X) + ", " + str(self.Z))
         self.batch = pyglet.graphics.Batch()
         self.CHUNK_DIST = 16
 
