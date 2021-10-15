@@ -10,6 +10,8 @@ def player(dt):
     window.player.pos[2] -= 0.1
     window.player.pos[1]  = 10
 
+test = False
+
 if __name__ == '__main__':
     window = Window(width=400, height=300, caption='PyCraft',
                     resizable=True, Chunk=Chunk, Player=Player, World=World)
@@ -23,5 +25,6 @@ if __name__ == '__main__':
     glFogi(GL_FOG_MODE, GL_LINEAR)
     glFogf(GL_FOG_START, window.model.chunk_distance/1600)
     glFogf(GL_FOG_END, window.model.chunk_distance*16)
-    pyglet.clock.schedule(player)
+    if test:
+        pyglet.clock.schedule(player)
     pyglet.app.run()
