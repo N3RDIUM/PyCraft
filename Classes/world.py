@@ -24,13 +24,14 @@ class TaskScheduler:
         self.tasks = []
         self.task_lock = threading.Lock()
         self._frame = 0
+        self._default_add_frame = 20
 
     def add_task(self, task):
         # Calculate the appropriate frame to run the task
-        APPROPRIATE_FRAME = self._frame + 50
+        APPROPRIATE_FRAME = self._frame + self._default_add_frame
         for i in self.tasks:
             if i[1] == APPROPRIATE_FRAME:
-                APPROPRIATE_FRAME += 50
+                APPROPRIATE_FRAME += self._default_add_frame
 
         with self.task_lock:
             self.tasks.append([task, APPROPRIATE_FRAME])
