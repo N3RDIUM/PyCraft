@@ -5,7 +5,7 @@
 
 ### <p align = "center"> A Minecraft clone written in python and pyglet. </p>
 
-![image](https://github.com/TheWebCrafters/PyCraft/blob/main/assets/pycraft_image.jpg)
+![image](./assets/pycraft_image.jpg)
 
 ## Running PyCraft
 ##### To run PyCraft, run the following code:
