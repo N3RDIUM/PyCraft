@@ -12,11 +12,6 @@ def log(source, message, ctime=None):
         now = ctime
     logging.debug(f"({now}) [{source}]: {message}")
 
-# This is a frame based task scheduler
-# It Flags frames for tasks in its own array.
-# It executes the task when the frame comes.
-# It does tasks in the order they are flagged.
-
 class TaskScheduler:
     def __init__(self):
         self.tasks = []
@@ -25,10 +20,10 @@ class TaskScheduler:
 
     def add_task(self, task):
         # Calculate the appropriate frame to run the task
-        APPROPRIATE_FRAME = self._frame + 50
+        APPROPRIATE_FRAME = self._frame + 2
         for i in self.tasks:
             if i[1] == APPROPRIATE_FRAME:
-                APPROPRIATE_FRAME += 50
+                APPROPRIATE_FRAME += 2
 
         with self.task_lock:
             self.tasks.append([task, APPROPRIATE_FRAME])
@@ -71,7 +66,7 @@ class World:
             for chunk in i:
                 if chunk is not None:
                     chunk.draw()
-                self._scheduler.run()
+        self._scheduler.run()
 
     def make_chunk(self, xz, index):
         self.chunks[index[0]].append(self.Chunk(xz[0], xz[1], self))
