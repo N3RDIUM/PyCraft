@@ -31,9 +31,14 @@ class TaskScheduler:
     def run(self):
         try:
             for task in self.tasks:
-                if task[1] == self._frame:
-                    task[0]()
-                    del self.tasks[0]
+                try:
+                    if task[1] == self._frame:
+                        task[0]()
+                        del self.tasks[0]
+                except:
+                    if task[0] == self._frame:
+                        task[1]()
+                        del self.tasks[0]
         finally:
             self._frame += 1
 
@@ -64,7 +69,7 @@ class World:
     def draw(self):
         for i in self.chunks:
             for chunk in i:
-                if chunk is not None:
+                if chunk is not None and chunk.generated:
                     chunk.draw()
         self._scheduler.run()
 
@@ -79,15 +84,8 @@ class World:
         # Nothin' to do with this
         dt
 
-        if x > self.x*16 + self.chunk_distance-1:
-            self.x += 1
-            self.generate()
-        elif x < self.x*16 - self.chunk_distance-1:
-            self.x -= 1
-            self.generate()
-        elif z > self.z*16 + self.chunk_distance-1:
-            self.z += 1
-            self.generate()
-        elif z < self.z*16 - self.chunk_distance-1:
-            self.z -= 1
+        # If the player is in a new chunk, generate the new chunk
+        if x > self.x*16 + self.chunk_distance-1 or x < self.x*16 - self.chunk_distance-1 or z > self.z*16 + self.chunk_distance-1 or z < self.z - self.chunk_distance-1:
+            self.x = x/2
+            self.z = z/2
             self.generate()

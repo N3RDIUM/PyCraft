@@ -31,6 +31,33 @@ side = get_tex('assets/grass_side.png')
 bottom = get_tex('assets/dirt.png')
 
 
+class TaskScheduler:
+    def __init__(self):
+        self.tasks = []
+        self.task_lock = threading.Lock()
+        self._frame = 0
+
+    def add_task(self, tasklist):
+        # Calculate the appropriate frame to run the task
+        APPROPRIATE_FRAME = self._frame + 1
+        for i in self.tasks:
+            if i[1] == APPROPRIATE_FRAME:
+                APPROPRIATE_FRAME += 1
+
+        with self.task_lock:
+            self.tasks.append([tasklist, APPROPRIATE_FRAME])
+
+    def run(self):
+        try:
+            for task in self.tasks:
+                if task[1] == self._frame:
+                    for i in task[0]:
+                        i()
+                    del self.tasks[0]
+        finally:
+            self._frame += 1
+
+
 class PrepareBatch(threading.Thread):
     def __init__(self, chunk, XYZ):
         threading.Thread.__init__(self)
@@ -47,21 +74,14 @@ class PrepareBatch(threading.Thread):
         X, Y, Z = x+1, y+1, z+1
 
         tex_coords = ('t2f', (0, 0, 1, 0, 1, 1, 0, 1))
-
-        self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (X, y,
-                                                           z,  x, y, z,  x, Y, z,  X, Y, z)), tex_coords)  # back
-        self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (x, y,
-                                                           Z,  X, y, Z,  X, Y, Z,  x, Y, Z)), tex_coords)  # front
-
-        self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (x, y,
-                                                           z,  x, y, Z,  x, Y, Z,  x, Y, z)), tex_coords)  # left
-        self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (X, y,
-                                                           Z,  X, y, z,  X, Y, z,  X, Y, Z)), tex_coords)  # right
-
-        self.chunk.batch.add(4, GL_QUADS, bottom, ('v3f', (x, y,
-                                                           z,  X, y, z,  X, y, Z,  x, y, Z)), tex_coords)  # bottom
-        self.chunk.batch.add(4, GL_QUADS, top,    ('v3f', (x, Y,
-                                                           Z,  X, Y, Z,  X, Y, z,  x, Y, z)), tex_coords)  # top
+        self.chunk._scheduler.add_task([
+            lambda: self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (X, y,z,  x, y, z,  x, Y, z,  X, Y, z)), tex_coords),
+            lambda: self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (x, y,Z,  X, y, Z,  X, Y, Z,  x, Y, Z)), tex_coords),
+            lambda: self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z)), tex_coords),
+            lambda: self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (X, y,Z,  X, y, z,  X, Y, z,  X, Y, Z)), tex_coords),
+            lambda: self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (X, y,Z,  X, y, z,  X, Y, z,  X, Y, Z)), tex_coords),
+            lambda: self.chunk.batch.add(4, GL_QUADS, top,    ('v3f', (x, Y,Z,  X, Y, Z,  X, Y, z,  x, Y, z)), tex_coords)
+        ])
 
 
 class Chunk:
@@ -70,6 +90,7 @@ class Chunk:
         self.X = X
         self.Z = Z
         self.generated = False
+        self._scheduler = TaskScheduler()
 
     def generate(self):
         self.batch = pyglet.graphics.Batch()
@@ -93,3 +114,4 @@ class Chunk:
             glTranslatef(self.X, 0, self.Z)
             self.batch.draw()
             glPopMatrix()
+        self._scheduler.run()
