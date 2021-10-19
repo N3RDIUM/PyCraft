@@ -123,3 +123,4 @@ class Chunk:
         for i in self.graphics:
             self.graphics[i].delete()
         self.graphics = {}
+        self.generated = False
