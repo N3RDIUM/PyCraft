@@ -75,12 +75,12 @@ class PrepareBatch(threading.Thread):
 
         tex_coords = ('t2f', (0, 0, 1, 0, 1, 1, 0, 1))
         self.chunk._scheduler.add_task([
-            lambda: self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (X, y,z,  x, y, z,  x, Y, z,  X, Y, z)), tex_coords),
-            lambda: self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (x, y,Z,  X, y, Z,  X, Y, Z,  x, Y, Z)), tex_coords),
-            lambda: self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z)), tex_coords),
-            lambda: self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (X, y,Z,  X, y, z,  X, Y, z,  X, Y, Z)), tex_coords),
-            lambda: self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (X, y,Z,  X, y, z,  X, Y, z,  X, Y, Z)), tex_coords),
-            lambda: self.chunk.batch.add(4, GL_QUADS, top,    ('v3f', (x, Y,Z,  X, Y, Z,  X, Y, z,  x, Y, z)), tex_coords)
+            lambda: self.chunk.add_to_graphics(x,y,z,"back",self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (X, y,z,  x, y, z,  x, Y, z,  X, Y, z)), tex_coords)),
+            lambda: self.chunk.add_to_graphics(x,y,z,"front",self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (x, y,Z,  X, y, Z,  X, Y, Z,  x, Y, Z)), tex_coords)),
+            lambda: self.chunk.add_to_graphics(x,y,z,"left",self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z)), tex_coords)),
+            lambda: self.chunk.add_to_graphics(x,y,z,"right",self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (X, y,Z,  X, y, z,  X, Y, z,  X, Y, Z)), tex_coords)),
+            lambda: self.chunk.add_to_graphics(x,y,z,"bottom",self.chunk.batch.add(4, GL_QUADS, side,   ('v3f', (X, y,Z,  X, y, z,  X, Y, z,  X, Y, Z)), tex_coords)),
+            lambda: self.chunk.add_to_graphics(x,y,z,"top",self.chunk.batch.add(4, GL_QUADS, top,    ('v3f', (x, Y,Z,  X, Y, Z,  X, Y, z,  x, Y, z)), tex_coords))
         ])
 
 
@@ -108,6 +108,9 @@ class Chunk:
                     simplex.noise2d(x/10, y/10)*5), y-self.Z))
         self.generated = True
 
+    def add_to_graphics(self, x, y, z, face, graphics):
+        self.graphics[(x, y, z, face)] = graphics
+
     def draw(self):
         if self.generated:
             glPushMatrix()
@@ -115,3 +118,8 @@ class Chunk:
             self.batch.draw()
             glPopMatrix()
         self._scheduler.run()
+
+    def _dispose(self):
+        for i in self.graphics:
+            self.graphics[i].delete()
+        self.graphics = {}
