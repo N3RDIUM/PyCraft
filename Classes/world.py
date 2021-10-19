@@ -81,9 +81,6 @@ class World:
         x = self.player.pos[0]
         z = self.player.pos[2]
 
-        # Nothin' to do with this
-        dt
-
         # If the player is in a new chunk, generate the new chunk
         if x > self.x*16 + self.chunk_distance-1 or x < self.x*16 - self.chunk_distance-1 or z > self.z*16 + self.chunk_distance-1 or z < self.z - self.chunk_distance-1:
             self.x = x/2
