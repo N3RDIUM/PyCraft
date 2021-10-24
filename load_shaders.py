@@ -1,4 +1,5 @@
-import pyshaders, os, logging, time
+import os, logging, time
+from OpenGL.GL import *
 logging.basicConfig(level=logging.DEBUG)
 
 def log(source, message):
@@ -17,4 +18,18 @@ def load_shaders():
                 frag = f.read()
             with open("./shaders/" + i+ "/"+f'{i}.vert', "r") as f:
                 vert = f.read()
-            shaders[i] = pyshaders.from_string(frag,vert)
+            shader = compile_shader(vert, frag)
+            shaders[i] = shader
+
+def compile_shader(vert, frag):
+    shader = glCreateProgram()
+    vs = glCreateShader(GL_VERTEX_SHADER)
+    fs = glCreateShader(GL_FRAGMENT_SHADER)
+    glShaderSource(vs, vert)
+    glShaderSource(fs, frag)
+    glCompileShader(vs)
+    glCompileShader(fs)
+    glAttachShader(shader, vs)
+    glAttachShader(shader, fs)
+    glLinkProgram(shader)
+    return shader

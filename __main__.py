@@ -1,13 +1,24 @@
 import pyglet
-from pyglet.window import key
+from OpenGL.GL import *
 from pyglet.gl import *
 from Classes.player import *
 from Classes.chunk import *
 from Classes.world import *
 from Classes.window import *
 from load_shaders import *
+import logging
+
+def log(source, message):
+    now = time.strftime("%H:%M:%S")
+    logging.debug(f"({now}) [{source}]: {message}")
+
+def use_shader(shader_name="default"):
+    log("main", f"Using shaders: {shader_name}:{shaders['default']}")
+    glLinkProgram(shaders['default'])
+    glUseProgram(shaders['default'])
 
 use_shaders = False
+load_shaders()
 
 if __name__ == '__main__':
     window = Window(width=400, height=300, caption='PyCraft',
@@ -22,12 +33,7 @@ if __name__ == '__main__':
     glFogi(GL_FOG_MODE, GL_LINEAR)
     glFogf(GL_FOG_START, window.model.chunk_distance/1600)
     glFogf(GL_FOG_END, window.model.chunk_distance*16)
-    #light
-    glEnable(GL_LIGHTING)
-    glEnable(GL_LIGHT0)
-    glLightfv(GL_LIGHT0, GL_AMBIENT, (GLfloat * 4)(10,10,10,10))
     #shaders
     if use_shaders:
-        load_shaders()
-        shaders['default'].use()
+        use_shader()
     pyglet.app.run()

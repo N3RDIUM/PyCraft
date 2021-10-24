@@ -18,27 +18,22 @@ class TaskScheduler:
         self.task_lock = threading.Lock()
         self._frame = 0
 
-    def add_task(self, task):
+    def add_task(self, tasklist):
         # Calculate the appropriate frame to run the task
-        APPROPRIATE_FRAME = self._frame + 2
+        APPROPRIATE_FRAME = self._frame + 1
         for i in self.tasks:
             if i[1] == APPROPRIATE_FRAME:
-                APPROPRIATE_FRAME += 2
+                APPROPRIATE_FRAME += 1
 
         with self.task_lock:
-            self.tasks.append([task, APPROPRIATE_FRAME])
+            self.tasks.append([tasklist, APPROPRIATE_FRAME])
 
     def run(self):
         try:
             for task in self.tasks:
-                try:
-                    if task[1] == self._frame:
-                        task[0]()
-                        del self.tasks[0]
-                except:
-                    if task[0] == self._frame:
-                        task[1]()
-                        del self.tasks[0]
+                if task[1] == self._frame:
+                    task[0]()
+                    del self.tasks[0]
         finally:
             self._frame += 1
 
@@ -74,8 +69,9 @@ class World:
         self._scheduler.run()
 
     def make_chunk(self, xz, index):
-        self.chunks[index[0]].append(self.Chunk(xz[0], xz[1], self))
-        self._scheduler.add_task(self.chunks[index[0]][len(self.chunks[index[0]])-1].generate)
+        chunk = self.Chunk(xz[0], xz[1], self)
+        self.chunks[index[0]].append(chunk)
+        self._scheduler.add_task(chunk.generate)
 
     def update(self, dt):
         x = self.player.pos[0]
