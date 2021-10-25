@@ -56,7 +56,7 @@ class Chunk:
 
     def generate(self):
         self.batch = pyglet.graphics.Batch()
-        self.CHUNK_DIST = 16
+        self.CHUNK_DIST = 8
 
         self.blocks = {}
 
@@ -77,9 +77,3 @@ class Chunk:
             self.batch.draw()
             glPopMatrix()
         self._scheduler.run()
-
-    def _dispose(self):
-        for i in self.graphics:
-            self.graphics[i].delete()
-        self.graphics = {}
-        self.generated = False

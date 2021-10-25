@@ -58,7 +58,7 @@ class World:
         self.generated = False
         for i in range(-self.chunk_distance, self.chunk_distance):
             for j in range(-self.chunk_distance, self.chunk_distance):
-                self.make_chunk((self.x+i, self.z+j), (i+self.chunk_distance, j+self.chunk_distance))
+                self.make_chunk((self.x+i-i/2, self.z+j-j/2), (i+self.chunk_distance, j+self.chunk_distance))
         self.generated = True
 
     def draw(self):
@@ -81,7 +81,7 @@ class World:
         dt
 
         # If the player is in a new chunk, generate the new chunk
-        if x > self.x*16 + self.chunk_distance-1 or x < self.x*16 - self.chunk_distance-1 or z > self.z*16 + self.chunk_distance-1 or z < self.z - self.chunk_distance-1:
-            self.x = x/2
-            self.z = z/2
+        if x*16 > self.x + self.chunk_distance or x*16 < self.x - self.chunk_distance or z*16 > self.z + self.chunk_distance or z*16 < self.z - self.chunk_distance:
+            self.x = x*16
+            self.z = z*16
             self.generate()
