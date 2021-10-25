@@ -49,9 +49,11 @@ class TaskScheduler:
 class Chunk:
     def __init__(self, X, Z, parent):
         self.parent = parent
+        self.CHUNK_DIST = 8
         self.X = X
         self.Z = Z
         self.generated = False
+        self.blocks = {}
         self._scheduler = TaskScheduler()
 
     def generate(self):
@@ -72,8 +74,5 @@ class Chunk:
 
     def draw(self):
         if self.generated:
-            glPushMatrix()
-            glTranslatef(self.X, 0, self.Z)
             self.batch.draw()
-            glPopMatrix()
         self._scheduler.run()

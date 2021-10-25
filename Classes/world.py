@@ -58,7 +58,7 @@ class World:
         self.generated = False
         for i in range(-self.chunk_distance, self.chunk_distance):
             for j in range(-self.chunk_distance, self.chunk_distance):
-                self.make_chunk((self.x+i-i/2, self.z+j-j/2), (i+self.chunk_distance, j+self.chunk_distance))
+                self.make_chunk((self.x+i, self.z+j), (i+self.chunk_distance, j+self.chunk_distance))
         self.generated = True
 
     def draw(self):
