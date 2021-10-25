@@ -59,7 +59,7 @@ def get_all_textures(dir):
 
 get_all_textures("assets/textures/block/")
 
-class grass_block(BlockBase):
+class grass(BlockBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -72,4 +72,242 @@ class grass_block(BlockBase):
             "bottom": textures["dirt"]
         }
 
-blocks_all["grass"] = grass_block
+blocks_all["grass"] = grass
+
+class dirt(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["dirt"],
+            "left": textures["dirt"],
+            "right": textures["dirt"],
+            "front": textures["dirt"],
+            "back": textures["dirt"],
+            "bottom": textures["dirt"]
+        }
+
+blocks_all["dirt"] = dirt
+
+class stone(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["stone"],
+            "left": textures["stone"],
+            "right": textures["stone"],
+            "front": textures["stone"],
+            "back": textures["stone"],
+            "bottom": textures["stone"]
+        }
+
+blocks_all["stone"] = stone
+
+class cobblestone(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["cobblestone"],
+            "left": textures["cobblestone"],
+            "right": textures["cobblestone"],
+            "front": textures["cobblestone"],
+            "back": textures["cobblestone"],
+            "bottom": textures["cobblestone"]
+        }
+    
+blocks_all["cobblestone"] = cobblestone
+
+class bedrock(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["bedrock"],
+            "left": textures["bedrock"],
+            "right": textures["bedrock"],
+            "front": textures["bedrock"],
+            "back": textures["bedrock"],
+            "bottom": textures["bedrock"]
+        }
+
+blocks_all["bedrock"] = bedrock
+
+class sand(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["sand"],
+            "left": textures["sand"],
+            "right": textures["sand"],
+            "front": textures["sand"],
+            "back": textures["sand"],
+            "bottom": textures["sand"]
+        }
+
+blocks_all["sand"] = sand
+
+class gravel(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["gravel"],
+            "left": textures["gravel"],
+            "right": textures["gravel"],
+            "front": textures["gravel"],
+            "back": textures["gravel"],
+            "bottom": textures["gravel"]
+        }
+
+blocks_all["gravel"] = gravel
+
+class andesite(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["andesite"],
+            "left": textures["andesite"],
+            "right": textures["andesite"],
+            "front": textures["andesite"],
+            "back": textures["andesite"],
+            "bottom": textures["andesite"]
+        }
+
+blocks_all["andesite"] = andesite
+
+class granite(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["granite"],
+            "left": textures["granite"],
+            "right": textures["granite"],
+            "front": textures["granite"],
+            "back": textures["granite"],
+            "bottom": textures["granite"]
+        }
+
+blocks_all["granite"] = granite
+
+class clay(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["clay"],
+            "left": textures["clay"],
+            "right": textures["clay"],
+            "front": textures["clay"],
+            "back": textures["clay"],
+            "bottom": textures["clay"]
+        }
+
+blocks_all["clay"] = clay
+
+class snow(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["snow"],
+            "left": textures["snow"],
+            "right": textures["snow"],
+            "front": textures["snow"],
+            "back": textures["snow"],
+            "bottom": textures["snow"]
+        }
+
+blocks_all["snow"] = snow
+
+class ice(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["ice"],
+            "left": textures["ice"],
+            "right": textures["ice"],
+            "front": textures["ice"],
+            "back": textures["ice"],
+            "bottom": textures["ice"]
+        }
+
+blocks_all["ice"] = ice
+
+class bamboo_leaves(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["bamboo_large_leaves"],
+            "left": textures["bamboo_large_leaves"],
+            "right": textures["bamboo_large_leaves"],
+            "front": textures["bamboo_large_leaves"],
+            "back": textures["bamboo_large_leaves"],
+            "bottom": textures["bamboo_large_leaves"]
+        }
+
+blocks_all["bamboo_leaves"] = bamboo_leaves
+
+class bamboo_wood(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["bamboo_stalk"],
+            "left": textures["bamboo_stalk"],
+            "right": textures["bamboo_stalk"],
+            "front": textures["bamboo_stalk"],
+            "back": textures["bamboo_stalk"],
+            "bottom": textures["bamboo_stalk"]
+        }
+
+class blue_ice(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["blue_ice"],
+            "left": textures["blue_ice"],
+            "right": textures["blue_ice"],
+            "front": textures["blue_ice"],
+            "back": textures["blue_ice"],
+            "bottom": textures["blue_ice"]
+        }
+
+blocks_all["blue_ice"] = blue_ice
+
+class birch_leaves(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["birch_leaves"],
+            "left": textures["birch_leaves"],
+            "right": textures["birch_leaves"],
+            "front": textures["birch_leaves"],
+            "back": textures["birch_leaves"],
+            "bottom": textures["birch_leaves"]
+        }
+
+blocks_all["birch_leaves"] = birch_leaves
+
+class birch_wood(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["birch_wood"],
+            "left": textures["birch_wood"],
+            "right": textures["birch_wood"],
+            "front": textures["birch_wood"],
+            "back": textures["birch_wood"],
+            "bottom": textures["birch_wood"]
+        }
+
+blocks_all["birch_wood"] = birch_wood

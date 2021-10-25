@@ -81,15 +81,16 @@ class World:
         dt
 
         # If the player is outside the chunk 0,0: add a row of chunks
-        if x < -self.chunk_distance:
+        if x/8 - self.x < -self.chunk_distance:
             self.x -= 1
             self.generate()
-        elif x > self.chunk_distance:
+        elif x/8 - self.x > self.chunk_distance:
             self.x += 1
             self.generate()
-        elif z < -self.chunk_distance:
+        
+        if z/8 - self.z < -self.chunk_distance:
             self.z -= 1
             self.generate()
-        elif z > self.chunk_distance:
+        elif z/8 - self.z > self.chunk_distance:
             self.z += 1
             self.generate()
