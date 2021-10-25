@@ -15,10 +15,12 @@ def log(source, message):
     now = time.strftime("%H:%M:%S")
     logging.debug(f"({now}) [{source}]: {message}")
 
-seed=random.randint(0, 100000)
+
+seed = random.randint(0, 100000)
 simplex_grass = OpenSimplex(seed)
 simplex_dirt = OpenSimplex(seed)
 simplex_stone = OpenSimplex(seed)
+
 
 class TaskScheduler:
     def __init__(self):
@@ -47,7 +49,6 @@ class TaskScheduler:
             self._frame += 1
 
 
-
 class Chunk:
     def __init__(self, X, Z, parent):
         self.parent = parent
@@ -72,19 +73,31 @@ class Chunk:
 
         for x in range(int(self.X), int(self.X+self.CHUNK_DIST)):
             for y in range(int(self.Z), int(self.Z+self.CHUNK_DIST)):
-                noiseval_grass = 10+int(simplex_grass.noise2d(x/50, y/50)*10)
-                noiseval_dirt  = 10+int(simplex_dirt.noise2d(x/100, y/100)*3)
-                noiseval_stone = 10+int(simplex_stone.noise2d(x/150, y/150)*40)
-                self.blocks[(x,noiseval_grass,y)] = blocks_all["grass"](block_data = {"block_pos":{'x': x, 'y': noiseval_grass, 'z': y}},parent = self)
-                self._scheduler.add_task([self.blocks[(x,noiseval_grass,y)].add_to_batch_and_save])
-                for i in range(noiseval_grass-noiseval_dirt-1,noiseval_grass):
-                    self.blocks[(x,i,y)] = blocks_all["dirt"](block_data = {"block_pos":{'x': x, 'y': i, 'z': y}},parent = self)
-                    self._scheduler_less_priority.add_task([self.blocks[(x,i,y)].add_to_batch_and_save])
-                for i in range(noiseval_grass-noiseval_dirt-noiseval_stone-1,noiseval_grass-noiseval_dirt):
-                    self.blocks[(x,i,y)] = blocks_all["stone"](block_data = {"block_pos":{'x': x, 'y': i, 'z': y}},parent = self)
-                    self._scheduler_less_priority.add_task([self.blocks[(x,i,y)].add_to_batch_and_save])
-                self.blocks[(x,noiseval_grass-noiseval_dirt-noiseval_stone-noiseval_stone-1,y)] = blocks_all["bedrock"](block_data = {"block_pos":{'x': x, 'y': noiseval_grass-noiseval_dirt-noiseval_stone-noiseval_stone-1, 'z': y}},parent = self)
-                self._scheduler_lesser_priority.add_task([self.blocks[(x,noiseval_grass-noiseval_dirt-noiseval_stone-noiseval_stone-1,y)].add_to_batch_and_save])
+
+                noiseval_grass = 10+int(simplex_grass.noise2d(x/50, y/50)*10+simplex_grass.noise2d(x/100, y/100)*20+simplex_grass.noise2d(x/1000, y/1000)*50)
+                noiseval_dirt = 2+int(simplex_dirt.noise2d(x/100, y/100)*3+simplex_dirt.noise2d(x/1000, y/1000)*10)
+                noiseval_stone = 20+int(simplex_stone.noise2d(x/150, y/150)*40+simplex_stone.noise2d(x/1000, y/1000)*100)
+
+                self.blocks[(x, noiseval_grass, y)] = blocks_all["grass"](
+                    block_data={"block_pos": {'x': x, 'y': noiseval_grass, 'z': y}}, parent=self)
+                self._scheduler.add_task(
+                    [self.blocks[(x, noiseval_grass, y)].add_to_batch_and_save])
+                for i in range(noiseval_grass-noiseval_dirt-1, noiseval_grass):
+                    self.blocks[(x, i, y)] = blocks_all["dirt"](
+                        block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
+                    self._scheduler_less_priority.add_task(
+                        [self.blocks[(x, i, y)].add_to_batch_and_save])
+                for i in range(noiseval_grass-noiseval_dirt-noiseval_stone-1, noiseval_grass-noiseval_dirt):
+                    if not i == noiseval_grass-noiseval_dirt-noiseval_stone-1:
+                        self.blocks[(x, i, y)] = blocks_all["stone"](
+                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
+                        self._scheduler_less_priority.add_task(
+                            [self.blocks[(x, i, y)].add_to_batch_and_save])
+                    else:
+                        self.blocks[(x, i, y)] = blocks_all["bedrock"](
+                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
+                        self._scheduler_lesser_priority.add_task(
+                            [self.blocks[(x, i, y)].add_to_batch_and_save])
         self.generated = True
 
     def draw(self):
