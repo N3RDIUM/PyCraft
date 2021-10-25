@@ -13,9 +13,9 @@ def log(source, message):
     logging.debug(f"({now}) [{source}]: {message}")
 
 def use_shader(shader_name="default"):
-    log("main", f"Using shaders: {shader_name}:{shaders['default']}")
-    glLinkProgram(shaders['default'])
-    glUseProgram(shaders['default'])
+    log("main", f"Using shaders: {shader_name}:{shaders[shader_name]}")
+    glLinkProgram(shaders[shader_name])
+    glUseProgram(shaders[shader_name])
 
 use_shaders = False
 load_shaders()

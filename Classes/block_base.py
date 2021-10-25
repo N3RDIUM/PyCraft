@@ -4,7 +4,7 @@ import logging
 blocks_all = {}
 import os
 import time
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 
 def log(source, message):
     now = time.strftime("%H:%M:%S")

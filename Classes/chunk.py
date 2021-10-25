@@ -18,7 +18,6 @@ def log(source, message):
 
 simplex = OpenSimplex(seed=random.randint(0, 100000))
 
-
 class TaskScheduler:
     def __init__(self):
         self.tasks = []
@@ -66,8 +65,9 @@ class Chunk:
 
         for x in range(int(self.X), int(self.X+self.CHUNK_DIST)):
             for y in range(int(self.Z), int(self.Z+self.CHUNK_DIST)):
-                self.blocks[(x,y)] = blocks_all["grass"](block_data = {"block_pos":{'x': x, 'y': 0, 'z': y}},parent = self)
-                self._scheduler.add_task([self.blocks[(x,y)].add_to_batch_and_save])
+                noiseval = int(simplex.noise2d(x/50, y/50)*10)
+                self.blocks[(x,noiseval,y)] = blocks_all["grass"](block_data = {"block_pos":{'x': x, 'y': noiseval, 'z': y}},parent = self)
+                self._scheduler.add_task([self.blocks[(x,noiseval,y)].add_to_batch_and_save])
         self.generated = True
 
     def draw(self):
