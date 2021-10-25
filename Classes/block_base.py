@@ -4,6 +4,7 @@ import logging
 blocks_all = {}
 import os
 import time
+logging.basicConfig(level=logging.DEBUG)
 
 def log(source, message):
     now = time.strftime("%H:%M:%S")
@@ -53,20 +54,21 @@ textures = {}
 def get_all_textures(dir):
     for i in os.listdir(dir):
         if i.endswith(".png"):
+            log("Texture Loader", "Loading texture: " + i)
             textures[i.split(".")[0]] = load_texture(dir+"/"+i)
 
-get_all_textures("assets/")
+get_all_textures("assets/textures/block/")
 
 class grass_block(BlockBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.block_data["block_textures"] = {
-            "top": textures["grass_top"],
-            "left": textures["grass_side"],
-            "right": textures["grass_side"],
-            "front": textures["grass_side"],
-            "back": textures["grass_side"],
+            "top": textures["grass_block_top"],
+            "left": textures["grass_block_side"],
+            "right": textures["grass_block_side"],
+            "front": textures["grass_block_side"],
+            "back": textures["grass_block_side"],
             "bottom": textures["dirt"]
         }
 
