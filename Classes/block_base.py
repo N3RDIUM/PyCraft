@@ -10,6 +10,12 @@ def log(source, message):
     now = time.strftime("%H:%M:%S")
     logging.debug(f"({now}) [{source}]: {message}")
 
+def load_texture(filename):
+    tex = pyglet.image.load(filename).get_texture()
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+    return pyglet.graphics.TextureGroup(tex)
+
 class BlockBase:
     def __init__(self, block_data, parent):
         self.block_data = {
