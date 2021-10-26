@@ -17,6 +17,7 @@ def log(source, message):
 
 
 seed = random.randint(0, 100000)
+print(f"Seed: {seed}")
 simplex_grass = OpenSimplex(seed)
 simplex_dirt = OpenSimplex(seed)
 simplex_stone = OpenSimplex(seed)
