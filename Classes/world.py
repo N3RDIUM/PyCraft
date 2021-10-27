@@ -1,6 +1,7 @@
 import threading
 import time
 import logging
+import math
 
 from Classes.chunk import Chunk
 
@@ -44,7 +45,7 @@ class World:
         self.CHUNK_DIST = 16
         self.generated = False
         self.Chunk = Chunk
-        self.chunk_distance = 5
+        self.chunk_distance = 2
         self.player = Player
 
         self.x = 0
@@ -120,13 +121,12 @@ class World:
 
         # Nothin' to do with this
         dt
-        val = self.CHUNK_DIST / 4
-        if self.z - int(z/val) >= self.chunk_distance-1:
+        if math.dist([self.x],[z/16]) >= self.chunk_distance-1:
             self.add_row_z_minus()
-        elif self.z - int(z/val) <= -self.chunk_distance+1:
+        elif math.dist([self.x],[z/16]) <= -self.chunk_distance+1:
             self.add_row_z_plus()
         
-        if self.x - int(x/val) >= self.chunk_distance-1:
+        if math.dist([x/16],[self.z]) >= self.chunk_distance-1:
             self.add_row_x_minus()
-        elif self.x - int(x/val) <= -self.chunk_distance+1:
+        elif math.dist([x/16],[self.z]) <= -self.chunk_distance+1:
             self.add_row_x_plus()
