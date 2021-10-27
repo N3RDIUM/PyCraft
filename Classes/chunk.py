@@ -64,7 +64,7 @@ class Chunk:
         self._scheduler = TaskScheduler()
         self._scheduler_less_priority = TaskScheduler()
         self._scheduler_lesser_priority = TaskScheduler()
-        self._scheduler_least_priority = TaskScheduler()
+        #self._scheduler_least_priority = TaskScheduler()
 
     def generate(self):
         self.batch = pyglet.graphics.Batch()
@@ -95,7 +95,7 @@ class Chunk:
                     if not i == noiseval_grass-noiseval_dirt-noiseval_stone-1:
                         self.blocks[(x, i, y)] = blocks_all["stone"](
                             block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
-                        self._scheduler_less_priority.add_task(
+                        self._scheduler_lesser_priority.add_task(
                             [self.blocks[(x, i, y)].add_to_batch_and_save])
                     else:
                         self.blocks[(x, i, y)] = blocks_all["bedrock"](

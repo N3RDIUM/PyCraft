@@ -44,7 +44,7 @@ class World:
         self.CHUNK_DIST = 16
         self.generated = False
         self.Chunk = Chunk
-        self.chunk_distance = 3
+        self.chunk_distance = 5
         self.player = Player
 
         self.x = 0
