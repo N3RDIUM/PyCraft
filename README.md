@@ -5,7 +5,64 @@
 
 ### <p align = "center"> A Minecraft clone written in python and pyglet. </p>
 
-![image](assets/pycraft_image.jpg)
+<!-- add style.css -->
+<style>
+body {
+    background-color: #f2f2f2;
+}
+@keyframes animation_1 {
+    0% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(100%);
+    }
+    50% {
+        transform: translateX(200%);
+    }
+    75% {
+        transform: translateX(300%);
+    }
+    90% {
+        transform: translateX(400%);
+    }
+    100% {
+        transform: translateX(0%);
+    }
+    }
+}
+.Carousel {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+}
+.carousel_item{
+    animation: animation_1 10s ease-in-out infinite;
+}
+</style>
+<body>
+<div class="Carousel">
+
+<div class="carousel_item">
+<img src="assets/pycraft_image.jpg" width="100%" height="100%">
+</div>
+
+<div class="carousel_item">
+<img src="assets/Screenshots/terrain.png" width="100%" height="100%">
+</div>
+
+<div class="carousel_item">
+<img src="assets/Screenshots/more_terrain.png" width="100%" height="100%">
+</div>
+
+<div class="carousel_item">
+<img src="assets/Screenshots/mountain.png" width="100%" height="100%">
+</div>
+
+</div>
+</body>
 
 ## Running PyCraft
 ##### To run PyCraft, run the following code:
