@@ -5,43 +5,7 @@
 
 ### <p align = "center"> A Minecraft clone written in python and pyglet. </p>
 
-<!-- add style.css -->
-<style>
-body {
-    background-color: #f2f2f2;
-}
-@keyframes animation_1 {
-    0% {
-        transform: translateX(0);
-    }
-    25% {
-        transform: translateX(100%);
-    }
-    50% {
-        transform: translateX(200%);
-    }
-    75% {
-        transform: translateX(300%);
-    }
-    90% {
-        transform: translateX(400%);
-    }
-    100% {
-        transform: translateX(0%);
-    }
-    }
-}
-.Carousel {
-    width: 100%;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: row;
-}
-.carousel_item{
-    animation: animation_1 10s ease-in-out infinite;
-}
-</style>
+<link rel="stylesheet" href="css/markdown.css">
 <body>
 <div class="Carousel">
 
