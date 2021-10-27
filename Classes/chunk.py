@@ -7,6 +7,7 @@ import threading
 import time
 import logging
 from Classes.block_base import *
+import math
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -49,11 +50,13 @@ class TaskScheduler:
         finally:
             self._frame += 1
 
+def distance_vector_2d(x1, y1, x2, y2):
+    return math.dist([x1, y1], [x2, y2])
 
 class Chunk:
     def __init__(self, X, Z, parent):
         self.parent = parent
-        self.CHUNK_DIST = 8
+        self.CHUNK_DIST = parent.CHUNK_DIST
         self.X = X
         self.Z = Z
         self.generated = False
@@ -102,7 +105,7 @@ class Chunk:
         self.generated = True
 
     def draw(self):
-        if self.generated:
+        if self.generated and not distance_vector_2d(self.parent.player.pos[0], self.parent.player.pos[2], self.X, self.Z) > self.parent.chunk_distance*1.5*self.CHUNK_DIST:
             self.batch.draw()
         self._scheduler.run()
         self._scheduler_less_priority.run()

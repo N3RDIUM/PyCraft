@@ -29,7 +29,7 @@ if __name__ == '__main__':
     glEnable(GL_CULL_FACE)
     glCullFace(GL_BACK)
     glEnable(GL_FOG)
-    glFogfv(GL_FOG_COLOR, (GLfloat * int(window.model.chunk_distance*100))(0.5, 0.69, 1.0, 1))
+    glFogfv(GL_FOG_COLOR, (GLfloat * int(window.model.chunk_distance*window.model.CHUNK_DIST*1000))(0.5, 0.69, 1.0, 1))
     glHint(GL_FOG_HINT, GL_DONT_CARE)
     glFogi(GL_FOG_MODE, GL_LINEAR)
     glFogf(GL_FOG_START, window.model.chunk_distance/1600)

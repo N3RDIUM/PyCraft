@@ -41,6 +41,7 @@ class TaskScheduler:
 
 class World:
     def __init__(self, Chunk, Player):
+        self.CHUNK_DIST = 16
         self.generated = False
         self.Chunk = Chunk
         self.chunk_distance = 3
@@ -119,7 +120,7 @@ class World:
 
         # Nothin' to do with this
         dt
-        val = 4
+        val = self.CHUNK_DIST / 4
         if self.z - int(z/val) >= self.chunk_distance-1:
             self.add_row_z_minus()
         elif self.z - int(z/val) <= -self.chunk_distance+1:
