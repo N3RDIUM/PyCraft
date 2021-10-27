@@ -37,8 +37,8 @@
 ## Known issues
 - [x] - Will be fixed soon.
 #####
-- [x] 1. The game hangs while generating chunks.
-- [x] 2. All contributors don't appear on the README.
+- [x] 1. All contributors don't appear on the README.
+- [x] 2. The README doesn't show the carousel.
 
 ## Contributors
 ##### (Someone please make all-contributors appear here)

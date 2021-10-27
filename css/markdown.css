@@ -3,22 +3,122 @@ body {
 }
 @keyframes animation_1 {
     0% {
-        transform: translateX(0);
+        opacity: 1;
     }
     25% {
-        transform: translateX(100%);
+        opacity: 0;
     }
     50% {
-        transform: translateX(200%);
+        opacity: 0;
     }
     75% {
-        transform: translateX(300%);
+        opacity: 0;
     }
     90% {
-        transform: translateX(400%);
+        opacity: 0;
     }
     100% {
-        transform: translateX(0%);
+        opacity: 0;
+    }
+}
+@keyframes animation_2 {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 0;
+    }
+    90% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes animation_3 {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    75% {
+        opacity: 0;
+    }
+    90% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes animation_4 {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes animation_5 {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 0;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes animation_5 {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 0;
+    }
+    90% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
     }
 }
 
@@ -26,9 +126,9 @@ body {
     width: 100%;
     position: relative;
     overflow: hidden;
-    display: flex;
-    flex-direction: row;
+    display: none;
 }
-#carousel_item{
+#carousel_item_1{
     animation: animation_1 10s ease-in-out infinite;
+    position: absolute;
 }
