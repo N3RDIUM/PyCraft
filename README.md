@@ -52,6 +52,7 @@
 </div>
 </div>
 </body>
+</html>
 
 ## Running PyCraft
 ##### To run PyCraft, run the following code:
