@@ -7,21 +7,21 @@
 
 <link rel="stylesheet" href="css/markdown.css">
 <body>
-<div class="Carousel">
+<div id="Carousel">
 
-<div class="carousel_item">
+<div id="carousel_item">
 <img src="assets/pycraft_image.jpg" width="100%" height="100%">
 </div>
 
-<div class="carousel_item">
+<div id="carousel_item">
 <img src="assets/Screenshots/terrain.png" width="100%" height="100%">
 </div>
 
-<div class="carousel_item">
+<div id="carousel_item">
 <img src="assets/Screenshots/more_terrain.png" width="100%" height="100%">
 </div>
 
-<div class="carousel_item">
+<div id="carousel_item">
 <img src="assets/Screenshots/mountain.png" width="100%" height="100%">
 </div>
 
