@@ -22,13 +22,13 @@ body {
     }
 }
 
-.Carousel {
+#Carousel {
     width: 100%;
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: row;
 }
-.carousel_item{
+#carousel_item{
     animation: animation_1 10s ease-in-out infinite;
 }
