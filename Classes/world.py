@@ -118,9 +118,6 @@ class World:
     def update(self, dt):
         x = self.player.pos[0]
         z = self.player.pos[2]
-
-        # Nothin' to do with this
-        dt
         if math.dist([self.x],[z/16]) >= self.chunk_distance-1:
             self.add_row_z_minus()
         elif math.dist([self.x],[z/16]) <= -self.chunk_distance+1:
