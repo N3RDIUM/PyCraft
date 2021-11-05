@@ -1,4 +1,4 @@
-# Contributing
+# Contributing 
 ### Contributing to PyCraft is easy, You just have to know python and pyglet.
 
 ### Contributing guidelines are as follows:
