@@ -18,7 +18,7 @@ def load_texture(filename):
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         return pyglet.graphics.TextureGroup(tex)
     except:
-        logging.warn("Texture Loader", "Failed to load texture: " + filename)
+        logging.warn("Texture Loader: Failed to load texture: " + filename)
         return None
 
 class BlockBase:

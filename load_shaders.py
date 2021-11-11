@@ -22,7 +22,7 @@ def load_shaders():
                 shader = compile_shader(vert, frag)
                 shaders[i] = shader
             except:
-                log("load_shaders", f"Failed to load shader: {i}")
+                logging.warn("load_shaders: Failed to load shader: {i}")
 
 def compile_shader(vert, frag):
     shader = glCreateProgram()
