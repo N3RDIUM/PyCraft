@@ -52,11 +52,11 @@ class BlockBase:
 textures = {}
 
 def get_all_textures(dir):
-    dir_ = os.listdir(dir)
-    for i in tqdm.trange(len(dir)):
-        if dir_[i].endswith(".png"):
-            #log("Texture Loader", "Loading texture: " + dir_[i])
-            textures[dir_[i].split(".")[0]] = load_texture(dir+"/"+dir_[i])
+    log("Texture Loader", "Loading textures...")
+    for i in tqdm.tqdm(os.listdir(dir)):
+        if i.endswith(".png"):
+            #log("Texture Loader", "Loading texture: " + i)
+            textures[i.split(".")[0]] = load_texture(dir+"/"+i)
 
 get_all_textures("assets/textures/block/")
 
