@@ -12,10 +12,14 @@ def log(source, message):
     logging.debug(f"({now}) [{source}]: {message}")
 
 def load_texture(filename):
-    tex = pyglet.image.load(filename).get_texture()
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-    return pyglet.graphics.TextureGroup(tex)
+    try:
+        tex = pyglet.image.load(filename).get_texture()
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        return pyglet.graphics.TextureGroup(tex)
+    except:
+        logging.warn("Texture Loader", "Failed to load texture: " + filename)
+        return None
 
 class BlockBase:
     def __init__(self, block_data, parent):
