@@ -4,6 +4,7 @@ import logging
 blocks_all = {}
 import os
 import time
+import tqdm
 logging.basicConfig(level=logging.DEBUG)
 
 def log(source, message):
@@ -51,10 +52,11 @@ class BlockBase:
 textures = {}
 
 def get_all_textures(dir):
-    for i in os.listdir(dir):
-        if i.endswith(".png"):
-            log("Texture Loader", "Loading texture: " + i)
-            textures[i.split(".")[0]] = load_texture(dir+"/"+i)
+    dir_ = os.listdir(dir)
+    for i in tqdm.trange(len(dir)):
+        if dir_[i].endswith(".png"):
+            #log("Texture Loader", "Loading texture: " + dir_[i])
+            textures[dir_[i].split(".")[0]] = load_texture(dir+"/"+dir_[i])
 
 get_all_textures("assets/textures/block/")
 

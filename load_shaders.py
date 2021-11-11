@@ -11,15 +11,18 @@ shaders = {}
 def load_shaders():
     for i in os.listdir("./shaders"):
         if not "." in i:
-            log("load_shaders", f"Loading shader: {i}")
-            frag = None
-            vert = None
-            with open("./shaders/" + i+ "/"+f'{i}.frag', "r") as f:
-                frag = f.read()
-            with open("./shaders/" + i+ "/"+f'{i}.vert', "r") as f:
-                vert = f.read()
-            shader = compile_shader(vert, frag)
-            shaders[i] = shader
+            try:
+                log("load_shaders", f"Loading shader: {i}")
+                frag = None
+                vert = None
+                with open("./shaders/" + i+ "/"+f'{i}.frag', "r") as f:
+                    frag = f.read()
+                with open("./shaders/" + i+ "/"+f'{i}.vert', "r") as f:
+                    vert = f.read()
+                shader = compile_shader(vert, frag)
+                shaders[i] = shader
+            except:
+                log("load_shaders", f"Failed tto load shader: {i}")
 
 def compile_shader(vert, frag):
     shader = glCreateProgram()
