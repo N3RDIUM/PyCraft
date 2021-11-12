@@ -9,7 +9,7 @@
 
 ### <p align = "center"> A Minecraft clone written in python and pyglet. </p>
 
-<a href = "thewebcrafters.github.io/PyCraft"><img src="assets/Screenshots/more_terrain.png" width="100%" height="100%"></a>
+<a href = "thewebcrafters.github.io/PyCraft"><img src="../assets/Screenshots/more_terrain.png" width="100%" height="100%"></a>
 
 ## Running PyCraft
 ##### To run PyCraft, run the following code:
