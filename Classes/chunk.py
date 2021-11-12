@@ -63,8 +63,6 @@ class Chunk:
         self.blocks = {}
         self._scheduler = TaskScheduler()
         self._scheduler_less_priority = TaskScheduler()
-        self._scheduler_lesser_priority = TaskScheduler()
-        #self._scheduler_least_priority = TaskScheduler()
 
     def generate(self):
         self.batch = pyglet.graphics.Batch()
@@ -95,18 +93,25 @@ class Chunk:
                     if not i == noiseval_grass-noiseval_dirt-noiseval_stone-1:
                         self.blocks[(x, i, y)] = blocks_all["stone"](
                             block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
-                        self._scheduler_lesser_priority.add_task(
+                        self._scheduler_less_priority.add_task(
                             [self.blocks[(x, i, y)].add_to_batch_and_save])
                     else:
                         self.blocks[(x, i, y)] = blocks_all["bedrock"](
                             block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
-                        self._scheduler_lesser_priority.add_task(
+                        self._scheduler_less_priority.add_task(
                             [self.blocks[(x, i, y)].add_to_batch_and_save])
+
         self.generated = True
 
+    def add_block(self,type_,block_data,index):
+        self.blocks[index] = blocks_all[type_](
+                            block_data=block_data, parent=self)
+        self._scheduler_less_priority.add_task(
+            [self.blocks[index].add_to_batch_and_save])
+                            
     def draw(self):
         if self.generated and not distance_vector_2d(self.parent.player.pos[0], self.parent.player.pos[2], self.X, self.Z) > self.parent.chunk_distance*1.5*self.CHUNK_DIST:
             self.batch.draw()
+        if self.parent._tick % 2 == 0:
+            self._scheduler_less_priority.run()
         self._scheduler.run()
-        self._scheduler_less_priority.run()
-        self._scheduler_lesser_priority.run()
