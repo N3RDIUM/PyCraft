@@ -123,12 +123,15 @@ class World:
     def update(self, dt):
         x = self.player.pos[0]
         z = self.player.pos[2]
-        if math.dist([self.x],[z/16]) >= self.chunk_distance-1:
+
+        val = self.CHUNK_DIST
+
+        if math.dist([self.x*val],[z]) >= self.CHUNK_DIST * self.chunk_distance-1:
             self.add_row_z_minus()
-        elif math.dist([self.x],[z/16]) <= -self.chunk_distance+1:
+        elif math.dist([self.x*val],[z]) <= -self.CHUNK_DIST * self.chunk_distance+1:
             self.add_row_z_plus()
         
-        if math.dist([x/16],[self.z]) >= self.chunk_distance-1:
+        if math.dist([x],[self.z*val]) >= self.CHUNK_DIST * self.chunk_distance-1:
             self.add_row_x_minus()
-        elif math.dist([x/16],[self.z]) <= -self.chunk_distance+1:
+        elif math.dist([x],[self.z*val]) <= -self.CHUNK_DIST * self.chunk_distance+1:
             self.add_row_x_plus()
