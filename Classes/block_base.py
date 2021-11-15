@@ -33,8 +33,9 @@ class BlockBase:
             "parent": parent
         }
         self.chunk = parent
+        self.generated = False
 
-    def add_to_batch_and_save(self):
+    def add_to_batch_and_save(self, *args, **kwargs):
         x = self.block_data['block_pos']['x']
         y = self.block_data['block_pos']['y']
         z = self.block_data['block_pos']['z']
@@ -46,6 +47,7 @@ class BlockBase:
         self.block_data['back'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['back'],   ('v3f', (X, y,z,  x, y, z,  x, Y, z,  X, Y, z)), tex_coords)
         self.block_data['left'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['left'],   ('v3f',(x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z)), tex_coords)
         self.block_data['right'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['right'],  ('v3f', (X, y,Z,  X, y, z,  X, Y, z,  X, Y, Z)), tex_coords)
+        self.generated = True
 
 textures = {}
 

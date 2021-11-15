@@ -56,7 +56,7 @@ class World:
         self.chunks = self.generate_2d_array(self.chunk_distance*2+1)
         self._scheduler = TaskScheduler()
         self._scheduler_ = TaskScheduler()
-        threading.Thread(target=self.generate,daemon=True).start()
+        self.generate()
         self._tick = 0
 
     def generate_2d_array(self, size):
@@ -82,7 +82,7 @@ class World:
     def make_chunk(self, xz, index):
         chunk = self.Chunk(xz[0], xz[1], self)
         self.chunks[index].append(chunk)
-        threading.Thread(target=chunk.generate,daemon=True).start()
+        chunk.generate()
 
     def add_row_z_minus(self):
         self.chunks.append([])
