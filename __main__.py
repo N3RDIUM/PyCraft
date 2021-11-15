@@ -6,12 +6,7 @@ from Classes.chunk import *
 from Classes.world import *
 from Classes.window import *
 from load_shaders import *
-import logging
-logging.basicConfig(level=logging.DEBUG)
-
-def log(source, message):
-    now = time.strftime("%H:%M:%S")
-    logging.debug(f"({now}) [{source}]: {message}")
+from logger import *
 
 def use_shader(shader_name="default"):
     log("main", f"Using shaders: {shader_name}:{shaders[shader_name]}")

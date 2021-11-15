@@ -2,9 +2,7 @@ import pyglet
 from pyglet.gl import *
 from pyglet.window import key
 import time
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
+from logger import *
 
 
 def log(source, message):
@@ -21,8 +19,10 @@ class Window(pyglet.window.Window):
         pyglet.clock.schedule(self.update)
 
         self.player = Player((0.5, 1.5, 1.5), (-30, 0))
-        self.model = World(Chunk,self.player)
+        self.model = World(self,Chunk,self.player)
         pyglet.clock.schedule_interval(self.model.update, 1/60)
+
+        self.alive = True
 
     def push(self, pos, rot):
         rot = self.player.rot
@@ -30,6 +30,9 @@ class Window(pyglet.window.Window):
         glRotatef(-rot[0], 1, 0, 0)
         glRotatef(-rot[1], 0, 1, 0)
         glTranslatef(-pos[0], -pos[1], -pos[2])
+
+    def on_close(self):
+        self.alive = False
 
     @staticmethod
     def Projection():

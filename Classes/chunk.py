@@ -5,16 +5,9 @@ import random
 from opensimplex import OpenSimplex
 import threading
 import time
-import logging
+from logging import *
 from Classes.block_base import *
 import math
-
-logging.basicConfig(level=logging.DEBUG)
-
-
-def log(source, message):
-    now = time.strftime("%H:%M:%S")
-    logging.debug(f"({now}) [{source}]: {message}")
 
 
 seed = random.randint(0, 100000)
@@ -25,10 +18,11 @@ simplex_stone = OpenSimplex(seed)
 
 
 class TaskScheduler:
-    def __init__(self):
+    def __init__(self,parent):
         self.tasks = []
         self.task_lock = threading.Lock()
         self._frame = 0
+        self.parent = parent
 
     def add_task(self, tasklist):
         # Calculate the appropriate frame to run the task
@@ -61,8 +55,8 @@ class Chunk:
         self.Z = Z
         self.generated = False
         self.blocks = {}
-        self._scheduler = TaskScheduler()
-        self._scheduler_less_priority = TaskScheduler()
+        self._scheduler = TaskScheduler(self)
+        self._scheduler_less_priority = TaskScheduler(self)
 
     def generate(self):
         self.batch = pyglet.graphics.Batch()
@@ -100,18 +94,16 @@ class Chunk:
                             block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
                         self._scheduler_less_priority.add_task(
                             [self.blocks[(x, i, y)].add_to_batch_and_save])
-
         self.generated = True
 
     def add_block(self,type_,block_data,index):
         self.blocks[index] = blocks_all[type_](
                             block_data=block_data, parent=self)
-        self._scheduler_less_priority.add_task(
-            [self.blocks[index].add_to_batch_and_save])
+        self.parent._scheduler_.add_task(self.blocks[index].add_to_batch_and_save)
                             
     def draw(self):
         if self.generated and not distance_vector_2d(self.parent.player.pos[0], self.parent.player.pos[2], self.X, self.Z) > self.parent.chunk_distance*1.5*self.CHUNK_DIST:
             self.batch.draw()
-        if self.parent._tick % 2 == 0:
+        if self.parent._tick % 5 == 0:
             self._scheduler_less_priority.run()
         self._scheduler.run()

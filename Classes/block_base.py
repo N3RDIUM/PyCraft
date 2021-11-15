@@ -1,15 +1,9 @@
 import pyglet
 from pyglet.gl import *
-import logging
+from logger import *
 blocks_all = {}
 import os
-import time
 import tqdm
-logging.basicConfig(level=logging.DEBUG)
-
-def log(source, message):
-    now = time.strftime("%H:%M:%S")
-    logging.debug(f"({now}) [{source}]: {message}")
 
 def load_texture(filename):
     try:
@@ -18,7 +12,7 @@ def load_texture(filename):
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         return pyglet.graphics.TextureGroup(tex)
     except:
-        logging.warn("Texture Loader: Failed to load texture: " + filename)
+        warn("Texture Loader", "Failed to load texture: " + filename)
         return None
 
 class BlockBase:

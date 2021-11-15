@@ -1,13 +1,6 @@
 from opensimplex import *
 from random import randint
-import logging
-import time
-
-logging.basicConfig(level=logging.DEBUG)
-
-def log(source, message):
-    now = time.strftime("%H:%M:%S")
-    logging.debug(f"({now}) [{source}]: {message}")
+from logger import *
 
 seed = randint(-999999,999999)
 noise = OpenSimplex(seed)

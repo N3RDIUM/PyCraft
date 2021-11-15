@@ -4,6 +4,7 @@ import logging
 import math
 
 from Classes.chunk import Chunk
+from Classes.environment.environment_objects import cloud
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -41,12 +42,13 @@ class TaskScheduler:
             self._frame += 1
 
 class World:
-    def __init__(self, Chunk, Player):
+    def __init__(self, window, Chunk, Player):
         self.CHUNK_DIST = 16
         self.generated = False
         self.Chunk = Chunk
         self.chunk_distance = 2
         self.player = Player
+        self.parent = window
 
         self.x = 0
         self.z = 0
@@ -80,7 +82,7 @@ class World:
     def make_chunk(self, xz, index):
         chunk = self.Chunk(xz[0], xz[1], self)
         self.chunks[index].append(chunk)
-        self._scheduler.add_task(lambda: threading.Thread(target=chunk.generate,daemon=True).start())
+        threading.Thread(target=chunk.generate,daemon=True).start()
 
     def add_row_z_minus(self):
         self.chunks.append([])
