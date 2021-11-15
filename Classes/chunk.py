@@ -45,14 +45,14 @@ class Chunk:
                 noiseval_dirt = 2+int(simplex_dirt.noise2d(x/100, y/100)*3+simplex_dirt.noise2d(x/1000, y/1000)*10)
                 noiseval_stone = 20+int(simplex_stone.noise2d(x/150, y/150)*40+simplex_stone.noise2d(x/1000, y/1000)*100)
 
-                self.blocks[(x, noiseval_grass, y)] = blocks_all["grass"](
+                self.blocks[(x, noiseval_grass+1, y)] = blocks_all["grass"](
                     block_data={"block_pos": {'x': x, 'y': noiseval_grass, 'z': y}}, parent=self)
-                pyglet.clock.schedule_once(self.blocks[(x, noiseval_grass, y)].add_to_batch_and_save, 0)
+                pyglet.clock.schedule_once(self.blocks[(x, noiseval_grass+1, y)].add_to_batch_and_save, 0)
                 for i in range(noiseval_grass-noiseval_dirt-1, noiseval_grass):
                     self.blocks[(x, i, y)] = blocks_all["dirt"](
                         block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
                 for i in range(noiseval_grass-noiseval_dirt-noiseval_stone-1, noiseval_grass-noiseval_dirt):
-                    if not i == noiseval_grass-noiseval_dirt-noiseval_stone-1:
+                    if not i == noiseval_grass-noiseval_dirt-noiseval_stone-1 and not simplex_stone.noise3d(x,i,y) > 0.5:
                         self.blocks[(x, i, y)] = blocks_all["stone"](
                             block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
                     else:
