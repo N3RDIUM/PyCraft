@@ -61,8 +61,7 @@ class Chunk:
 
         for i in self.blocks:
             if not type(self.blocks[i]) == type(blocks_all["grass"]):
-                self._scheduled_frame_last += 1
-                pyglet.clock.schedule_once(self.blocks[i].add_to_batch_and_save,self._scheduled_frame_last)
+                pyglet.clock.schedule_once(self.blocks[i].add_to_batch_and_save,random.randint(5,25))
 
         self.generated = True
 
