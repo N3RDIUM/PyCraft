@@ -41,12 +41,25 @@ class BlockBase:
         z = self.block_data['block_pos']['z']
         X, Y, Z = x+1, y+1, z+1
         tex_coords = ('t2f', (0, 0, 1, 0, 1, 1, 0, 1))
-        self.block_data['top'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['top'],    ('v3f', (x, Y,Z,  X, Y, Z,  X, Y, z,  x, Y, z)), tex_coords)
-        self.block_data['bottom'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['bottom'], ('v3f', (x, Y,z,  x, Y, Z,  x, y, Z,  x, y, z)), tex_coords)
-        self.block_data['front'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['front'],  ('v3f', (x, y,Z,  X, y, Z,  X, Y, Z,  x, Y, Z)), tex_coords)
-        self.block_data['back'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['back'],   ('v3f', (X, y,z,  x, y, z,  x, Y, z,  X, Y, z)), tex_coords)
-        self.block_data['left'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['left'],   ('v3f',(x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z)), tex_coords)
-        self.block_data['right'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['right'],  ('v3f', (X, y,Z,  X, y, z,  X, Y, z,  X, Y, Z)), tex_coords)
+
+        if not self.chunk.block_exists((x,y+1,z)):
+            self.block_data['top'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['top'],    ('v3f', (x, Y,Z,  X, Y, Z,  X, Y, z,  x, Y, z)), tex_coords)
+
+        if not self.chunk.block_exists((x,y-1,z)):
+            self.block_data['bottom'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['bottom'], ('v3f', (x,y,z, X,y,z, X,y,Z, x,y,Z)), tex_coords)
+
+        if not self.chunk.block_exists((x-1,y,z)):
+            self.block_data['left'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['left'],   ('v3f',(x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z)), tex_coords)
+
+        if not self.chunk.block_exists((x+1,y,z)):
+            self.block_data['right'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['right'],  ('v3f', (X, y,Z,  X, y, z,  X, Y, z,  X, Y, Z)), tex_coords)
+
+        if not self.chunk.block_exists((x,y,z+1)):
+            self.block_data['front'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['front'],  ('v3f', (x, y,Z,  X, y, Z,  X, Y, Z,  x, Y, Z)), tex_coords)
+
+        if not self.chunk.block_exists((x,y,z-1)):
+            self.block_data['back'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['back'],   ('v3f', (X, y,z,  x, y, z,  x, Y, z,  X, Y, z)), tex_coords)
+
         self.generated = True
 
 textures = {}

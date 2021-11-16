@@ -45,9 +45,9 @@ class Chunk:
                 noiseval_dirt = 2+int(simplex_dirt.noise2d(x/100, y/100)*3+simplex_dirt.noise2d(x/1000, y/1000)*10)
                 noiseval_stone = 20+int(simplex_stone.noise2d(x/150, y/150)*40+simplex_stone.noise2d(x/1000, y/1000)*100)
 
-                self.blocks[(x, noiseval_grass+1, y)] = blocks_all["grass"](
+                self.blocks[(x, noiseval_grass, y)] = blocks_all["grass"](
                     block_data={"block_pos": {'x': x, 'y': noiseval_grass, 'z': y}}, parent=self)
-                pyglet.clock.schedule_once(self.blocks[(x, noiseval_grass+1, y)].add_to_batch_and_save, 0)
+                pyglet.clock.schedule_once(self.blocks[(x, noiseval_grass, y)].add_to_batch_and_save, 0)
                 for i in range(noiseval_grass-noiseval_dirt-1, noiseval_grass):
                     self.blocks[(x, i, y)] = blocks_all["dirt"](
                         block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
@@ -70,7 +70,13 @@ class Chunk:
         self.blocks[index] = blocks_all[type_](
                             block_data=block_data, parent=self)
         self.parent._scheduler_.add_task(self.blocks[index].add_to_batch_and_save)
-                            
+
+    def block_exists(self,index):
+        try: 
+            return self.blocks[index].block_data
+        except:
+            return False
+
     def draw(self):
         if self.generated and not distance_vector_2d(self.parent.player.pos[0], self.parent.player.pos[2], self.X, self.Z) > self.parent.chunk_distance*1.5*self.CHUNK_DIST:
             self.batch.draw()

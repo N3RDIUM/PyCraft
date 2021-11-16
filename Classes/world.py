@@ -4,7 +4,7 @@ import logging
 import math
 
 from Classes.chunk import Chunk
-from Classes.environment.environment_objects import cloud
+from Classes.environment.cloud_generator import cloud_generator
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -49,6 +49,7 @@ class World:
         self.chunk_distance = 2
         self.player = Player
         self.parent = window
+        self.cloud_generator = cloud_generator(self)
 
         self.x = 0
         self.z = 0
@@ -75,6 +76,7 @@ class World:
             for chunk in i:
                 if chunk is not None and chunk.generated:
                     chunk.draw()
+        self.cloud_generator.draw()
         if self._tick % 10 == 0:
             self._scheduler.run()
             self._scheduler_.run()
@@ -124,14 +126,14 @@ class World:
         x = self.player.pos[0]
         z = self.player.pos[2]
 
-        val = self.CHUNK_DIST
+        val = self.chunk_distance
 
-        if math.dist([self.x*val],[z]) >= self.CHUNK_DIST * self.chunk_distance-1:
+        if math.dist([self.x*val],[z]) >= self.CHUNK_DIST * self.chunk_distance/2:
             self.add_row_z_minus()
-        elif math.dist([self.x*val],[z]) <= -self.CHUNK_DIST * self.chunk_distance+1:
+        elif math.dist([self.x*val],[z]) <= -self.CHUNK_DIST * self.chunk_distance/2:
             self.add_row_z_plus()
         
-        if math.dist([x],[self.z*val]) >= self.CHUNK_DIST * self.chunk_distance-1:
+        if math.dist([x],[self.z*val]) >= self.CHUNK_DIST * self.chunk_distance/2:
             self.add_row_x_minus()
-        elif math.dist([x],[self.z*val]) <= -self.CHUNK_DIST * self.chunk_distance+1:
+        elif math.dist([x],[self.z*val]) <= -self.CHUNK_DIST * self.chunk_distance/2:
             self.add_row_x_plus()
