@@ -77,9 +77,8 @@ class World:
                 if chunk is not None and chunk.generated:
                     chunk.draw()
         self.cloud_generator.draw()
-        if self._tick % 10 == 0:
-            self._scheduler.run()
-            self._scheduler_.run()
+        self._scheduler.run()
+        self._scheduler_.run()
 
     def make_chunk(self, xz, index):
         chunk = self.Chunk(xz[0], xz[1], self)
@@ -126,14 +125,15 @@ class World:
         x = self.player.pos[0]
         z = self.player.pos[2]
 
-        val = self.chunk_distance
+        val = self.CHUNK_DIST * self.chunk_distance
+        val_ = 1/4
 
-        if math.dist([self.x*val],[z]) >= self.CHUNK_DIST * self.chunk_distance/2:
+        if math.dist([self.x*val],[z]) >= (self.chunk_distance)/val_:
             self.add_row_z_minus()
-        elif math.dist([self.x*val],[z]) <= -self.CHUNK_DIST * self.chunk_distance/2:
+        elif math.dist([self.x*val],[z]) <= -(self.chunk_distance)/val_:
             self.add_row_z_plus()
         
-        if math.dist([x],[self.z*val]) >= self.CHUNK_DIST * self.chunk_distance/2:
+        if math.dist([x],[self.z*val]) >= (self.chunk_distance)/val_:
             self.add_row_x_minus()
-        elif math.dist([x],[self.z*val]) <= -self.CHUNK_DIST * self.chunk_distance/2:
+        elif math.dist([x],[self.z*val]) <= -(self.chunk_distance)/val_:
             self.add_row_x_plus()
