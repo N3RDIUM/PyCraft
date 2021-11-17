@@ -92,7 +92,7 @@ class World:
             data.append(self.Chunk(self.x+x, self.z-self.chunk_distance, self))
             self._scheduler_.add_task(data[-1].generate)
         self.chunks.insert(0, data)
-        self.z -= 1
+        self.z += 1
 
     def add_row_z_plus(self):
         self.chunks.insert(0, [])
@@ -101,7 +101,7 @@ class World:
             data.append(self.Chunk(self.x+x, self.z+self.chunk_distance, self))
             self._scheduler_.add_task(data[-1].generate)
         self.chunks.append(data)
-        self.z += 1
+        self.z -= 1
 
     def add_row_x_minus(self):
         self.chunks.append([])
@@ -110,7 +110,7 @@ class World:
             data.append(self.Chunk(self.x-self.chunk_distance, self.z+z, self))
             self._scheduler_.add_task(data[-1].generate)
         self.chunks.insert(0, data)
-        self.x -= 1
+        self.x += 1
 
     def add_row_x_plus(self):
         self.chunks.append([])
@@ -119,7 +119,7 @@ class World:
             data.append(self.Chunk(self.x+self.chunk_distance, self.z+z, self))
             self._scheduler_.add_task(data[-1].generate)
         self.chunks.append(data)
-        self.x += 1
+        self.x -= 1
 
     def update(self, dt):
         x = self.player.pos[0]

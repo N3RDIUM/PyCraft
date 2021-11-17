@@ -10,6 +10,9 @@ from Classes.window import *
 from load_shaders import *
 from logger import *
 
+if test:
+    warn('Main',"This is a test!")
+
 def use_shader(shader_name="default"):
     log("main", f"Using shaders: {shader_name}:{shaders[shader_name]}")
     glLinkProgram(shaders[shader_name])
