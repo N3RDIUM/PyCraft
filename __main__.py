@@ -1,6 +1,6 @@
 import pyglet
 # Header
-test = True
+test = False
 
 from OpenGL.GL import *
 from pyglet.gl import *
