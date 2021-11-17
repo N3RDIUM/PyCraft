@@ -1,7 +1,7 @@
-import pyglet
 # Header
-test = False
+test = True
 
+import pyglet
 from OpenGL.GL import *
 from pyglet.gl import *
 from Classes.player import *
@@ -23,10 +23,10 @@ if __name__ == '__main__':
     window = Window(width=400, height=300, caption='PyCraft',
                     resizable=True, Chunk=Chunk, Player=Player, World=World)
     glClearColor(0.5, 0.7, 1, 1)
+    glEnable(GL_DEPTH_TEST)
+    glEnable(GL_CULL_FACE)
+    glCullFace(GL_BACK)
     if not test:
-        glEnable(GL_DEPTH_TEST)
-        glEnable(GL_CULL_FACE)
-        glCullFace(GL_BACK)
         glEnable(GL_FOG)
         glFogfv(GL_FOG_COLOR, (GLfloat * int(window.model.chunk_distance*1600))(0.5, 0.69, 1.0, 1))
         glHint(GL_FOG_HINT, GL_DONT_CARE)
