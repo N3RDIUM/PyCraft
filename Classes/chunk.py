@@ -8,7 +8,7 @@ import time
 from logging import *
 from Classes.block_base import *
 import math
-
+from __main__ import test
 
 seed = random.randint(0, 100000)
 print(f"Seed: {seed}")
@@ -77,5 +77,5 @@ class Chunk:
             return False
 
     def draw(self):
-        if self.generated and not distance_vector_2d(self.parent.player.pos[0], self.parent.player.pos[2], self.X, self.Z) > self.parent.chunk_distance*1.5*self.CHUNK_DIST:
+        if not test and self.generated and not distance_vector_2d(self.parent.player.pos[0], self.parent.player.pos[2], self.X, self.Z) > self.parent.chunk_distance*1.5*self.CHUNK_DIST:
             self.batch.draw()
