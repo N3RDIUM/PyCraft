@@ -46,7 +46,7 @@ class World:
         self.CHUNK_DIST = 16
         self.generated = False
         self.Chunk = Chunk
-        self.chunk_distance = 2
+        self.chunk_distance = 3
         self.player = Player
         self.parent = window
         self.cloud_generator = cloud_generator(self)
@@ -54,71 +54,75 @@ class World:
         self.x = 0
         self.z = 0
 
-        self.chunks = self.generate_2d_array(self.chunk_distance*2+1)
+        self.chunks = {}
         self._scheduler = TaskScheduler()
         self._scheduler_ = TaskScheduler()
         self.generate()
         self._tick = 0
 
-    def generate_2d_array(self, size):
-        return [[None] * size for _ in range(size)]
-
     def generate(self):
         self.generated = False
         for i in range(-self.chunk_distance, self.chunk_distance):
             for j in range(-self.chunk_distance, self.chunk_distance):
-                self.make_chunk((self.x+i, self.z+j), i+self.chunk_distance)
+                self.make_chunk((self.x+i, self.z+j), (i+self.chunk_distance, j+self.chunk_distance))
         self.generated = True
 
     def draw(self):
         self._tick += 1
         for i in self.chunks:
-            for chunk in i:
-                if chunk is not None and chunk.generated:
-                    chunk.draw()
+            chunk = self.chunks[i]
+            if chunk is not None and chunk.generated:
+                chunk.draw()
         self.cloud_generator.draw()
         self._scheduler.run()
         self._scheduler_.run()
 
     def make_chunk(self, xz, index):
         chunk = self.Chunk(xz[0], xz[1], self)
-        self.chunks[index].append(chunk)
+        self.chunks[index] = chunk
         chunk.generate()
 
+    def chunk_exists(self, index):
+        return index in self.chunks
+
     def add_row_z_minus(self):
-        self.chunks.append([])
-        data = []
+        data = {}
         for x in range(-self.chunk_distance, self.chunk_distance):
-            data.append(self.Chunk(self.x+x, self.z-self.chunk_distance, self))
-            self._scheduler_.add_task(data[-1].generate)
-        self.chunks.insert(0, data)
+            if not self.chunk_exists((self.x+x, self.z-self.chunk_distance)):
+                data[(self.x+x, self.z-self.chunk_distance)] = self.Chunk(self.x+x, self.z-self.chunk_distance, self)
+                self._scheduler_.add_task(data[self.x+x, self.z-self.chunk_distance].generate)
+        for i in data:
+            self.chunks[i] = data[i]
         self.z -= 1
 
     def add_row_z_plus(self):
-        self.chunks.insert(0, [])
-        data = []
+        data = {}
         for x in range(-self.chunk_distance, self.chunk_distance):
-            data.append(self.Chunk(self.x+x, self.z+self.chunk_distance, self))
-            self._scheduler_.add_task(data[-1].generate)
-        self.chunks.append(data)
+            if not self.chunk_exists((self.x+x, self.z+self.chunk_distance)):
+                data[(self.x+x, self.z+self.chunk_distance)] = self.Chunk(self.x+x, self.z+self.chunk_distance, self)
+                self._scheduler_.add_task(data[self.x+x, self.z+self.chunk_distance].generate)
+        for i in data:
+            self.chunks[i] = data[i]
         self.z += 1
 
     def add_row_x_minus(self):
-        self.chunks.append([])
-        data = []
+        data = {}
         for z in range(-self.chunk_distance, self.chunk_distance):
-            data.append(self.Chunk(self.x-self.chunk_distance+1, self.z+z, self))
-            self._scheduler_.add_task(data[-1].generate)
-        self.chunks.insert(0, data)
+            if not self.chunk_exists((self.x-self.chunk_distance, self.z+z)):
+                data[(self.x-self.chunk_distance, self.z+z)] = self.Chunk(self.x-self.chunk_distance, self.z+z, self)
+                self._scheduler_.add_task(data[self.x-self.chunk_distance, self.z+z].generate)
+        for i in data:
+            self.chunks[i] = data[i]
         self.x -= 1
 
     def add_row_x_plus(self):
-        self.chunks.append([])
-        data = []
+        data = {}
         for z in range(-self.chunk_distance, self.chunk_distance):
-            data.append(self.Chunk(self.x+self.chunk_distance-1, self.z+z, self))
-            self._scheduler_.add_task(data[-1].generate)
-        self.chunks.append(data)
+            if not self.chunk_exists((self.x+self.chunk_distance, self.z+z)):
+                data[(self.x+self.chunk_distance, self.z+z)] = self.Chunk(self.x+self.chunk_distance, self.z+z, self)
+                self._scheduler_.add_task(data[self.x+self.chunk_distance, self.z+z].generate)
+        for i in data:
+            self.chunks[i] = data[i]
         self.x += 1
 
     def update(self, dt):
@@ -126,12 +130,12 @@ class World:
         z = int(self.player.pos[2]/self.CHUNK_DIST*2)
         
         if x != self.x:
-            if x > self.x:
+            if x+1 > self.x:
                 self.add_row_x_plus()
-            else:
+            elif x-1 < self.x:
                 self.add_row_x_minus()
         if z != self.z:
-            if z > self.z:
+            if z+1 > self.z:
                 self.add_row_z_plus()
-            else:
+            elif z-1 < self.z:
                 self.add_row_z_minus()
