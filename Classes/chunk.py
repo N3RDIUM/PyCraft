@@ -79,5 +79,5 @@ class Chunk:
     def draw(self):
         if not test and self.generated and not distance_vector_2d(self.parent.player.pos[0], self.parent.player.pos[2], self.X, self.Z) > self.parent.chunk_distance*1.5*self.CHUNK_DIST:
             self.batch.draw()
-        else:
+        elif test:
             self.batch.draw()
