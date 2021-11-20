@@ -92,7 +92,7 @@ class World:
             data.append(self.Chunk(self.x+x, self.z-self.chunk_distance, self))
             self._scheduler_.add_task(data[-1].generate)
         self.chunks.insert(0, data)
-        self.z += 1
+        self.z -= 1
 
     def add_row_z_plus(self):
         self.chunks.insert(0, [])
@@ -101,39 +101,37 @@ class World:
             data.append(self.Chunk(self.x+x, self.z+self.chunk_distance, self))
             self._scheduler_.add_task(data[-1].generate)
         self.chunks.append(data)
-        self.z -= 1
+        self.z += 1
 
     def add_row_x_minus(self):
         self.chunks.append([])
         data = []
         for z in range(-self.chunk_distance, self.chunk_distance):
-            data.append(self.Chunk(self.x-self.chunk_distance, self.z+z, self))
+            data.append(self.Chunk(self.x-self.chunk_distance+1, self.z+z, self))
             self._scheduler_.add_task(data[-1].generate)
         self.chunks.insert(0, data)
-        self.x += 1
+        self.x -= 1
 
     def add_row_x_plus(self):
         self.chunks.append([])
         data = []
         for z in range(-self.chunk_distance, self.chunk_distance):
-            data.append(self.Chunk(self.x+self.chunk_distance, self.z+z, self))
+            data.append(self.Chunk(self.x+self.chunk_distance-1, self.z+z, self))
             self._scheduler_.add_task(data[-1].generate)
         self.chunks.append(data)
-        self.x -= 1
+        self.x += 1
 
     def update(self, dt):
-        x = self.player.pos[0]
-        z = self.player.pos[2]
-
-        val = self.CHUNK_DIST * self.chunk_distance
-        val_ = 1/4
-
-        if math.dist([self.x*val],[z]) >= (self.chunk_distance)/val_:
-            self.add_row_z_minus()
-        elif math.dist([self.x*val],[z]) <= -(self.chunk_distance)/val_:
-            self.add_row_z_plus()
+        x = int(self.player.pos[0]/self.CHUNK_DIST*2)
+        z = int(self.player.pos[2]/self.CHUNK_DIST*2)
         
-        if math.dist([x],[self.z*val]) >= (self.chunk_distance)/val_:
-            self.add_row_x_minus()
-        elif math.dist([x],[self.z*val]) <= -(self.chunk_distance)/val_:
-            self.add_row_x_plus()
+        if x != self.x:
+            if x > self.x:
+                self.add_row_x_plus()
+            else:
+                self.add_row_x_minus()
+        if z != self.z:
+            if z > self.z:
+                self.add_row_z_plus()
+            else:
+                self.add_row_z_minus()
