@@ -33,8 +33,8 @@ if __name__ == '__main__':
         glFogfv(GL_FOG_COLOR, (GLfloat * int(window.model.chunk_distance*16))(0.5, 0.69, 1.0, 10))
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
-        glFogf(GL_FOG_START, window.model.chunk_distance*5)
-        glFogf(GL_FOG_END, window.model.chunk_distance*6)
+        glFogf(GL_FOG_START, window.model.chunk_distance*3)
+        glFogf(GL_FOG_END, window.model.chunk_distance*4)
     #shaders
     if use_shaders:
         use_shader()

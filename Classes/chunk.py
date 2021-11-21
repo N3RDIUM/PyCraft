@@ -52,8 +52,14 @@ class Chunk:
                     self.blocks[(x, i, y)] = blocks_all["dirt"](
                         block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
                 for i in range(noiseval_grass-noiseval_dirt-noiseval_stone-1, noiseval_grass-noiseval_dirt):
-                    if not i == noiseval_grass-noiseval_dirt-noiseval_stone-1 and not simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.5:
+                    if not i == noiseval_grass-noiseval_dirt-noiseval_stone-1 and not simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.5 and not simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.7:
                         self.blocks[(x, i, y)] = blocks_all["stone"](
+                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
+                    if simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.9:
+                        self.blocks[(x, i, y)] = blocks_all["iron_ore"](
+                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
+                    if simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.99:
+                        self.blocks[(x, i, y)] = blocks_all["gold_ore"](
                             block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
                     elif i == noiseval_grass-noiseval_dirt-noiseval_stone-1:
                         self.blocks[(x, i, y)] = blocks_all["bedrock"](

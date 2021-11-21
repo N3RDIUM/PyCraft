@@ -147,3 +147,33 @@ class bedrock(BlockBase):
         }
 
 blocks_all["bedrock"] = bedrock
+
+class iron_ore(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["stone"],
+            "left": textures["iron_ore"],
+            "right": textures["iron_ore"],
+            "front": textures["iron_ore"],
+            "back": textures["iron_ore"],
+            "bottom": textures["stone"]
+        }
+
+blocks_all["iron_ore"] = iron_ore
+
+class gold_ore(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["stone"],
+            "left": textures["gold_ore"],
+            "right": textures["gold_ore"],
+            "front": textures["gold_ore"],
+            "back": textures["gold_ore"],
+            "bottom": textures["stone"]
+        }
+
+blocks_all["gold_ore"] = gold_ore
