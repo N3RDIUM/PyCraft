@@ -49,21 +49,24 @@ class Chunk:
                     block_data={"block_pos": {'x': x, 'y': noiseval_grass, 'z': y}}, parent=self)
                 pyglet.clock.schedule_once(self.blocks[(x, noiseval_grass, y)].add_to_batch_and_save, 0)
                 for i in range(noiseval_grass-noiseval_dirt-1, noiseval_grass):
-                    self.blocks[(x, i, y)] = blocks_all["dirt"](
-                        block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
+                    if not simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.5:
+                        self.blocks[(x, i, y)] = blocks_all["dirt"](
+                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
                 for i in range(noiseval_grass-noiseval_dirt-noiseval_stone-1, noiseval_grass-noiseval_dirt):
                     if not i == noiseval_grass-noiseval_dirt-noiseval_stone-1 and not simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.5 and not simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.7:
                         self.blocks[(x, i, y)] = blocks_all["stone"](
                             block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
-                    if simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.9:
+                    if simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.7 and not simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.5:
                         self.blocks[(x, i, y)] = blocks_all["iron_ore"](
                             block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
-                    if simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.99:
+                    if simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.99 and not simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.5:
                         self.blocks[(x, i, y)] = blocks_all["gold_ore"](
                             block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
                     elif i == noiseval_grass-noiseval_dirt-noiseval_stone-1:
                         self.blocks[(x, i, y)] = blocks_all["bedrock"](
                             block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
+                    elif simplex_stone.noise3d(x/5,i/5,y/5)*2 > 0.6:
+                        self.blocks[(x, i, y)] = None
 
         for i in self.blocks:
             if not type(self.blocks[i]) == type(blocks_all["grass"]) and not type(self.blocks[i]) == type(None):

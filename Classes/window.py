@@ -4,13 +4,16 @@ from pyglet.window import key
 import time
 from logger import *
 
+from Classes.player import *
+from Classes.chunk import *
+from Classes.world import *
 
 def log(source, message):
     now = time.strftime("%H:%M:%S")
     logging.debug(f"({now}) [{source}]: {message}")
 
 class Window(pyglet.window.Window):
-    def __init__(self, Chunk, World, Player, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         log("Window", "Initializing window")
         self.set_minimum_size(800, 500)
@@ -18,8 +21,8 @@ class Window(pyglet.window.Window):
         self.push_handlers(self.keys)
         pyglet.clock.schedule(self.update)
 
-        self.player = Player((0.5, 1.5, 1.5), (-30, 0))
-        self.model = World(self,Chunk,self.player)
+        self.player = Player((0.5, 1.5, 1.5), (-30, 0), self)
+        self.model = World(self,self.player)
         pyglet.clock.schedule_interval(self.model.update, 1/60)
 
         self.alive = True
