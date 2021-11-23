@@ -69,7 +69,7 @@ class Chunk:
                         self.blocks[(x, i, y)] = None
 
         for i in self.blocks:
-            if not type(self.blocks[i]) == type(blocks_all["grass"]) and not type(self.blocks[i]) == type(None):
+            if not type(self.blocks[i]) is type(blocks_all["grass"]) and not type(self.blocks[i]) is type(None):
                 pyglet.clock.schedule_once(self.blocks[i].add_to_batch_and_save,random.randint(5,25))
 
         self.generated = True
