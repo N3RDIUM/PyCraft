@@ -1,4 +1,6 @@
-import os, logging, time
+import os
+import logging
+import time
 from OpenGL.GL import *
 logging.basicConfig(level=logging.DEBUG)
 
