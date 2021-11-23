@@ -1,9 +1,5 @@
 # <p align = 'center'> PyCraft </p>
 
-### 🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧
-#### We are working on a HUGE remake + update, so you might not see much activity here!
-### 🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧
-
 ##### [![DeepSource](https://deepsource.io/gh/1upCommunity/PyCraft.svg/?label=active+issues&show_trend=true&token=4Etoi3bOhBMRoKUWGDpPJFvS)](https://deepsource.io/gh/1upCommunity/PyCraft/?ref=repository-badge) [![DeepSource](https://deepsource.io/gh/1upCommunity/PyCraft.svg/?label=resolved+issues&show_trend=true&token=4Etoi3bOhBMRoKUWGDpPJFvS)](https://deepsource.io/gh/1upCommunity/PyCraft/?ref=repository-badge) ![Contribs](https://img.shields.io/github/all-contributors/TheWebCrafters/PyCraft) ![Repo Size](https://img.shields.io/github/languages/code-size/TheWebCrafters/PyCraft?style=flat&color=limegreen) ![Downloads](https://img.shields.io/github/downloads/1upCommunity/PyCraft/total?logoColor=limegreen) ![issues](https://img.shields.io/github/issues/1upCommunity/PyCraft?logoColor=limegreen) ![Discussions](https://img.shields.io/github/discussions/1upCommunity/PyCraft) ![license](https://img.shields.io/github/license/1upCommunity/PyCraft) ![commits](https://img.shields.io/github/commit-activity/w/1upCommunity/PyCraft) 
 ##### ![social](https://img.shields.io/github/forks/1upCommunity/PyCraft?style=social) ![social](https://img.shields.io/github/stars/1upCommunity/PyCraft?style=social) ![social](https://img.shields.io/github/watchers/1upCommunity/PyCraft?style=social) 
 
