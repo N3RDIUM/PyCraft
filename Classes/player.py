@@ -1,72 +1,19 @@
+from logging import root
 from pyglet.window import key
 from pyglet.gl import *
 import math
-from Box2D import *
 
 
 def polar_to_cartesian(radius, angle):
     return [radius * math.cos(angle), radius * math.sin(angle)]
 
-
 def cartesian_to_polar(x, y):
     return math.sqrt(x**2 + y**2), math.atan2(y, x)
-
-class _collision_engine:
-    def __init__(self, player):
-        self.player = player
-        self._block_size = 1
-        self.player_diameter = 0.75
-
-    def _collision_algorithm(self, player_pos, block_pos):
-        if block_pos[0] - player_pos[0] <= self.player_diameter-0.1/2 + self._block_size-0.1/2 or player_pos[1] - block_pos[1] <= self.player_diameter-0.1/2 + self._block_size-0.1/2:
-            return False
-        else:
-            return True
-
-    def step(self):
-        player_x = self.player.pos[0]-int(self.player.pos[0])
-        player_y = self.player.pos[1]-int(self.player.pos[1])
-        player_z = self.player.pos[2]-int(self.player.pos[2])
-
-        # Facing north
-        if self.player.rot[1] > 360-45 and self.player.rot[1] < 45:
-            if self.player.block_exists["forward"]:
-                if self._collision_algorithm(self.player.pos, [player_x, player_y, player_z-1]):
-                    self.player.movable["forward"] = False
-                else:
-                    self.player.movable["forward"] = True
-            
-            if self.player.block_exists["backward"]:
-                if self._collision_algorithm(self.player.pos, [player_x, player_y, player_z+1]):
-                    self.player.movable["backward"] = False
-                else:
-                    self.player.movable["backward"] = True
-
-            if self.player.block_exists["left"]:
-                if self._collision_algorithm(self.player.pos, [player_x+1, player_y, player_z]):
-                    self.player.movable["left"] = False
-                else:
-                    self.player.movable["left"] = True
-
-            if self.player.block_exists["right"]:
-                if self._collision_algorithm(self.player.pos, [player_x-1, player_y, player_z]):
-                    self.player.movable["right"] = False
-                else:
-                    self.player.movable["right"] = True
 
 def _to_radians(angle):
     return angle * math.pi / 180
 
 def normalize(position):
-    """ Accepts `position` of arbitrary precision and returns the block
-    containing that position.
-    Parameters
-    ----------
-    position : tuple of len 3
-    Returns
-    -------
-    block_position : tuple of ints of len 3
-    """
     x, y, z = position
     x, y, z = (int(round(x)), int(round(y)), int(round(z)))
     return (x, y, z)
@@ -96,7 +43,6 @@ class Player:
 
         self.terminal_velocity = 5
 
-        self._listener = _collision_engine(self)
         self.mouse_click = False
 
     def mouse_motion(self, dx, dy):
@@ -158,18 +104,32 @@ class Player:
         self.pointing_at[1] = None
         return None, None
 
+    def get_surrounding_blocks(self):
+        value = []
+        if self.block_exists["forward"]:
+            value.append((0, 0, -1))
+        if self.block_exists["backward"]:
+            value.append((0, 0, 1))
+        if self.block_exists["right"]:
+            value.append((1, 0, 0))
+        if self.block_exists["left"]:
+            value.append((-1, 0, 0))
+        if self.block_exists["up"]:
+            value.append((0, 1, 0))
+        if self.block_exists["down"]:
+            value.append((0, -1, 0))
+        return value
+
     def update(self, dt, keys):
         sens = self.speed
         s = dt*10
         rotY = _to_radians(-self.rot[1])
         rotX = _to_radians(-self.rot[0])
         dx, dz = math.sin(rotY), math.cos(rotY)
-
-        _dx, _dz = s*math.sin(rotX), math.cos(rotY)
-        self.hit_test(self.pos, (_dx, _dz, 0), self.hit_range)
+        dy = math.sin(rotX)
+        self.hit_test(position=self.pos, vector=(dx, dy, dz), max_distance=self.hit_range)
         
         self.collide()
-        self._listener.step()
         if self.velocity_y > self.terminal_velocity:
             self.velocity_y = self.terminal_velocity
         if self.velocity_y < -self.terminal_velocity:

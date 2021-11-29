@@ -59,7 +59,7 @@ class World:
                                 (i+self.chunk_distance, j+self.chunk_distance))
         self.generated = True
 
-    def draw_cube(x, y, z, size):
+    def draw_cube(self, x, y, z, size):
             glPushMatrix()
             glTranslatef(x, y, z)
             glScalef(size, size, size)
@@ -87,9 +87,10 @@ class World:
     def draw(self):
         self._tick += 1
         try:
-            self.draw_player_hitbox(self.parent.player.looking_at[1])
+            self.draw_player_hitbox(self.parent.player.looking_at[0])
         except:
             pass
+        
         for i in self.chunks:
             chunk = self.chunks[i]
             if chunk is not None and chunk.generated:
