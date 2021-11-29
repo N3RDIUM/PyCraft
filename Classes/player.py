@@ -34,8 +34,6 @@ class Player:
 
         self.block_exists = {"left": False, "right": False,
                              "forward": False, "backward": False, "up": False, "down": False}
-        self.movable = {"left": True, "right": True, "forward": True,
-                        "backward": True, "up": True, "down": True}
         self.suffocating = False
         self.falling = False
         self.velocity_y = 0
@@ -82,12 +80,14 @@ class Player:
         else:
             self.block_exists["forward"] = True
 
-        if self.parent.model.block_exists((x_int, y_int-3, z_int)):
+        if self.parent.model.block_exists((x_int, y_int-2, z_int)):
             self.falling = False
             self.velocity_y = 0
         else:
             self.falling = True
             self.velocity_y -= self.gravity
+
+        self._collide(self.pos)
 
     def hit_test(self, position, vector, max_distance=8):
         m = 8
@@ -122,6 +122,33 @@ class Player:
             value.append((0, -1, 0))
         return value
 
+    def _collision_algorithm(self, b1,b1_rad, b2, b2_side):
+        x1, y1, z1 = b1
+        x2, y2, z2 = b2
+        r1 = b1_rad
+        r2 = b2_side
+
+        if abs(x1 - x2) < r1 + r2 or abs(y1-y2) < r1 + r2 or abs(z1-z2) < r1 + r2:
+            print("collision: ",[[x1,y1,z1], [x2,y2,z2]])
+            return True
+        else:
+            return False
+
+    def _collide(self, position):
+        x, y, z = position
+        if self.block_exists["right"] and (self._collision_algorithm((x-round(x), y-round(y), z-round(z)), 0.7, (1,0,0), 1) or self._collision_algorithm((x-round(x), y-round(y), z-round(z)), 0.7, (-1,0,0), 1)):
+            self.pos[0] = x
+            self.vel[0] = 0
+        if self.block_exists["left"] and self._collision_algorithm((x-round(x), y-round(y), z-round(z)), 0.7, (-1,0,0), 1):
+            self.pos[0] = x
+            self.vel[0] = 0
+        if self.block_exists["forward"] and self._collision_algorithm((x-round(x), y-round(y), z-round(z)), 0.7, (0,0,1), 1):
+            self.pos[2] = z
+            self.vel[1] = 0
+        if self.block_exists["backward"] and self._collision_algorithm((x-round(x), y-round(y), z-round(z)), 0.7, (0,0,-1), 1):
+            self.pos[2] = z
+            self.vel[1] = 0
+
     def update(self, dt, keys):
         sens = self.speed
         s = dt*10
@@ -137,19 +164,19 @@ class Player:
         if self.velocity_y < -self.terminal_velocity:
             self.velocity_y = -self.terminal_velocity
 
-        if keys[key.W] and self.movable["forward"]:
+        if keys[key.W]:
             self.vel[0] += dx*sens
             self.vel[1] -= dz*sens
-        if keys[key.S] and self.movable["backward"]:
+        if keys[key.S]:
             self.vel[0] -= dx*sens
             self.vel[1] += dz*sens
-        if keys[key.A] and self.movable["left"]:
+        if keys[key.A]:
             self.vel[0] -= dz*sens
             self.vel[1] -= dx*sens
-        if keys[key.D] and self.movable["right"]:
+        if keys[key.D]:
             self.vel[0] += dz*sens
             self.vel[1] += dx*sens
-        if keys[key.SPACE] and self.movable["up"] and not self.suffocating and not self.falling:
+        if keys[key.SPACE] and not self.suffocating and not self.falling:
             self.velocity_y += 0.2
         if keys[key.LCTRL]:
             self.speed = 0.5
