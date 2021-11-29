@@ -22,6 +22,7 @@ class Player:
     def __init__(self, pos=(0, 0, 0), rot=(0, 0), parent=None):
         self.pos = list(pos)
         self.rot = list(rot)
+        self.vel = [0, 0]
         self.x = 0
         self.y = 0
         self.z = 0
@@ -40,6 +41,7 @@ class Player:
         self.velocity_y = 0
         self.gravity = 0.02
         self.hit_range = 8
+        self.friction = 0.25
 
         self.terminal_velocity = 5
 
@@ -136,17 +138,17 @@ class Player:
             self.velocity_y = -self.terminal_velocity
 
         if keys[key.W] and self.movable["forward"]:
-            self.pos[0] += dx*sens
-            self.pos[2] -= dz*sens
+            self.vel[0] += dx*sens
+            self.vel[1] -= dz*sens
         if keys[key.S] and self.movable["backward"]:
-            self.pos[0] -= dx*sens
-            self.pos[2] += dz*sens
+            self.vel[0] -= dx*sens
+            self.vel[1] += dz*sens
         if keys[key.A] and self.movable["left"]:
-            self.pos[0] -= dz*sens
-            self.pos[2] -= dx*sens
+            self.vel[0] -= dz*sens
+            self.vel[1] -= dx*sens
         if keys[key.D] and self.movable["right"]:
-            self.pos[0] += dz*sens
-            self.pos[2] += dx*sens
+            self.vel[0] += dz*sens
+            self.vel[1] += dx*sens
         if keys[key.SPACE] and self.movable["up"] and not self.suffocating and not self.falling:
             self.velocity_y += 0.2
         if keys[key.LCTRL]:
@@ -159,10 +161,8 @@ class Player:
                 self.parent.model.remove_block([self.pointing_at[0][0], self.pointing_at[0][1], self.pointing_at[0][2]])
 
         self.pos[1] += self.velocity_y
+        self.pos[0] += self.vel[0]
+        self.pos[2] += self.vel[1]
 
-        self.x = self.pos[0]
-        self.y = self.pos[2]
-        self.z = self.pos[1]
-
-        self.rotY = self.rot[0]
-        self.rotX = self.rot[1]
+        self.vel[0] *= self.friction
+        self.vel[1] *= self.friction
