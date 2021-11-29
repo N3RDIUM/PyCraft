@@ -11,7 +11,6 @@ import math
 from __main__ import test
 
 seed = random.randint(0, 100000)
-print(f"Seed: {seed}")
 simplex_grass = OpenSimplex(seed)
 simplex_dirt = OpenSimplex(seed)
 simplex_stone = OpenSimplex(seed)

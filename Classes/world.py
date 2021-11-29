@@ -1,22 +1,9 @@
 import threading
-import time
-import logging
-import math
+from logger import *
+from pyglet.gl import *
 
 from Classes.chunk import Chunk
 from Classes.environment.cloud_generator import cloud_generator
-from logger import warn
-
-logging.basicConfig(level=logging.DEBUG)
-
-
-def log(source, message, ctime=None):
-    # Get the time in a nice format
-    now = time.strftime("%H:%M:%S")
-    if ctime is not None:
-        now = ctime
-    logging.debug(f"({now}) [{source}]: {message}")
-
 
 class TaskScheduler:
     def __init__(self):
@@ -72,8 +59,37 @@ class World:
                                 (i+self.chunk_distance, j+self.chunk_distance))
         self.generated = True
 
+    def draw_cube(x, y, z, size):
+            glPushMatrix()
+            glTranslatef(x, y, z)
+            glScalef(size, size, size)
+            glBegin(GL_QUADS)
+            glVertex3f(1, 1, 1)
+            glVertex3f(1, 1, -1)
+            glVertex3f(-1, 1, -1)
+            glVertex3f(-1, 1, 1)
+            glVertex3f(1, -1, 1)
+            glVertex3f(1, -1, -1)
+            glVertex3f(-1, -1, -1)
+            glVertex3f(-1, -1, 1)
+            glVertex3f(1, 1, 1)
+            glVertex3f(-1, 1, 1)
+            glVertex3f(-1, -1, 1)
+            glVertex3f(1, -1, 1)
+            glVertex3f(1, 1, -1)
+            glVertex3f(-1, 1, -1)
+            glPopMatrix()
+
+    def draw_player_hitbox(self, pos):
+        # Just draw a cube with black outline
+        self.draw_cube(pos[0], pos[1], pos[2], 1)
+
     def draw(self):
         self._tick += 1
+        try:
+            self.draw_player_hitbox(self.parent.player.looking_at[1])
+        except:
+            pass
         for i in self.chunks:
             chunk = self.chunks[i]
             if chunk is not None and chunk.generated:
@@ -148,7 +164,6 @@ class World:
         for i in range(self.x-self.chunk_distance+1, self.x+self.chunk_distance-1):
             for j in range(self.z-self.chunk_distance+1, self.z+self.chunk_distance-1):
                 if not self.chunk_exists((i, j)):
-                    #warn("HoleChecker", f"Chunk hole at: {i} {j}")
                     self.make_chunk((i, j), (i, j))
 
     def remove_block(self, coords):

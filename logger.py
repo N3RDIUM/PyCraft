@@ -3,7 +3,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def log(source, message):
-    logging.info(f'(info) [{source}]: {message}')
+    info(source, message)
 
 
 def info(source, message):

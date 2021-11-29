@@ -3,6 +3,7 @@ from pyglet.gl import *
 from pyglet.window import key
 import time
 from logger import *
+logging.basicConfig(level=logging.INFO)
 
 from Classes.player import *
 from Classes.chunk import *
@@ -12,7 +13,7 @@ from Classes.world import *
 class Window(pyglet.window.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        log("Window", "Initializing window")
+        info("Window", "Initializing window")
         self.set_minimum_size(800, 500)
         self.keys = key.KeyStateHandler()
         self.push_handlers(self.keys)
