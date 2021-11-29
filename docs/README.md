@@ -9,7 +9,7 @@
 
 ## Running PyCraft
 ##### To run PyCraft, run the following code:
-    git clone https://github.com/TheWebCrafters/PyCraft.git
+    git clone https://github.com/1upCommunity/PyCraft.git
     cd PyCraft
     python __main__.py
     
