@@ -5,6 +5,7 @@ import math
 
 from Classes.chunk import Chunk
 from Classes.environment.cloud_generator import cloud_generator
+from logger import warn
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -15,6 +16,7 @@ def log(source, message, ctime=None):
     if ctime is not None:
         now = ctime
     logging.debug(f"({now}) [{source}]: {message}")
+
 
 class TaskScheduler:
     def __init__(self):
@@ -41,15 +43,17 @@ class TaskScheduler:
         finally:
             self._frame += 1
 
+
 class World:
-    def __init__(self, window, Chunk, Player):
+    def __init__(self, window, player):
         self.CHUNK_DIST = 16
         self.generated = False
         self.Chunk = Chunk
         self.chunk_distance = 3
-        self.player = Player
         self.parent = window
         self.cloud_generator = cloud_generator(self)
+        self.player = player
+        self._all_blocks = {}
 
         self.x = 0
         self.z = 0
@@ -64,7 +68,8 @@ class World:
         self.generated = False
         for i in range(-self.chunk_distance, self.chunk_distance):
             for j in range(-self.chunk_distance, self.chunk_distance):
-                self.make_chunk((self.x+i, self.z+j), (i+self.chunk_distance, j+self.chunk_distance))
+                self.make_chunk((self.x+i, self.z+j),
+                                (i+self.chunk_distance, j+self.chunk_distance))
         self.generated = True
 
     def draw(self):
@@ -85,12 +90,20 @@ class World:
     def chunk_exists(self, index):
         return index in self.chunks
 
+    def block_exists(self, coords):
+        try:
+            return self._all_blocks[(coords[0], coords[1], coords[2])].block_data
+        except:
+            return False
+
     def add_row_z_minus(self):
         data = {}
         for x in range(-self.chunk_distance, self.chunk_distance):
             if not self.chunk_exists((self.x+x, self.z-self.chunk_distance)):
-                data[(self.x+x, self.z-self.chunk_distance)] = self.Chunk(self.x+x, self.z-self.chunk_distance, self)
-                self._scheduler_.add_task(data[self.x+x, self.z-self.chunk_distance].generate)
+                data[(self.x+x, self.z-self.chunk_distance)
+                     ] = self.Chunk(self.x+x, self.z-self.chunk_distance, self)
+                self._scheduler_.add_task(
+                    data[self.x+x, self.z-self.chunk_distance].generate)
         for i in data:
             self.chunks[i] = data[i]
         self.z -= 1
@@ -99,8 +112,10 @@ class World:
         data = {}
         for x in range(-self.chunk_distance, self.chunk_distance):
             if not self.chunk_exists((self.x+x, self.z+self.chunk_distance)):
-                data[(self.x+x, self.z+self.chunk_distance)] = self.Chunk(self.x+x, self.z+self.chunk_distance, self)
-                self._scheduler_.add_task(data[self.x+x, self.z+self.chunk_distance].generate)
+                data[(self.x+x, self.z+self.chunk_distance)
+                     ] = self.Chunk(self.x+x, self.z+self.chunk_distance, self)
+                self._scheduler_.add_task(
+                    data[self.x+x, self.z+self.chunk_distance].generate)
         for i in data:
             self.chunks[i] = data[i]
         self.z += 1
@@ -109,8 +124,10 @@ class World:
         data = {}
         for z in range(-self.chunk_distance, self.chunk_distance):
             if not self.chunk_exists((self.x-self.chunk_distance, self.z+z)):
-                data[(self.x-self.chunk_distance, self.z+z)] = self.Chunk(self.x-self.chunk_distance, self.z+z, self)
-                self._scheduler_.add_task(data[self.x-self.chunk_distance, self.z+z].generate)
+                data[(self.x-self.chunk_distance, self.z+z)
+                     ] = self.Chunk(self.x-self.chunk_distance, self.z+z, self)
+                self._scheduler_.add_task(
+                    data[self.x-self.chunk_distance, self.z+z].generate)
         for i in data:
             self.chunks[i] = data[i]
         self.x -= 1
@@ -119,16 +136,30 @@ class World:
         data = {}
         for z in range(-self.chunk_distance, self.chunk_distance):
             if not self.chunk_exists((self.x+self.chunk_distance, self.z+z)):
-                data[(self.x+self.chunk_distance, self.z+z)] = self.Chunk(self.x+self.chunk_distance, self.z+z, self)
-                self._scheduler_.add_task(data[self.x+self.chunk_distance, self.z+z].generate)
+                data[(self.x+self.chunk_distance, self.z+z)
+                     ] = self.Chunk(self.x+self.chunk_distance, self.z+z, self)
+                self._scheduler_.add_task(
+                    data[self.x+self.chunk_distance, self.z+z].generate)
         for i in data:
             self.chunks[i] = data[i]
         self.x += 1
 
+    def _check_no_holes(self):
+        for i in range(self.x-self.chunk_distance+1, self.x+self.chunk_distance-1):
+            for j in range(self.z-self.chunk_distance+1, self.z+self.chunk_distance-1):
+                if not self.chunk_exists((i, j)):
+                    #warn("HoleChecker", f"Chunk hole at: {i} {j}")
+                    self.make_chunk((i, j), (i, j))
+
+    def remove_block(self, coords):
+        if self._all_blocks[(coords[0], coords[1], coords[2])].generated:
+            self._all_blocks[(coords[0], coords[1], coords[2])].remove()
+
     def update(self, dt):
         x = int(self.player.pos[0]/self.CHUNK_DIST*2)
-        z = int(self.player.pos[2]/self.CHUNK_DIST*2)
-        
+        z = int(self.player.pos[2]/self.CHUNK_DIST*2)                
+        self._check_no_holes()
+
         if x != self.x:
             if x+1 > self.x:
                 self.add_row_x_plus()

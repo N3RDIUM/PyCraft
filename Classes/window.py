@@ -8,9 +8,6 @@ from Classes.player import *
 from Classes.chunk import *
 from Classes.world import *
 
-def log(source, message):
-    now = time.strftime("%H:%M:%S")
-    logging.debug(f"({now}) [{source}]: {message}")
 
 class Window(pyglet.window.Window):
     def __init__(self, *args, **kwargs):
@@ -21,8 +18,8 @@ class Window(pyglet.window.Window):
         self.push_handlers(self.keys)
         pyglet.clock.schedule(self.update)
 
-        self.player = Player((0.5, 1.5, 1.5), (-30, 0), self)
-        self.model = World(self,self.player)
+        self.player = Player((0, 20, 0), (0, 0), self)
+        self.model = World(self, self.player)
         pyglet.clock.schedule_interval(self.model.update, 1/60)
 
         self.alive = True
@@ -81,9 +78,14 @@ class Window(pyglet.window.Window):
     def update(self, dt):
         self.player.update(dt, self.keys)
 
+    def on_mouse_press(self, *args, **kwargs):
+        self.player.mouse_click = True
+
+    def on_mouse_release(self, *args, **kwargs):
+        self.player.mouse_click = False
+
     def on_draw(self):
         self.clear()
         self.set3d()
         self.push(self.player.pos, self.player.rot)
         self.model.draw()
-        

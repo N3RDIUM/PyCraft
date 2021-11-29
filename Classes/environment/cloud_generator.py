@@ -3,11 +3,12 @@ from opensimplex import OpenSimplex
 import random
 from pyglet.gl import *
 
+
 class cloud_generator:
-    def __init__(self,parent):
+    def __init__(self, parent):
         self.clouds = []
         self.frame = 0
-        self.seed = random.randint(-999999,999999)
+        self.seed = random.randint(-999999, 999999)
         self.noise = OpenSimplex(self.seed)
         self.parent = parent
         self.trans_z = 0
@@ -16,7 +17,7 @@ class cloud_generator:
         self.frame += 1
         self.trans_z += 0.1
         glPushMatrix()
-        glTranslatef(self.parent.player.pos[0],0,self.parent.player.pos[1])
+        glTranslatef(self.parent.player.pos[0], 0, self.parent.player.pos[1])
         for i in self.clouds:
             self.clouds[i].draw()
         glPopMatrix()

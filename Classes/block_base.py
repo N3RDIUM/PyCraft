@@ -1,9 +1,10 @@
+import tqdm
+import os
 import pyglet
 from pyglet.gl import *
 from logger import *
 blocks_all = {}
-import os
-import tqdm
+
 
 def load_texture(filename):
     try:
@@ -15,22 +16,29 @@ def load_texture(filename):
         warn("Texture Loader", "Failed to load texture: " + filename)
         return None
 
+
 class BlockBase:
     def __init__(self, block_data, parent):
         self.block_data = {
             "block_textures": None,
             "block_pos": block_data["block_pos"],
-            "block_faces": {
-                "top": None,
-                "bottom": None,
-                "front": None,
-                "back": None,
-                "left": None,
-                "right": None
-            },
             "block_redstone_activated": False,
             "block_conducts_redstone": False,
-            "parent": parent
+            "parent": parent,
+            "top": None,
+            "bottom": None,
+            "left": None,
+            "right": None,
+            "front": None,
+            "back": None,
+            "block_textures":{
+                "top": None,
+                "bottom": None,
+                "left": None,
+                "right": None,
+                "front": None,
+                "back": None
+            }
         }
         self.chunk = parent
         self.generated = False
@@ -42,27 +50,62 @@ class BlockBase:
         X, Y, Z = x+1, y+1, z+1
         tex_coords = ('t2f', (0, 0, 1, 0, 1, 1, 0, 1))
 
-        if not self.chunk.block_exists((x,y+1,z)):
-            self.block_data['top'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['top'],    ('v3f', (x, Y,Z,  X, Y, Z,  X, Y, z,  x, Y, z)), tex_coords)
+        if not self.chunk.parent.block_exists((x, y+1, z)):
+            self.block_data['top'] = self.chunk.batch.add(
+                4, GL_QUADS, self.block_data['block_textures']['top'],    ('v3f', (x, Y, Z,  X, Y, Z,  X, Y, z,  x, Y, z)), tex_coords)
 
-        if not self.chunk.block_exists((x,y-1,z)):
-            self.block_data['bottom'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['bottom'], ('v3f', (x,y,z, X,y,z, X,y,Z, x,y,Z)), tex_coords)
+        if not self.chunk.parent.block_exists((x, y-1, z)):
+            self.block_data['bottom'] = self.chunk.batch.add(
+                4, GL_QUADS, self.block_data['block_textures']['bottom'], ('v3f', (x, y, z, X, y, z, X, y, Z, x, y, Z)), tex_coords)
 
-        if not self.chunk.block_exists((x-1,y,z)):
-            self.block_data['left'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['left'],   ('v3f',(x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z)), tex_coords)
+        if not self.chunk.parent.block_exists((x-1, y, z)):
+            self.block_data['left'] = self.chunk.batch.add(
+                4, GL_QUADS, self.block_data['block_textures']['left'],   ('v3f', (x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z)), tex_coords)
 
-        if not self.chunk.block_exists((x+1,y,z)):
-            self.block_data['right'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['right'],  ('v3f', (X, y,Z,  X, y, z,  X, Y, z,  X, Y, Z)), tex_coords)
+        if not self.chunk.parent.block_exists((x+1, y, z)):
+            self.block_data['right'] = self.chunk.batch.add(
+                4, GL_QUADS, self.block_data['block_textures']['right'],  ('v3f', (X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z)), tex_coords)
 
-        if not self.chunk.block_exists((x,y,z+1)):
-            self.block_data['front'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['front'],  ('v3f', (x, y,Z,  X, y, Z,  X, Y, Z,  x, Y, Z)), tex_coords)
+        if not self.chunk.parent.block_exists((x, y, z+1)):
+            self.block_data['front'] = self.chunk.batch.add(
+                4, GL_QUADS, self.block_data['block_textures']['front'],  ('v3f', (x, y, Z,  X, y, Z,  X, Y, Z,  x, Y, Z)), tex_coords)
 
-        if not self.chunk.block_exists((x,y,z-1)):
-            self.block_data['back'] = self.chunk.batch.add(4, GL_QUADS, self.block_data['block_textures']['back'],   ('v3f', (X, y,z,  x, y, z,  x, Y, z,  X, Y, z)), tex_coords)
+        if not self.chunk.parent.block_exists((x, y, z-1)):
+            self.block_data['back'] = self.chunk.batch.add(
+                4, GL_QUADS, self.block_data['block_textures']['back'],   ('v3f', (X, y, z,  x, y, z,  x, Y, z,  X, Y, z)), tex_coords)
 
         self.generated = True
 
+    def remove(self, *args, **kwargs):
+        if self.generated:
+            try:
+                self.block_data['top'].delete()
+            except:
+                pass
+            try:
+                self.block_data['bottom'].delete()
+            except:
+                pass
+            try:
+                self.block_data['left'].delete()
+            except:
+                pass
+            try:
+                self.block_data['right'].delete()
+            except:
+                pass
+            try:
+                self.block_data['front'].delete()
+            except:
+                pass
+            try:
+                self.block_data['back'].delete()
+            except:
+                pass
+            self.generated = False
+
 textures = {}
+
 
 def get_all_textures(dir):
     log("Texture Loader", "Loading textures...")
@@ -71,7 +114,9 @@ def get_all_textures(dir):
             #log("Texture Loader", "Loading texture: " + i)
             textures[i.split(".")[0]] = load_texture(dir+"/"+i)
 
+
 get_all_textures("assets/textures/block/")
+
 
 class grass(BlockBase):
     def __init__(self, *args, **kwargs):
@@ -86,7 +131,9 @@ class grass(BlockBase):
             "bottom": textures["dirt"]
         }
 
+
 blocks_all["grass"] = grass
+
 
 class dirt(BlockBase):
     def __init__(self, *args, **kwargs):
@@ -101,7 +148,9 @@ class dirt(BlockBase):
             "bottom": textures["dirt"]
         }
 
+
 blocks_all["dirt"] = dirt
+
 
 class stone(BlockBase):
     def __init__(self, *args, **kwargs):
@@ -116,7 +165,9 @@ class stone(BlockBase):
             "bottom": textures["stone"]
         }
 
+
 blocks_all["stone"] = stone
+
 
 class cobblestone(BlockBase):
     def __init__(self, *args, **kwargs):
@@ -130,8 +181,10 @@ class cobblestone(BlockBase):
             "back": textures["cobblestone"],
             "bottom": textures["cobblestone"]
         }
-    
+
+
 blocks_all["cobblestone"] = cobblestone
+
 
 class bedrock(BlockBase):
     def __init__(self, *args, **kwargs):
@@ -146,7 +199,9 @@ class bedrock(BlockBase):
             "bottom": textures["bedrock"]
         }
 
+
 blocks_all["bedrock"] = bedrock
+
 
 class iron_ore(BlockBase):
     def __init__(self, *args, **kwargs):
@@ -161,7 +216,9 @@ class iron_ore(BlockBase):
             "bottom": textures["stone"]
         }
 
+
 blocks_all["iron_ore"] = iron_ore
+
 
 class gold_ore(BlockBase):
     def __init__(self, *args, **kwargs):
@@ -175,5 +232,6 @@ class gold_ore(BlockBase):
             "back": textures["gold_ore"],
             "bottom": textures["stone"]
         }
+
 
 blocks_all["gold_ore"] = gold_ore
