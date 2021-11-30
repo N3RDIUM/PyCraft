@@ -186,8 +186,7 @@ class Player:
 
             if abs(x1 - x2) < r1 + r2 or abs(y1-y2) < r1 + r2 or abs(z1-z2) < r1 + r2:
                 return True
-            else:
-                return False
+            return False
         except:
             return False
 
