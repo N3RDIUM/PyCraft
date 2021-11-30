@@ -1,13 +1,23 @@
+# imports
 from pyglet.gl import *
 from opensimplex import OpenSimplex
 import random
 
+# values and noise generators
 seed = random.randint(-999999, 999999)
 noise = OpenSimplex(seed=seed)
 
-
+# Single Cloud Class
 class cloud:
     def __init__(self, x, z):
+        """
+        class cloud
+
+        *Makes a single cloud and draws it.
+
+        :x: x position
+        :z: z position
+        """
         self.pos = [x, z]
         self.size = [10, 10]
 

@@ -3,7 +3,6 @@ from pyglet.window import key
 from pyglet.gl import *
 import math
 
-
 def polar_to_cartesian(radius, angle):
     return [radius * math.cos(angle), radius * math.sin(angle)]
 
@@ -60,22 +59,22 @@ class Player:
         y_int = int(self.pos[1])
         z_int = int(self.pos[2])
 
-        if not self.parent.model.block_exists((x_int-1, y_int-1, z_int)) or self.parent.model.block_exists((x_int-1, y_int-2, z_int)):
+        if not self.parent.model.block_exists((x_int-1, y_int, z_int)) or self.parent.model.block_exists((x_int-1, y_int+1, z_int)):
             self.block_exists["left"] = False
         else:
             self.block_exists["left"] = True
 
-        if self.parent.model.block_exists((x_int+1, y_int-1, z_int)) or self.parent.model.block_exists((x_int+1, y_int-2, z_int)):
+        if self.parent.model.block_exists((x_int+1, y_int, z_int)) or self.parent.model.block_exists((x_int+1, y_int+1, z_int)):
             self.block_exists["right"] = False
         else:
             self.block_exists["right"] = True
 
-        if not self.parent.model.block_exists((x_int, y_int-1, z_int-1)) or self.parent.model.block_exists((x_int, y_int-2, z_int-1)):
+        if not self.parent.model.block_exists((x_int, y_int, z_int-1)) or self.parent.model.block_exists((x_int, y_int+1, z_int+1)):
             self.block_exists["backward"] = False
         else:
             self.block_exists["backward"] = True
 
-        if not self.parent.model.block_exists((x_int, y_int-1, z_int+1)) or self.parent.model.block_exists((x_int, y_int-2, z_int+1)):
+        if not self.parent.model.block_exists((x_int, y_int, z_int+1)) or self.parent.model.block_exists((x_int, y_int+1, z_int-1)):
             self.block_exists["forward"] = False
         else:
             self.block_exists["forward"] = True
@@ -123,31 +122,35 @@ class Player:
         return value
 
     def _collision_algorithm(self, b1,b1_rad, b2, b2_side):
-        x1, y1, z1 = b1
-        x2, y2, z2 = b2
-        r1 = b1_rad
-        r2 = b2_side
+        try:
+            x1, y1, z1 = b1
+            x2, y2, z2 = b2
+            r1 = b1_rad
+            r2 = b2_side
 
-        if abs(x1 - x2) < r1 + r2 or abs(y1-y2) < r1 + r2 or abs(z1-z2) < r1 + r2:
-            print("collision: ",[[x1,y1,z1], [x2,y2,z2]])
-            return True
-        else:
+            if abs(x1 - x2) < r1 + r2 or abs(y1-y2) < r1 + r2 or abs(z1-z2) < r1 + r2:
+                return True
+            else:
+                return False
+        except:
             return False
 
     def _collide(self, position):
         x, y, z = position
-        if self.block_exists["right"] and (self._collision_algorithm((x-round(x), y-round(y), z-round(z)), 0.7, (1,0,0), 1) or self._collision_algorithm((x-round(x), y-round(y), z-round(z)), 0.7, (-1,0,0), 1)):
-            self.pos[0] = x
-            self.vel[0] = 0
-        if self.block_exists["left"] and self._collision_algorithm((x-round(x), y-round(y), z-round(z)), 0.7, (-1,0,0), 1):
-            self.pos[0] = x
-            self.vel[0] = 0
-        if self.block_exists["forward"] and self._collision_algorithm((x-round(x), y-round(y), z-round(z)), 0.7, (0,0,1), 1):
-            self.pos[2] = z
-            self.vel[1] = 0
-        if self.block_exists["backward"] and self._collision_algorithm((x-round(x), y-round(y), z-round(z)), 0.7, (0,0,-1), 1):
-            self.pos[2] = z
-            self.vel[1] = 0
+        x = x-int(x)
+        y = y-int(y)
+        z = z-int(z)
+        blocks = self.get_surrounding_blocks()
+
+        for block in blocks:
+            if self._collision_algorithm((x,y,z),0.45,block,0.5):
+                self.vel[0] = 0
+            elif self._collision_algorithm((x,y,z),0.45,block,0.5):
+                self.vel[0] = 0
+            elif self._collision_algorithm((x,y,z),0.45,block,0.5):
+                self.vel[1] = 0
+            elif self._collision_algorithm((x,y,z),0.45,block,0.5):
+                self.vel[1] = 0
 
     def update(self, dt, keys):
         sens = self.speed
@@ -158,7 +161,6 @@ class Player:
         dy = math.sin(rotX)
         self.hit_test(position=self.pos, vector=(dx, dy, dz), max_distance=self.hit_range)
         
-        self.collide()
         if self.velocity_y > self.terminal_velocity:
             self.velocity_y = self.terminal_velocity
         if self.velocity_y < -self.terminal_velocity:
@@ -182,6 +184,8 @@ class Player:
             self.speed = 0.5
         else:
             self.speed = 0.3
+        
+        self.collide()
 
         if self.mouse_click and not self.pointing_at[0] is None and not self.pointing_at[1] is None:
             if self.parent.model.block_exists([self.pointing_at[0][0], self.pointing_at[0][1], self.pointing_at[0][2]]):

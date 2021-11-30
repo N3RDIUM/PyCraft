@@ -7,8 +7,10 @@
 # |_|         ||    |______| |_| \_\ |_|    |_|_|         |__|  *
 #################################################################
 
+# Make this true to enter debug mode
 test = False
 
+# import all the modules
 from logger import *
 from load_shaders import *
 from Classes.window import *
@@ -19,23 +21,26 @@ from pyglet.gl import *
 from OpenGL.GL import *
 import pyglet
 
-
+# Warn if game is in debug mode
 if test:
     warn('Main', "This is a test!")
 
-
+# Use shaders function
 def use_shader(shader_name="default"):
     log("main", f"Using shaders: {shader_name}:{shaders[shader_name]}")
     glLinkProgram(shaders[shader_name])
     glUseProgram(shaders[shader_name])
 
-
+# shader variables
 use_shaders = False
 load_shaders()
 
 if __name__ == '__main__':
+    # Create window
     window = Window(width=400, height=300, caption='PyCraft',
                     resizable=True)
+
+    # initialize opengl
     glClearColor(0.5, 0.7, 1, 1)
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_CULL_FACE)
@@ -52,7 +57,10 @@ if __name__ == '__main__':
         glEnable (GL_BLEND)
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glHint (GL_LINE_SMOOTH_HINT, GL_DONT_CARE)
+    
     # shaders
     if use_shaders:
         use_shader()
+    
+    # run the game
     pyglet.app.run()

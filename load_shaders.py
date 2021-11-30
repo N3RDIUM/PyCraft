@@ -1,18 +1,16 @@
+# imports
 import os
-import logging
+from logger import *
 import time
 from OpenGL.GL import *
+
+# configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-
-def log(source, message):
-    now = time.strftime("%H:%M:%S")
-    logging.debug(f"({now}) [{source}]: {message}")
-
-
+# dictionary of shaders
 shaders = {}
 
-
+# function to load shaders
 def load_shaders():
     for i in os.listdir("./shaders"):
         if not "." in i:
@@ -29,7 +27,7 @@ def load_shaders():
             except:
                 logging.warn(f"load_shaders: Failed to load shader: {i}")
 
-
+# function to compile shaders
 def compile_shader(vert, frag):
     shader = glCreateProgram()
     vs = glCreateShader(GL_VERTEX_SHADER)
