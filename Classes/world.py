@@ -91,7 +91,8 @@ class World:
                                 (i+self.chunk_distance, j+self.chunk_distance))
         self.generated = True
 
-    def draw_cube(self, x, y, z, size):
+    @staticmethod
+    def draw_cube(x, y, z, size):
         """
         draw_cube
 

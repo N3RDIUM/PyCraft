@@ -164,7 +164,8 @@ class Player:
             value.append((0, -1, 0))
         return value
 
-    def _collision_algorithm(self, b1,b1_rad, b2, b2_side):
+    @staticmethod
+    def _collision_algorithm(b1,b1_rad, b2, b2_side):
         """
         _collision_algorithm
 
