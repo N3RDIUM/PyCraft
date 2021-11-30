@@ -8,10 +8,10 @@ seed = random.randint(-999999, 999999)
 noise = OpenSimplex(seed=seed)
 
 # Single Cloud Class
-class cloud:
+class Cloud:
     def __init__(self, x, z):
         """
-        class cloud
+        class Cloud
 
         *Makes a single cloud and draws it.
 

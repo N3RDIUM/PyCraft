@@ -1,13 +1,11 @@
 # imports
-from pyglet import gl
 from pyglet.gl import *
 import pyglet
 import random
 from opensimplex import OpenSimplex
-import threading
-import time
 from logging import *
-from Classes.block_base import *
+from Classes.terrain.block.blocks import *
+from Classes.util.math_util import *
 import math
 from __main__ import test
 
@@ -16,10 +14,6 @@ seed = random.randint(0, 100000)
 simplex_grass = OpenSimplex(seed)
 simplex_dirt = OpenSimplex(seed)
 simplex_stone = OpenSimplex(seed)
-
-# Function to get distance between two points
-def distance_vector_2d(x1, y1, x2, y2):
-    return math.dist([x1, y1], [x2, y2])
 
 # Chunk Class
 class Chunk:

@@ -3,8 +3,8 @@ import threading
 from logger import *
 from pyglet.gl import *
 
-from Classes.chunk import Chunk
-from Classes.environment.cloud_generator import cloud_generator
+from Classes.terrain.chunk import *
+from Classes.environment.cloud_generator import CloudGenerator
 
 # Task Scheduler Class
 class TaskScheduler:
@@ -62,10 +62,9 @@ class World:
         """
         self.CHUNK_DIST = 16
         self.generated = False
-        self.Chunk = Chunk
         self.chunk_distance = 3
         self.parent = window
-        self.cloud_generator = cloud_generator(self)
+        self.cloud_generator = CloudGenerator(self)
         self.player = player
         self._all_blocks = {}
 
@@ -162,7 +161,7 @@ class World:
         :xz: The xz coordinates of the chunk.
         :index: The index of the chunk.
         """
-        chunk = self.Chunk(xz[0], xz[1], self)
+        chunk = Chunk(xz[0], xz[1], self)
         self.chunks[index] = chunk
         chunk.generate()
 
@@ -203,7 +202,7 @@ class World:
         for x in range(-self.chunk_distance, self.chunk_distance):
             if not self.chunk_exists((self.x+x, self.z-self.chunk_distance)):
                 data[(self.x+x, self.z-self.chunk_distance)
-                     ] = self.Chunk(self.x+x, self.z-self.chunk_distance, self)
+                     ] = Chunk(self.x+x, self.z-self.chunk_distance, self)
                 self._scheduler_.add_task(
                     data[self.x+x, self.z-self.chunk_distance].generate)
         for i in data:
@@ -220,7 +219,7 @@ class World:
         for x in range(-self.chunk_distance, self.chunk_distance):
             if not self.chunk_exists((self.x+x, self.z+self.chunk_distance)):
                 data[(self.x+x, self.z+self.chunk_distance)
-                     ] = self.Chunk(self.x+x, self.z+self.chunk_distance, self)
+                     ] = Chunk(self.x+x, self.z+self.chunk_distance, self)
                 self._scheduler_.add_task(
                     data[self.x+x, self.z+self.chunk_distance].generate)
         for i in data:
@@ -237,7 +236,7 @@ class World:
         for z in range(-self.chunk_distance, self.chunk_distance):
             if not self.chunk_exists((self.x-self.chunk_distance, self.z+z)):
                 data[(self.x-self.chunk_distance, self.z+z)
-                     ] = self.Chunk(self.x-self.chunk_distance, self.z+z, self)
+                     ] = Chunk(self.x-self.chunk_distance, self.z+z, self)
                 self._scheduler_.add_task(
                     data[self.x-self.chunk_distance, self.z+z].generate)
         for i in data:
@@ -254,7 +253,7 @@ class World:
         for z in range(-self.chunk_distance, self.chunk_distance):
             if not self.chunk_exists((self.x+self.chunk_distance, self.z+z)):
                 data[(self.x+self.chunk_distance, self.z+z)
-                     ] = self.Chunk(self.x+self.chunk_distance, self.z+z, self)
+                     ] = Chunk(self.x+self.chunk_distance, self.z+z, self)
                 self._scheduler_.add_task(
                     data[self.x+self.chunk_distance, self.z+z].generate)
         for i in data:

@@ -1,14 +1,14 @@
 # imports
-from Classes.environment.environment_objects import cloud
+from Classes import *
 from opensimplex import OpenSimplex
 import random
 from pyglet.gl import *
 
 # Cloud Generator
-class cloud_generator:
+class CloudGenerator:
     def __init__(self, parent):
         """
-        cloud_generator
+        CloudGenerator
 
         *This is a cloud generator for the world.
 

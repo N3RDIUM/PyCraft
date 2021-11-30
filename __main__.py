@@ -13,10 +13,7 @@ test = False
 # import all the modules
 from logger import *
 from load_shaders import *
-from Classes.window import *
-from Classes.world import *
-from Classes.chunk import *
-from Classes.player import *
+from Classes import *
 from pyglet.gl import *
 from OpenGL.GL import *
 import pyglet
@@ -37,9 +34,9 @@ load_shaders()
 
 if __name__ == '__main__':
     # Create window
-    window = Window(width=400, height=300, caption='PyCraft',
+    _window = window.Window(width=400, height=300, caption='PyCraft',
                     resizable=True)
-
+    _window.set_visible()
     # initialize opengl
     glClearColor(0.5, 0.7, 1, 1)
     glEnable(GL_DEPTH_TEST)
@@ -48,11 +45,11 @@ if __name__ == '__main__':
     if not test:
         glEnable(GL_FOG)
         glFogfv(GL_FOG_COLOR, (GLfloat *
-                int(window.model.chunk_distance*16))(0.5, 0.69, 1.0, 10))
+                int(_window.model.chunk_distance*16))(0.5, 0.69, 1.0, 10))
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
-        glFogf(GL_FOG_START, window.model.chunk_distance*3)
-        glFogf(GL_FOG_END, window.model.chunk_distance*4)
+        glFogf(GL_FOG_START, _window.model.chunk_distance*3)
+        glFogf(GL_FOG_END, _window.model.chunk_distance*4)
         glEnable (GL_LINE_SMOOTH)
         glEnable (GL_BLEND)
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)

@@ -6,9 +6,7 @@ import time
 from logger import *
 logging.basicConfig(level=logging.INFO)
 
-from Classes.player import *
-from Classes.chunk import *
-from Classes.world import *
+from Classes import *
 
 # Window class
 class Window(pyglet.window.Window):

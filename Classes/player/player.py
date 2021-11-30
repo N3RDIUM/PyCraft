@@ -3,21 +3,7 @@ from logging import root
 from pyglet.window import key
 from pyglet.gl import *
 import math
-
-# util functions will be moved to a different file soon
-def polar_to_cartesian(radius, angle):
-    return [radius * math.cos(angle), radius * math.sin(angle)]
-
-def cartesian_to_polar(x, y):
-    return math.hypot(x**2 + y**2), math.atan2(y, x)
-
-def _to_radians(angle):
-    return angle * math.pi / 180
-
-def normalize(position):
-    x, y, z = position
-    x, y, z = (int(round(x)), int(round(y)), int(round(z)))
-    return (x, y, z)
+from Classes.util.math_util import _to_radians, normalize
 
 # player class
 class Player:
