@@ -98,7 +98,7 @@ class Chunk:
         # schedule the chunk for rendering
         for i in self.blocks:
             self.parent._all_blocks[i] = self.blocks[i]
-            if not type(self.blocks[i]) == type(blocks_all["grass"]) and not type(self.blocks[i]) == type(None):
+            if not type(self.blocks[i]) is type(blocks_all["grass"]) and not type(self.blocks[i]) is type(None):
                 pyglet.clock.schedule_once(
                     self.blocks[i].add_to_batch_and_save, random.randint(0,1))
 
