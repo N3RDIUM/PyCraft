@@ -1,8 +1,10 @@
+# imports
 from logging import root
 from pyglet.window import key
 from pyglet.gl import *
 import math
 
+# util functions will be moved to a different file soon
 def polar_to_cartesian(radius, angle):
     return [radius * math.cos(angle), radius * math.sin(angle)]
 
@@ -17,8 +19,18 @@ def normalize(position):
     x, y, z = (int(round(x)), int(round(y)), int(round(z)))
     return (x, y, z)
 
+# player class
 class Player:
     def __init__(self, pos=(0, 0, 0), rot=(0, 0), parent=None):
+        """
+        Player
+
+        * the first person controller
+
+        :pos: the position of the player
+        :rot: the rotation of the player
+        :parent: the parent of the player
+        """
         self.pos = list(pos)
         self.rot = list(rot)
         self.vel = [0, 0]
@@ -45,6 +57,14 @@ class Player:
         self.mouse_click = False
 
     def mouse_motion(self, dx, dy):
+        """
+        mouse_motion
+
+        * handles mouse movement
+
+        :dx: the change in x
+        :dy: the change in y
+        """
         self.rot[0] += dy/8
         self.rot[1] -= dx/8
         if self.rot[0] > 90:
@@ -55,6 +75,11 @@ class Player:
         self.rot[1] = self.rot[1]
 
     def collide(self):
+        """
+        collide
+
+        * handles collision with the world
+        """
         x_int = int(self.pos[0])
         y_int = int(self.pos[1])
         z_int = int(self.pos[2])
@@ -89,6 +114,17 @@ class Player:
         self._collide(self.pos)
 
     def hit_test(self, position, vector, max_distance=8):
+        """
+        hit_test
+
+        * checks if the player is pointing at a block
+
+        :position: the position of the player
+        :vector: the vector of the player
+        :max_distance: the maximum distance to check
+
+        :return: a list of positions
+        """
         m = 8
         x, y, z = position
         dx, dy, dz = vector
@@ -106,6 +142,13 @@ class Player:
         return None, None
 
     def get_surrounding_blocks(self):
+        """
+        get_surrounding_blocks
+
+        * gets the surrounding blocks of the player
+
+        :return: a list of blocks
+        """
         value = []
         if self.block_exists["forward"]:
             value.append((0, 0, -1))
@@ -122,6 +165,18 @@ class Player:
         return value
 
     def _collision_algorithm(self, b1,b1_rad, b2, b2_side):
+        """
+        _collision_algorithm
+
+        * handles collision
+
+        :b1: the first entity
+        :b1_rad: the radius of the first entity
+        :b2: the second entity
+        :b2_side: the side of the second entity
+
+        :return: bool if collision
+        """
         try:
             x1, y1, z1 = b1
             x2, y2, z2 = b2
@@ -136,6 +191,13 @@ class Player:
             return False
 
     def _collide(self, position):
+        """
+        collide
+
+        * handles collision with the world
+
+        :position: the position of the player
+        """
         x, y, z = position
         x = x-int(x)
         y = y-int(y)
@@ -153,6 +215,14 @@ class Player:
                 self.vel[1] = 0
 
     def update(self, dt, keys):
+        """
+        update
+
+        * updates the player
+
+        :dt: the delta time
+        :keys: the keys pressed
+        """
         sens = self.speed
         s = dt*10
         rotY = _to_radians(-self.rot[1])

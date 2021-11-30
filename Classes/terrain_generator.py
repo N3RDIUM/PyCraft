@@ -1,17 +1,33 @@
+# imports
 from opensimplex import *
 from random import randint
 from logger import *
 
+# this file is currently not used
+
+# values and noise generators
 seed = randint(-999999, 999999)
 noise = OpenSimplex(seed)
 log("terrain_gen", f"Seed is {seed}")
 
-
-class terrain_gen:
+# terrain generator class
+class TerrainGenerator:
     def __init__(self):
+        """
+        TerrainGenerator
+
+        * Generates terrain for a chunk.
+        """
         self.simplex = noise
 
     def gen_for(self, chunk):
+        """
+        gen_for
+
+        * Generates terrain for a chunk.
+
+        :chunk: chunk to generate terrain for (Chunk)
+        """
         for i in range(-chunk.CHUNK_DIST, chunk.CHUNK_DIST):
             for j in range(-chunk.CHUNK_DIST, chunk.CHUNK_DIST):
                 noiseval_bedrock = 1 + \
