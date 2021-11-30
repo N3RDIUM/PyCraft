@@ -9,7 +9,7 @@ def polar_to_cartesian(radius, angle):
     return [radius * math.cos(angle), radius * math.sin(angle)]
 
 def cartesian_to_polar(x, y):
-    return math.sqrt(x**2 + y**2), math.atan2(y, x)
+    return math.hypot(x**2 + y**2), math.atan2(y, x)
 
 def _to_radians(angle):
     return angle * math.pi / 180
