@@ -38,7 +38,6 @@ class BlockBase:
         :parent: parent chunk
         """
         self.block_data = {
-            "block_textures": None,
             "block_pos": block_data["block_pos"],
             "block_redstone_activated": False,
             "block_conducts_redstone": False,
