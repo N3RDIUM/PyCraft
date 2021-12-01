@@ -83,6 +83,7 @@ class TerrainGenerator:
             if chunk.blocks[i] != None:
                 chunk.parent._all_blocks[i] = chunk.blocks[i]  
         chunk.generated = True
+        exit()
 
     def add_to_batch(self,chunk):
         for i in chunk.blocks:

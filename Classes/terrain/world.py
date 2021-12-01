@@ -77,6 +77,18 @@ class World:
         self.generate()
         self._tick = 0
 
+    def get_chunk(self, coords):
+        """
+        get_chu
+
+        * Gets a chunk.
+
+        :coords: The coordinates of the chunk.
+
+        :returns: The chunk.
+        """
+        return self.chunks[(coords[0], coords[1])]
+
     def generate(self):
         """
         generate
