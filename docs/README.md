@@ -7,6 +7,7 @@
 
 ## Running PyCraft
 ##### To run PyCraft, run the following code:
+##### A dep installer will be added soon.
     git clone https://github.com/1upCommunity/PyCraft.git
     cd PyCraft
     python __main__.py
