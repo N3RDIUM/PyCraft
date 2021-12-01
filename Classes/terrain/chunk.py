@@ -7,7 +7,7 @@ from logging import *
 from Classes.terrain.block.blocks import *
 from Classes.terrain.terrain_generator import *
 from Classes.util.math_util import *
-import math
+import threading
 from __main__ import test
 
 # values and noise generators
@@ -36,6 +36,7 @@ class Chunk:
         self.generated = False
         self.blocks = {}
         self._scheduled_frame_last = 0
+        self.added_to_batch = False
 
     def generate(self):
         """
@@ -46,59 +47,14 @@ class Chunk:
         # values and constants
         self.batch = pyglet.graphics.Batch()
         self.CHUNK_DIST = 8
-        self.terrain_generator = TerrainGenerator()
+        self.generator = TerrainGenerator()
 
         self.blocks = {}
 
         # get positions
         self.X = self.X*self.CHUNK_DIST
         self.Z = self.Z*self.CHUNK_DIST
-
-        for x in range(int(self.X), int(self.X+self.CHUNK_DIST)):
-            for y in range(int(self.Z), int(self.Z+self.CHUNK_DIST)):
-                
-                # get noise values
-                noiseval_grass = 10+abs(int(simplex_grass.noise2d(x/50, y/50)*10+simplex_grass.noise2d(
-                    x/100, y/100)*20+simplex_grass.noise2d(x/1000, y/1000)*50))
-                noiseval_dirt = 2 + \
-                    abs(int(simplex_dirt.noise2d(x/100, y/100)*3 +
-                        simplex_dirt.noise2d(x/1000, y/1000)*10))
-                noiseval_stone = 20 + \
-                    abs(int(simplex_stone.noise2d(x/150, y/150)*40 +
-                        simplex_stone.noise2d(x/1000, y/1000)*100))
-                
-                # do the block generation
-                self.blocks[(x, noiseval_grass, y)] = blocks_all["grass"](
-                    block_data={"block_pos": {'x': x, 'y': noiseval_grass, 'z': y}}, parent=self)
-                pyglet.clock.schedule_once(
-                    self.blocks[(x, noiseval_grass, y)].add_to_batch_and_save, 0)
-                for i in range(noiseval_grass-noiseval_dirt-1, noiseval_grass):
-                    if not simplex_stone.noise3d(x/5, i/5, y/5)*2 > 0.5:
-                        self.blocks[(x, i, y)] = blocks_all["dirt"](
-                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
-                for i in range(noiseval_grass-noiseval_dirt-noiseval_stone-1, noiseval_grass-noiseval_dirt):
-                    if not i == noiseval_grass-noiseval_dirt-noiseval_stone-1 and not simplex_stone.noise3d(x/5, i/5, y/5)*2 > 0.5 and not simplex_stone.noise3d(x/5, i/5, y/5)*2 > 0.7:
-                        self.blocks[(x, i, y)] = blocks_all["stone"](
-                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
-                    if simplex_stone.noise3d(x/5, i/5, y/5)*2 > 0.7 and not simplex_stone.noise3d(x/5, i/5, y/5)*2 > 0.5:
-                        self.blocks[(x, i, y)] = blocks_all["iron_ore"](
-                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
-                    if simplex_stone.noise3d(x/5, i/5, y/5)*2 > 0.99 and not simplex_stone.noise3d(x/5, i/5, y/5)*2 > 0.5:
-                        self.blocks[(x, i, y)] = blocks_all["gold_ore"](
-                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
-                    elif i == noiseval_grass-noiseval_dirt-noiseval_stone-1:
-                        self.blocks[(x, i, y)] = blocks_all["bedrock"](
-                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=self)
-                    elif simplex_stone.noise3d(x/5, i/5, y/5)*2 > 0.6 and not simplex_stone.noise3d(x/5, i/5, y/5)*2 > 0.7:
-                        self.blocks[(x, i, y)] = None
-
-        # schedule the chunk for rendering
-        for i in self.blocks:
-            self.parent._all_blocks[i] = self.blocks[i]
-            if not type(self.blocks[i]) is type(blocks_all["grass"]) and not type(self.blocks[i]) is type(None):
-                pyglet.clock.schedule_once(
-                    self.blocks[i].add_to_batch_and_save, random.randint(0,1))
-
+        threading.Thread(target = lambda: self.generator.generate_for(self), daemon = True).start()
         self.generated = True
 
     def add_block(self, type_, block_data, index):
@@ -149,3 +105,16 @@ class Chunk:
             self.batch.draw()
         elif test:
             self.batch.draw()
+
+        if self.generated:
+            self.add_to_batch()
+
+    def add_to_batch(self):
+        """
+        add_to_batch
+
+        * Adds the chunk to the batch
+        """
+        if not self.added_to_batch:
+            self.generator.add_to_batch(chunk=self)
+            self.added_to_batch = True
