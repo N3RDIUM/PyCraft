@@ -5,12 +5,14 @@ import random
 from opensimplex import OpenSimplex
 from logging import *
 from Classes.terrain.block.blocks import *
+from Classes.terrain.terrain_generator import *
 from Classes.util.math_util import *
 import math
 from __main__ import test
 
 # values and noise generators
-seed = random.randint(0, 100000)
+seed = random.randint(-99999999, 99999999)
+log("Seed" ,str(seed))
 simplex_grass = OpenSimplex(seed)
 simplex_dirt = OpenSimplex(seed)
 simplex_stone = OpenSimplex(seed)
@@ -44,6 +46,7 @@ class Chunk:
         # values and constants
         self.batch = pyglet.graphics.Batch()
         self.CHUNK_DIST = 8
+        self.terrain_generator = TerrainGenerator()
 
         self.blocks = {}
 
@@ -55,14 +58,14 @@ class Chunk:
             for y in range(int(self.Z), int(self.Z+self.CHUNK_DIST)):
                 
                 # get noise values
-                noiseval_grass = 10+int(simplex_grass.noise2d(x/50, y/50)*10+simplex_grass.noise2d(
-                    x/100, y/100)*20+simplex_grass.noise2d(x/1000, y/1000)*50)
+                noiseval_grass = 10+abs(int(simplex_grass.noise2d(x/50, y/50)*10+simplex_grass.noise2d(
+                    x/100, y/100)*20+simplex_grass.noise2d(x/1000, y/1000)*50))
                 noiseval_dirt = 2 + \
-                    int(simplex_dirt.noise2d(x/100, y/100)*3 +
-                        simplex_dirt.noise2d(x/1000, y/1000)*10)
+                    abs(int(simplex_dirt.noise2d(x/100, y/100)*3 +
+                        simplex_dirt.noise2d(x/1000, y/1000)*10))
                 noiseval_stone = 20 + \
-                    int(simplex_stone.noise2d(x/150, y/150)*40 +
-                        simplex_stone.noise2d(x/1000, y/1000)*100)
+                    abs(int(simplex_stone.noise2d(x/150, y/150)*40 +
+                        simplex_stone.noise2d(x/1000, y/1000)*100))
                 
                 # do the block generation
                 self.blocks[(x, noiseval_grass, y)] = blocks_all["grass"](

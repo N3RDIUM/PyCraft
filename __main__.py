@@ -25,10 +25,11 @@ if test:
 # Use shaders function
 def use_shader(shader_name="default"):
     log("main", f"Using shaders: {shader_name}:{shaders[shader_name]}")
+    # Link and use the shader program
     glLinkProgram(shaders[shader_name])
     glUseProgram(shaders[shader_name])
 
-# shader variables
+# Load shaders
 use_shaders = False
 load_shaders()
 
@@ -38,11 +39,15 @@ if __name__ == '__main__':
                     resizable=True)
     _window.set_visible()
     # initialize opengl
+    # Background color
     glClearColor(0.5, 0.7, 1, 1)
+    # Enable depth test
     glEnable(GL_DEPTH_TEST)
+    # Enable backface culling
     glEnable(GL_CULL_FACE)
     glCullFace(GL_BACK)
     if not test:
+        # Enable fog
         glEnable(GL_FOG)
         glFogfv(GL_FOG_COLOR, (GLfloat *
                 int(_window.model.chunk_distance*16))(0.5, 0.69, 1.0, 10))
@@ -50,6 +55,7 @@ if __name__ == '__main__':
         glFogi(GL_FOG_MODE, GL_LINEAR)
         glFogf(GL_FOG_START, _window.model.chunk_distance*3)
         glFogf(GL_FOG_END, _window.model.chunk_distance*4)
+        # Texture blending
         glEnable (GL_LINE_SMOOTH)
         glEnable (GL_BLEND)
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)

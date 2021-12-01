@@ -34,7 +34,7 @@ class Player:
         self.suffocating = False
         self.falling = False
         self.velocity_y = 0
-        self.gravity = 0.02
+        self.gravity = 0.01
         self.hit_range = 8
         self.friction = 0.25
 
@@ -92,7 +92,8 @@ class Player:
 
         if self.parent.model.block_exists((x_int, y_int-2, z_int)):
             self.falling = False
-            self.velocity_y = 0
+            if self.velocity_y < 0:
+                self.velocity_y = 0
         else:
             self.falling = True
             self.velocity_y -= self.gravity
@@ -188,17 +189,15 @@ class Player:
         x = x-int(x)
         y = y-int(y)
         z = z-int(z)
-        blocks = self.get_surrounding_blocks()
 
-        for block in blocks:
-            if self._collision_algorithm((x,y,z),0.45,block,0.5):
-                self.vel[0] = 0
-            elif self._collision_algorithm((x,y,z),0.45,block,0.5):
-                self.vel[0] = 0
-            elif self._collision_algorithm((x,y,z),0.45,block,0.5):
-                self.vel[1] = 0
-            elif self._collision_algorithm((x,y,z),0.45,block,0.5):
-                self.vel[1] = 0
+        if self._collision_algorithm((x,y,z),0.45,(0,0,-1),0.5) and self.vel[0] < 0 and self.block_exists["forward"]:
+            self.vel[0] = 0
+        elif self._collision_algorithm((x,y,z),0.45,(0,0,1),0.5) and self.vel[0] > 0 and self.block_exists["backward"]:
+            self.vel[0] = 0
+        elif self._collision_algorithm((x,y,z),0.45,(1,0,0),0.5) and self.vel[1] < 0 and self.block_exists["left"]:
+            self.vel[1] = 0
+        elif self._collision_algorithm((x,y,z),0.45,(-1,0,0),0.5) and self.vel[1] > 0 and self.block_exists["right"]:
+            self.vel[1] = 0
 
     def update(self, dt, keys):
         """
@@ -234,8 +233,8 @@ class Player:
         if keys[key.D]:
             self.vel[0] += dz*sens
             self.vel[1] += dx*sens
-        if keys[key.SPACE] and not self.suffocating and not self.falling:
-            self.velocity_y += 0.2
+        if keys[key.SPACE] and not self.falling:
+            self.velocity_y += 0.05
         if keys[key.LCTRL]:
             self.speed = 0.5
         else:

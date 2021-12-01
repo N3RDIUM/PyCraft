@@ -1,6 +1,8 @@
 # imports
 from opensimplex import *
 from random import randint
+
+from pyglet.window.key import F
 from logger import *
 
 # this file is currently not used
@@ -20,7 +22,7 @@ class TerrainGenerator:
         """
         self.simplex = noise
 
-    def gen_for(self, chunk):
+    def generate_for(self, chunk):
         """
         gen_for
 
@@ -28,17 +30,25 @@ class TerrainGenerator:
 
         :chunk: chunk to generate terrain for (Chunk)
         """
-        for i in range(-chunk.CHUNK_DIST, chunk.CHUNK_DIST):
-            for j in range(-chunk.CHUNK_DIST, chunk.CHUNK_DIST):
-                noiseval_bedrock = 1 + \
-                    int(abs(self.simplex.noise2d(i+chunk.X /
-                        chunk.CHUNK_DIST, j+chunk.Z/chunk.CHUNK_DIST)*2))
-                noiseval_stone = 10+int(abs(self.simplex.noise2d(i+chunk.X/chunk.CHUNK_DIST, j +
-                                        chunk.Z/chunk.CHUNK_DIST)*2+self.simplex.noise2d(i+chunk.X/100, j+chunk.Z/100)*10))
+        for x in range(-round(chunk.CHUNK_DIST/2), round(chunk.CHUNK_DIST/2)):
+            for y in range(-round(chunk.CHUNK_DIST/2), round(chunk.CHUNK_DIST/2)):
+                noiseval_bedrock = 1 + int(abs(self.simplex.noise2d(x+chunk.X /
+                        chunk.CHUNK_DIST, y+chunk.Z/chunk.CHUNK_DIST)*2))
+                noiseval_stone = 10 + int(abs(self.simplex.noise2d(x+chunk.X/chunk.CHUNK_DIST, y +
+                                        chunk.Z/chunk.CHUNK_DIST)*2+self.simplex.noise2d(x+chunk.X/100, y+chunk.Z/100)*10))
+                noiseval_dirt = 30 + int(abs(self.simplex.noise2d(x+chunk.X/chunk.CHUNK_DIST, y + chunk.Z/chunk.CHUNK_DIST)*2))
+                
                 for i_ in range(0, noiseval_bedrock):
                     chunk.add_block(type_="bedrock", block_data={"block_pos": {
-                                    'x': chunk.X+i, 'y': i_, 'z': chunk.Z+j}}, index=(i, i_, j))
+                        'x': chunk.X+x, 'y': i_, 'z': chunk.Z+y}}, index=(x, i_, y))
+                
                 for i_ in range(noiseval_bedrock, noiseval_bedrock+noiseval_stone):
-                    if not abs(self.simplex.noise3d(i+chunk.X, i_, j+chunk.Z)*2) > 0.05:
-                        chunk.add_block(type_="stone", block_data={"block_pos": {
-                                        'x': chunk.X+i, 'y': i_, 'z': chunk.Z+j}}, index=(i, i_, j))
+                    chunk.add_block(type_="stone", block_data={"block_pos": {
+                        'x': chunk.X+x, 'y': i_, 'z': chunk.Z+y}}, index=(x, i_, y))
+                
+                for i_ in range(noiseval_bedrock+noiseval_stone, noiseval_dirt):
+                    chunk.add_block(type_="dirt", block_data={"block_pos": {
+                        'x': chunk.X+x, 'y': i_, 'z': chunk.Z+y}}, index=(x, i_, y))
+                
+                chunk.add_block(type_="grass", block_data={"block_pos": {
+                    'x': chunk.X+x, 'y': noiseval_dirt, 'z': chunk.Z+y}}, index=(x, noiseval_dirt, y))                
