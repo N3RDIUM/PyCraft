@@ -35,6 +35,7 @@ class Chunk:
         self.Z = Z
         self.generated = False
         self.blocks = {}
+        self.structures = {}
         self._scheduled_frame_last = 0
         self.added_to_batch = False
 
@@ -67,10 +68,12 @@ class Chunk:
         :block_data: data for block
         :index: index of block
         """
-        self.blocks[index] = blocks_all[type_](
-            block_data=block_data, parent=self)
-        self.parent._scheduler_.add_task(
-            self.blocks[index].add_to_batch_and_save)
+        try:
+            self.blocks[index] = blocks_all[type_](block_data=block_data, parent=self)
+            self.parent._all_blocks[index] = self.blocks[index]
+            pyglet.clock.schedule_once(self.blocks[index].add_to_batch_and_save, randint(0, 1))
+        except:
+            pass
 
     def remove_block(self, index):
         """

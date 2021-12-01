@@ -67,6 +67,7 @@ class World:
         self.cloud_generator = CloudGenerator(self)
         self.player = player
         self._all_blocks = {}
+        self._all_structures = {}
 
         self.x = 0
         self.z = 0
@@ -291,6 +292,14 @@ class World:
         """
         if self._all_blocks[(coords[0], coords[1], coords[2])].generated:
             self._all_blocks[(coords[0], coords[1], coords[2])].remove()
+
+    def add_block(self, coords, block_type, parent):
+        """
+        add_block
+
+        * Adds a block to the world.
+        """
+        parent.add_block(type_=block_type, block_data={"block_pos":{"x":coords[0], "y":coords[1], "z":coords[2]}}, index=tuple(coords))
 
     def update(self, dt):
         """

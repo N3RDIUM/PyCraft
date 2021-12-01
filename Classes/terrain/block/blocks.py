@@ -39,8 +39,6 @@ class BlockBase:
         """
         self.block_data = {
             "block_pos": block_data["block_pos"],
-            "block_redstone_activated": False,
-            "block_conducts_redstone": False,
             "parent": parent,
             "top": None,
             "bottom": None,
@@ -269,3 +267,33 @@ class gold_ore(BlockBase):
 
 
 blocks_all["gold_ore"] = gold_ore
+
+class birch_log(BlockBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["birch_log_top"],
+            "left": textures["birch_log"],
+            "right": textures["birch_log"],
+            "front": textures["birch_log"],
+            "back": textures["birch_log"],
+            "bottom": textures["birch_log_top"]
+        }
+
+blocks_all["birch_log"] = birch_log
+
+class birch_leaves:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.block_data["block_textures"] = {
+            "top": textures["birch_leaves"],
+            "left": textures["birch_leaves"],
+            "right": textures["birch_leaves"],
+            "front": textures["birch_leaves"],
+            "back": textures["birch_leaves"],
+            "bottom": textures["birch_leaves"]
+        }
+
+blocks_all["birch_leaves"] = birch_leaves

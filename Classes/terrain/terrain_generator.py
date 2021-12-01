@@ -5,6 +5,7 @@ import pyglet
 from pyglet.window.key import F
 from logger import *
 from Classes.terrain.block.blocks import *
+from Classes.structures.structure_base import *
 
 # this file is currently not used
 
@@ -46,7 +47,7 @@ class TerrainGenerator:
         """
         for x in range(int(chunk.X), int(chunk.X+chunk.CHUNK_DIST)):
             for y in range(int(chunk.Z), int(chunk.Z+chunk.CHUNK_DIST)):
-                
+
                 # get noise values
                 noiseval_grass = 10+abs(int(self.simplex.noise2d(x/50, y/50)*10+self.simplex.noise2d(
                     x/100, y/100)*20+self.simplex.noise2d(x/1000, y/1000)*50))
@@ -56,6 +57,12 @@ class TerrainGenerator:
                 noiseval_stone = 20 + \
                     abs(int(self.simplex.noise2d(x/150, y/150)*40 +
                         self.simplex.noise2d(x/1000, y/1000)*100))
+                
+                # get tree noise
+                tree_noise = randint(0,100)
+                if tree_noise < 2:
+                    tree_pos_y = noiseval_grass
+                    chunk.structures[(x,tree_pos_y,y)] = all_structures['birch_tree'](structure_data = {'structure_pos':{'x':x,'y':tree_pos_y,'z':y},'structure_type':'birch_tree'}, parent=chunk)
                 
                 # do the block generation
                 chunk.blocks[(x, noiseval_grass, y)] = blocks_all["grass"](
@@ -82,10 +89,19 @@ class TerrainGenerator:
         for i in chunk.blocks:
             if chunk.blocks[i] != None:
                 chunk.parent._all_blocks[i] = chunk.blocks[i]  
+
+        for i in chunk.structures:
+            if chunk.structures[i] != None:
+                chunk.parent._all_structures[i] = chunk.structures[i]
+
         chunk.generated = True
         exit()
 
     def add_to_batch(self,chunk):
+        for i in chunk.structures:
+            if chunk.structures[i] != None:
+                pyglet.clock.schedule_once(chunk.structures[i].generate, randint(0,1))
+
         for i in chunk.blocks:
             if chunk.blocks[i] != None:
                 pyglet.clock.schedule_once(chunk.blocks[i].add_to_batch_and_save, randint(0,1))
