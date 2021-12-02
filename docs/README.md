@@ -17,4 +17,3 @@
 - [x] - Will be fixed soon.
 #####
 - [x] 1. All contributors don't appear on the README.
-- [x] 2. The README doesn't show the carousel.
