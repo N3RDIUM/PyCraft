@@ -46,8 +46,8 @@ class birch_tree(StructureBase):
 
         self.structure_data["structure_type"] = "tree"
         self.structure_data["structure_name"] = "tree"
-        self.height = random.randint(7,10)
-        self.leaf_height = self.height - random.randint(6,8)
+        self.height = random.randint(5,6)
+        self.leaf_height = random.randint(2,3)
         self.side = random.randint(1,2)
 
     def generate(self, *args, **kwargs):
