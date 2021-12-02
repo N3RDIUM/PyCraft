@@ -2,7 +2,6 @@
 import pyglet
 from pyglet.gl import *
 from pyglet.window import key
-import time
 from logger import *
 logging.basicConfig(level=logging.INFO)
 

@@ -1,7 +1,6 @@
 # imports
 import os
 from logger import *
-import time
 from OpenGL.GL import *
 
 # configure logging
