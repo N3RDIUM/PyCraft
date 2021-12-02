@@ -78,6 +78,8 @@ class World:
         self.generate()
         self._tick = 0
 
+        self.light_color = [10,10,10,5]
+
     def get_chunk(self, coords):
         """
         get_chu
@@ -151,6 +153,10 @@ class World:
 
         * Draws the world.
         """
+        # Lights
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glEnable(GL_LIGHT7)
+        glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat * 4)(*self.light_color))
         self._tick += 1
         try:
             self.draw_player_hitbox(self.parent.player.looking_at[0])

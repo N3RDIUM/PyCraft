@@ -46,6 +46,8 @@ if __name__ == '__main__':
     # Enable backface culling
     glEnable(GL_CULL_FACE)
     glCullFace(GL_BACK)
+    # Enable lighting
+    glEnable(GL_LIGHTING)
     if not test:
         # Enable fog
         glEnable(GL_FOG)
