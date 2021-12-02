@@ -30,7 +30,7 @@ class Window(pyglet.window.Window):
         pyglet.clock.schedule(self.update)
 
         # Player
-        self.player = Player((0, 100, 0), (0, 0), self)
+        self.player = Player((0, 50, 0), (0, 0), self)
         # Model
         self.model = World(self, self.player)
         pyglet.clock.schedule_interval(self.model.update, 1/60)

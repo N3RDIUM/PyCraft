@@ -47,7 +47,8 @@ class birch_tree(StructureBase):
         self.structure_data["structure_type"] = "tree"
         self.structure_data["structure_name"] = "tree"
         self.height = random.randint(7,10)
-        self.side = random.randint(5,6)
+        self.leaf_height = self.height - random.randint(6,8)
+        self.side = random.randint(1,2)
 
     def generate(self, *args, **kwargs):
         """
@@ -72,10 +73,10 @@ class birch_tree(StructureBase):
         """
         for i in range(self.height):
             self.util.add_block("birch_log", [self.structure_data["structure_pos"]["x"], self.structure_data["structure_pos"]["y"] + i, self.structure_data["structure_pos"]["z"]], self.chunk)
-            if i == self.height - 5:
+            if i >= self.leaf_height:
                 for j in range(-self.side, self.side):
                     for k in range(-self.side, self.side):
-                        if not j == 0 and not k == 0:
+                        if not [j,k] == [0,0] or i == self.height - 1:
                             self.util.add_block("birch_leaves", [self.structure_data["structure_pos"]["x"]+j, self.structure_data["structure_pos"]["y"] + i, self.structure_data["structure_pos"]["z"]+k], self.chunk)
 
 all_structures["birch_tree"] = birch_tree

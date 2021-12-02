@@ -283,7 +283,7 @@ class birch_log(BlockBase):
 
 blocks_all["birch_log"] = birch_log
 
-class birch_leaves:
+class birch_leaves(BlockBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

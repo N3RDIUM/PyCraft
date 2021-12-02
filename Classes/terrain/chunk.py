@@ -68,12 +68,9 @@ class Chunk:
         :block_data: data for block
         :index: index of block
         """
-        try:
-            self.blocks[index] = blocks_all[type_](block_data=block_data, parent=self)
-            self.parent._all_blocks[index] = self.blocks[index]
-            pyglet.clock.schedule_once(self.blocks[index].add_to_batch_and_save, randint(0, 1))
-        except:
-            pass
+        self.blocks[index] = blocks_all[type_](block_data=block_data, parent=self)
+        self.parent._all_blocks[index] = self.blocks[index]
+        pyglet.clock.schedule_once(self.blocks[index].add_to_batch_and_save, randint(0, 1))
 
     def remove_block(self, index):
         """
