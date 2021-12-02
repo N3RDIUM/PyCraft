@@ -9,7 +9,7 @@
 ##### To run PyCraft, run the following code:
     git clone https://github.com/1upCommunity/PyCraft.git
     cd PyCraft
-    dep_installer.bat
+    dep_installer
     python __main__.py
 ##### (assuming that you already have git and python installed)
 
