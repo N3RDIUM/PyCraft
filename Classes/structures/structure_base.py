@@ -72,11 +72,10 @@ class birch_tree(StructureBase):
         """
         for i in range(self.height):
             self.util.add_block("birch_log", [self.structure_data["structure_pos"]["x"], self.structure_data["structure_pos"]["y"] + i, self.structure_data["structure_pos"]["z"]], self.chunk)
-
-        for i_ in range(3, self.height):
-            for j in range(-self.side, self.side):
-                for k in range(-self.side, self.side):
-                    if not j == 0 and not k == 0:
-                        self.util.add_block("birch_leaves", [self.structure_data["structure_pos"]["x"]+j, self.structure_data["structure_pos"]["y"] + i_, self.structure_data["structure_pos"]["z"]+k], self.chunk)
+            if i == self.height - 5:
+                for j in range(-self.side, self.side):
+                    for k in range(-self.side, self.side):
+                        if not j == 0 and not k == 0:
+                            self.util.add_block("birch_leaves", [self.structure_data["structure_pos"]["x"]+j, self.structure_data["structure_pos"]["y"] + i, self.structure_data["structure_pos"]["z"]+k], self.chunk)
 
 all_structures["birch_tree"] = birch_tree
