@@ -76,7 +76,7 @@ class birch_tree(StructureBase):
             if i >= self.leaf_height:
                 for j in range(-self.side, self.side):
                     for k in range(-self.side, self.side):
-                        if not [j,k] == [0,0] or i == self.height - 1:
+                        if [j,k] != [0,0] or i == self.height - 1:
                             self.util.add_block("birch_leaves", [self.structure_data["structure_pos"]["x"]+j, self.structure_data["structure_pos"]["y"] + i, self.structure_data["structure_pos"]["z"]+k], self.chunk)
 
 all_structures["birch_tree"] = birch_tree
