@@ -87,11 +87,11 @@ class TerrainGenerator:
                     elif self.simplex.noise3d(x/5, i/5, y/5)*2 > 0.6 and not self.simplex.noise3d(x/5, i/5, y/5)*2 > 0.7:
                         chunk.blocks[(x, i, y)] = None 
         for i in chunk.blocks:
-            if chunk.blocks[i] != None:
+            if chunk.blocks[i] is not None:
                 chunk.parent._all_blocks[i] = chunk.blocks[i]  
 
         for i in chunk.structures:
-            if chunk.structures[i] != None:
+            if chunk.structures[i] is not None:
                 chunk.parent._all_structures[i] = chunk.structures[i]
 
         chunk.generated = True
@@ -99,9 +99,9 @@ class TerrainGenerator:
 
     def add_to_batch(self,chunk):
         for i in chunk.structures:
-            if chunk.structures[i] != None:
+            if chunk.structures[i] is not None:
                 pyglet.clock.schedule_once(chunk.structures[i].generate, randint(0,1))
 
         for i in chunk.blocks:
-            if chunk.blocks[i] != None:
+            if chunk.blocks[i] is not None:
                 pyglet.clock.schedule_once(chunk.blocks[i].add_to_batch_and_save, randint(0,1))
