@@ -8,7 +8,7 @@
 #################################################################
 
 # Make this true to enter debug mode
-test = True
+test = False
 
 # import all the modules
 from logger import *
