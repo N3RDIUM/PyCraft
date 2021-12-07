@@ -70,22 +70,22 @@ class Player:
         y_int = int(self.pos[1])
         z_int = int(self.pos[2])
 
-        if not self.parent.model.block_exists((x_int-1, y_int, z_int)) or self.parent.model.block_exists((x_int-1, y_int+1, z_int)):
+        if not self.parent.model.block_exists((x_int-1, y_int, z_int)) or self.parent.model.block_exists((x_int-1, y_int-1, z_int)):
             self.block_exists["left"] = False
         else:
             self.block_exists["left"] = True
 
-        if self.parent.model.block_exists((x_int+1, y_int, z_int)) or self.parent.model.block_exists((x_int+1, y_int+1, z_int)):
+        if self.parent.model.block_exists((x_int+1, y_int, z_int)) or self.parent.model.block_exists((x_int+1, y_int-1, z_int)):
             self.block_exists["right"] = False
         else:
             self.block_exists["right"] = True
 
-        if not self.parent.model.block_exists((x_int, y_int, z_int-1)) or self.parent.model.block_exists((x_int, y_int+1, z_int+1)):
+        if not self.parent.model.block_exists((x_int, y_int, z_int-1)) or self.parent.model.block_exists((x_int, y_int-1, z_int+1)):
             self.block_exists["backward"] = False
         else:
             self.block_exists["backward"] = True
 
-        if not self.parent.model.block_exists((x_int, y_int, z_int+1)) or self.parent.model.block_exists((x_int, y_int+1, z_int-1)):
+        if not self.parent.model.block_exists((x_int, y_int, z_int+1)) or self.parent.model.block_exists((x_int, y_int-1, z_int-1)):
             self.block_exists["forward"] = False
         else:
             self.block_exists["forward"] = True
@@ -190,13 +190,13 @@ class Player:
         y = y-int(y)
         z = z-int(z)
 
-        if self._collision_algorithm((x,y,z),0.45,(0,0,-1),0.5) and self.vel[0] < 0 and self.block_exists["forward"]:
+        if self._collision_algorithm((x,y,z),0.45,(0,0,1),0.5) and self.vel[0] < 0 and self.block_exists["forward"]:
             self.vel[0] = 0
-        elif self._collision_algorithm((x,y,z),0.45,(0,0,1),0.5) and self.vel[0] > 0 and self.block_exists["backward"]:
+        elif self._collision_algorithm((x,y,z),0.45,(0,0,-1),0.5) and self.vel[0] > 0 and self.block_exists["backward"]:
             self.vel[0] = 0
-        elif self._collision_algorithm((x,y,z),0.45,(1,0,0),0.5) and self.vel[1] < 0 and self.block_exists["left"]:
+        elif self._collision_algorithm((x,y,z),0.45,(-1,0,0),0.5) and self.vel[1] < 0 and self.block_exists["left"]:
             self.vel[1] = 0
-        elif self._collision_algorithm((x,y,z),0.45,(-1,0,0),0.5) and self.vel[1] > 0 and self.block_exists["right"]:
+        elif self._collision_algorithm((x,y,z),0.45,(1,0,0),0.5) and self.vel[1] > 0 and self.block_exists["right"]:
             self.vel[1] = 0
 
     def update(self, dt, keys):

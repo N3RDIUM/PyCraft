@@ -6,8 +6,14 @@ from pyglet.window.key import F
 from logger import *
 from Classes.terrain.block.blocks import *
 from Classes.structures.structure_base import *
+import pyximport
+pyximport.install()
 
-# this file is currently not used
+# Import the terrain generator helper
+import Classes.terrain.terrain_generator_helper as helper
+
+def add_to_batch(batch):
+    helper.add_to_batch(batch)
 
 # values and noise generators
 seed = randint(-999999, 999999)
@@ -100,8 +106,6 @@ class TerrainGenerator:
     def add_to_batch(self,chunk):
         for i in chunk.structures:
             if chunk.structures[i] is not None:
-                pyglet.clock.schedule_once(chunk.structures[i].generate, randint(0,1))
+                chunk.structures[i].generate()
 
-        for i in chunk.blocks:
-            if chunk.blocks[i] is not None:
-                pyglet.clock.schedule_once(chunk.blocks[i].add_to_batch_and_save, randint(0,1))
+        add_to_batch(chunk)

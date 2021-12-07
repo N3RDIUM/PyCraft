@@ -33,7 +33,7 @@ use_shaders = True
 load_shaders()
 
 if __name__ == '__main__':
-    # shaders
+    # shaders: move it after window to enable, after we fix 'em.
     if use_shaders:
         use_shader()
     
