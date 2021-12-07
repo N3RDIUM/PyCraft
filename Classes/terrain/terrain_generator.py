@@ -1,5 +1,6 @@
 # imports
 from opensimplex import *
+from Classes.util.noise_util import *
 from random import randint
 import pyglet
 from pyglet.window.key import F
@@ -55,14 +56,13 @@ class TerrainGenerator:
             for y in range(int(chunk.Z), int(chunk.Z+chunk.CHUNK_DIST)):
 
                 # get noise values
-                noiseval_grass = 10+abs(int(self.simplex.noise2d(x/50, y/50)*10+self.simplex.noise2d(
-                    x/100, y/100)*20+self.simplex.noise2d(x/1000, y/1000)*50))
+                noiseval_grass = 10+int(abs(lerp(self.simplex.noise2d(x/50, y/50)*10, self.simplex.noise2d(x/100, y/100)*20, self.simplex.noise2d(x/1000000, y/1000000)*5000)))
                 noiseval_dirt = 2 + \
-                    abs(int(self.simplex.noise2d(x/100, y/100)*3 +
-                        self.simplex.noise2d(x/1000, y/1000)*10))
+                    int(abs(lerp(self.simplex.noise2d(x/100, y/100)*2, self.simplex.noise2d(x/100, y/100)*3 ,
+                        self.simplex.noise2d(x/1000, y/1000)*10)))
                 noiseval_stone = 20 + \
-                    abs(int(self.simplex.noise2d(x/150, y/150)*40 +
-                        self.simplex.noise2d(x/1000, y/1000)*100))
+                    int(abs(lerp(self.simplex.noise2d(x/150, y/150)*2, self.simplex.noise2d(x/150, y/150)*40,
+                        self.simplex.noise2d(x/1000, y/1000)*100)))
                 
                 # get tree noise
                 tree_noise = randint(0,100)
