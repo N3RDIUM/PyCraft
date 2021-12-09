@@ -56,7 +56,7 @@ class TerrainGenerator:
             for y in range(int(chunk.Z), int(chunk.Z+chunk.CHUNK_DIST)):
 
                 # get noise values
-                noiseval_grass = 10+int(abs(lerp(self.simplex.noise2d(x/50, y/50)*2, self.simplex.noise2d(x/50, y/50)*10, self.simplex.noise2d(x/100, y/100)*50+self.simplex.noise2d(x/10000, y/10000)*500)))
+                noiseval_grass = 10+int(abs(lerp(self.simplex.noise2d(x/50, y/50)*2, self.simplex.noise2d(x/100, y/100)*10, self.simplex.noise2d(x/500, y/500)*50)))
                 noiseval_dirt = 2 + \
                     int(abs(lerp(self.simplex.noise2d(x/100, y/100)*2, self.simplex.noise2d(x/100, y/100)*3 ,
                         self.simplex.noise2d(x/1000, y/1000)*10)))
