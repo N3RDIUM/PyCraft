@@ -123,7 +123,7 @@ class Player:
                 self.pointing_at[1] = previous
                 return key, previous
             previous = key
-            x, y, z = x + dx / m, y + dy / m, z + dz / m
+            x, y, z = x + dx, y + dy, z + dz
         self.pointing_at[0] = None
         self.pointing_at[1] = None
         return None, None
