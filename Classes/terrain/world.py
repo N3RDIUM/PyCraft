@@ -78,7 +78,10 @@ class World:
         self.generate()
         self._tick = 0
 
-        self.light_color = [10,10,10,5]
+        self.light_color = [5,5,5,5]
+        self.daynight_min = 1
+        self.daynight_max = 5
+        self.light_change = 0.1
 
     def get_chunk(self, coords):
         """
@@ -307,6 +310,20 @@ class World:
         """
         parent.add_block(type_=block_type, block_data={"block_pos":{"x":coords[0], "y":coords[1], "z":coords[2]}}, index=tuple(coords))
 
+    def _do_daynight(self):
+        """
+        _do_daynight
+
+        * Updates the day/night cycle.
+        """
+        if self.light_color[0] > self.daynight_max:
+            self.light_change = -0.0001
+        elif self.light_color[0] < self.daynight_min:
+            self.light_change = 0.0001
+        self.light_color[0] += self.light_change
+        self.light_color[1] += self.light_change
+        self.light_color[2] += self.light_change
+
     def update(self, dt):
         """
         update
@@ -315,6 +332,7 @@ class World:
 
         :dt: The time since the last update.
         """
+        self._do_daynight()
         x = int(self.player.pos[0]/self.CHUNK_DIST*2)
         z = int(self.player.pos[2]/self.CHUNK_DIST*2)                
         self._check_no_holes()
