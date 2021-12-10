@@ -55,12 +55,11 @@ if __name__ == '__main__':
     if not test:
         # Enable fog
         glEnable(GL_FOG)
-        glFogfv(GL_FOG_COLOR, (GLfloat *
-                int(_window.model.chunk_distance*16))(0.5, 0.69, 1.0, 10))
+        glFogfv(GL_FOG_COLOR, (GLfloat * int(_window.model.chunk_distance*16))(0.5, 0.69, 1.0, 10))
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
-        glFogf(GL_FOG_START, _window.model.chunk_distance*3)
-        glFogf(GL_FOG_END, _window.model.chunk_distance*4)
+        glFogf(GL_FOG_START, _window.model.chunk_distance*4)
+        glFogf(GL_FOG_END, _window.model.chunk_distance*5)
         # Texture blending
         glEnable (GL_LINE_SMOOTH)
         glEnable (GL_BLEND)
