@@ -1,8 +1,10 @@
 # imports
-from Classes import *
+from pyglet.window.key import I
+from Classes.environment.environment_objects import *
 from opensimplex import OpenSimplex
 import random
 from pyglet.gl import *
+from pyglet.graphics import Batch
 
 # Cloud Generator
 class CloudGenerator:
@@ -23,15 +25,13 @@ class CloudGenerator:
 
     def draw(self):
         self.frame += 1
-        self.trans_z += 0.1
+        self.trans_z += 0.05
 
-        glPushMatrix()
-        glTranslatef(self.parent.player.pos[0], 0, self.parent.player.pos[1])
-        for i in self.clouds:
-            self.clouds[i].draw()
-        glPopMatrix()
+        for cloud in self.clouds:
+            cloud.draw()
 
-        self.generate_for_frame()
+        if self.frame % 2 == 0:
+            self.generate_for_frame()
 
     def generate_for_frame(self):
         """
@@ -39,5 +39,9 @@ class CloudGenerator:
 
         returns: None
         """
-        distance = self.parent.CHUNK_DIST * self.parent.chunk_distance
-        noise_val = self.noise.noise2d(self.frame/100, self.trans_z/100)*10
+        self.clouds = []
+
+        for i in range(self.parent.x-self.parent.chunk_distance, self.parent.x+self.parent.chunk_distance):
+            for j in range(self.parent.z-self.parent.chunk_distance, self.parent.z+self.parent.chunk_distance):
+                if self.noise.noise2d(i, j)*2 > 0.5:
+                    self.clouds.append(Cloud((i*4, j*4), self))

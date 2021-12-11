@@ -2,6 +2,8 @@
 from pyglet.gl import *
 from opensimplex import OpenSimplex
 import random
+
+from pyglet.window.key import N
 from logger import *
 
 # Function to load a texture
@@ -28,7 +30,7 @@ noise = OpenSimplex(seed=seed)
 
 # Single Cloud Class
 class Cloud:
-    def __init__(self, x, z):
+    def __init__(self, xz, parent):
         """
         class Cloud
 
@@ -37,23 +39,23 @@ class Cloud:
         :x: x position
         :z: z position
         """
-        self.pos = [x, z]
-        self.size = [10, 10]
+        self.pos = xz
+        self.size = [16,16]
+        self.parent = parent
+        self.foo_image = load_texture("assets/textures/environment/sun.png")
 
     def draw(self):
-        x = self.pos[0]
-        y = 50
-        z = self.pos[1]
+        x = self.pos[0] - self.size[0]
+        y = self.parent.parent.player.pos[1] * 0.75
+        z = self.pos[1] - self.size[0]
 
-        X = x+self.size[0]
-        Y = y+10
-        Z = z+self.size[1]
+        X = self.pos[0] + self.size[0]
+        Z = self.pos[1] + self.size[1]
 
         glPushMatrix()
-        glColor3f(0.8, 0.8, 0.8)
-        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS,
-                             ('v3f', (X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z)))
+        glTranslatef(x, y, z)
         glColor3f(1, 1, 1)
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (x, y, z, X, y, z, X, y, Z, x, y, Z)))
         glPopMatrix()
 
 class Sun:
@@ -81,7 +83,6 @@ class Sun:
 
         glPushMatrix()
         glColor3f(1, 1, 0)
-        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, self.texture,
-                             ('v3f', (X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z)))
+        #pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, self.texture, ('v3f', (x, y, Z,  X, y, Z,  X, y, z,  x, y, z)))
         glColor3f(1, 1, 1)
         glPopMatrix()
