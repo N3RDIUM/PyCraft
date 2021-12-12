@@ -112,21 +112,20 @@ class Player:
 
         :return: a list of positions
         """
-        m = 8
         x, y, z = position
         dx, dy, dz = vector
         previous = None
-        for _ in range(max_distance * m):
+        for _ in range(0, max_distance):
             key = normalize((x, y, z))
             if key != previous and self.parent.model.block_exists(key):
                 self.pointing_at[0] = key
                 self.pointing_at[1] = previous
-                return key, previous
+                return None
             previous = key
             x, y, z = x + dx, y + dy, z + dz
         self.pointing_at[0] = None
         self.pointing_at[1] = None
-        return None, None
+        return None
 
     def get_surrounding_blocks(self):
         """
@@ -214,7 +213,7 @@ class Player:
         rotX = _to_radians(-self.rot[0])
         dx, dz = math.sin(rotY), math.cos(rotY)
         dy = math.sin(rotX)
-        self.hit_test(position=self.pos, vector=(dx, dy, dz), max_distance=self.hit_range)
+        self.hit_test(position=self.pos, vector=(dx, -dy, -dz), max_distance=self.hit_range)
         
         if self.velocity_y > self.terminal_velocity:
             self.velocity_y = self.terminal_velocity
@@ -243,8 +242,7 @@ class Player:
         self.collide()
 
         if self.mouse_click and not self.pointing_at[0] is None and not self.pointing_at[1] is None:
-            if self.parent.model.block_exists([self.pointing_at[0][0], self.pointing_at[0][1], self.pointing_at[0][2]]):
-                self.parent.model.remove_block([self.pointing_at[0][0], self.pointing_at[0][1], self.pointing_at[0][2]])
+            self.parent.model.remove_block([self.pointing_at[0][0], self.pointing_at[0][1], self.pointing_at[0][2]])
 
         self.pos[1] += self.velocity_y
         self.pos[0] += self.vel[0]

@@ -80,6 +80,7 @@ class Chunk:
 
         :index: index of block
         """
+        self.blocks[index].remove()
         self.blocks[index] = None
 
     def block_exists(self, index):

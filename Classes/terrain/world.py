@@ -120,25 +120,18 @@ class World:
         :z: The z coordinate of the cube.
         :size: The size of the cube.
         """
-        glPushMatrix()
-        glTranslatef(x, y, z)
-        glScalef(size, size, size)
-        glBegin(GL_QUADS)
-        glVertex3f(1, 1, 1)
-        glVertex3f(1, 1, -1)
-        glVertex3f(-1, 1, -1)
-        glVertex3f(-1, 1, 1)
-        glVertex3f(1, -1, 1)
-        glVertex3f(1, -1, -1)
-        glVertex3f(-1, -1, -1)
-        glVertex3f(-1, -1, 1)
-        glVertex3f(1, 1, 1)
-        glVertex3f(-1, 1, 1)
-        glVertex3f(-1, -1, 1)
-        glVertex3f(1, -1, 1)
-        glVertex3f(1, 1, -1)
-        glVertex3f(-1, 1, -1)
-        glPopMatrix()
+        X = x + size + 0.01
+        Y = y + size + 0.01
+        Z = z + size + 0.01
+        x = x - 0.01
+        y = y - 0.01
+        z = z - 0.01
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (x, Y, Z,  X, Y, Z,  X, Y, z,  x, Y, z)), ('c4B', (255, 255, 255, 5) * 4))
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (x, y, z,  X, y, z,  X, y, Z,  x, y, Z)), ('c4B', (255, 255, 255, 5) * 4))
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z)), ('c4B', (255, 255, 255, 5) * 4))
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z)), ('c4B', (255, 255, 255, 5) * 4))
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (x, y, Z,  X, y, Z,  X, Y, Z,  x, Y, Z)), ('c4B', (255, 255, 255, 5) * 4))
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (X, y, z,  x, y, z,  x, Y, z,  X, Y, z)), ('c4B', (255, 255, 255, 5) * 4))
 
     def draw_player_hitbox(self, pos):
         """
@@ -161,11 +154,8 @@ class World:
         glEnable(GL_LIGHT7)
         glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat * 4)(*self.light_color))
         self._tick += 1
-        try:
-            self.draw_player_hitbox(self.parent.player.looking_at[0])
-        except:
-            pass
-        
+        if self.player.pointing_at[0] != None:
+            self.draw_player_hitbox(self.parent.player.pointing_at[0])
         for i in self.chunks:
             chunk = self.chunks[i]
             if chunk is not None and chunk.generated:
@@ -300,6 +290,7 @@ class World:
         * Removes a block from the world.
         """
         if self._all_blocks[(coords[0], coords[1], coords[2])].generated:
+            self._all_blocks[(coords[0], coords[1], coords[2])].chunk.remove_block(tuple(coords))
             self._all_blocks[(coords[0], coords[1], coords[2])].remove()
 
     def add_block(self, coords, block_type, parent):
