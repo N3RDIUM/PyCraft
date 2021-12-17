@@ -1,111 +1,68 @@
 # imports
-from opensimplex import *
-from Classes.util.noise_util import *
-from random import randint
 import pyglet
-from pyglet.window.key import F
+import random
+import opensimplex
+
+# inbuilt imports
+import Classes as pycraft
 from logger import *
-from Classes.terrain.block.blocks import *
-from Classes.structures.structure_base import *
-import pyximport
-pyximport.install()
 
-# Import the terrain generator helper
-import Classes.terrain.terrain_generator_helper as helper
-
-def add_to_batch(batch):
-    helper.add_to_batch(batch)
-
-# values and noise generators
-seed = randint(-999999, 999999)
-noise = OpenSimplex(seed)
-log("terrain_gen", f"Seed is {seed}")
-
-# terrain generator class
 class TerrainGenerator:
-    def __init__(self):
+    def __init__(self, parent):
         """
         TerrainGenerator
-
-        * Generates terrain for a chunk.
+        
+        * Initializes the terrain generator
+        
+        :parent: the parent window
         """
-        self.simplex = noise
+        self.parent = parent
+        self.noise = opensimplex.OpenSimplex(seed=self.parent.parent.seed)
+        self.queue = []
+        self._size = 6
 
-    def add_block(self,batch, type_, block_data, index):
+    def generate(self):
         """
-        add_block
-
-        * Adds a block to the chunk
-
-        :type_: type of block
-        :block_data: data for block
-        :index: index of block
+        generate
+        
+        * Generates a chunk
+        
+        :position: the position of the chunk
         """
-        self.blocks[index] = blocks_all[type_](block_data=block_data, parent=self)
-        self.blocks[index].add_to_batch_and_save(batch)
-
-    def generate_for(self, chunk):
-        """
-        gen_for
-
-        * Generates terrain for a chunk.
-
-        :chunk: chunk to generate terrain for (Chunk)
-        """
-        for x in range(int(chunk.X), int(chunk.X+chunk.CHUNK_DIST)):
-            for y in range(int(chunk.Z), int(chunk.Z+chunk.CHUNK_DIST)):
-
-                # get noise values
-                noiseval_grass = 10+int(abs(lerp(self.simplex.noise2d(x/100, y/100)*2, self.simplex.noise2d(x/100, y/100)*10, self.simplex.noise2d(x/500, y/500)*50)))
-                noiseval_dirt = 2 + \
-                    int(abs(lerp(self.simplex.noise2d(x/100, y/100)*2, self.simplex.noise2d(x/100, y/100)*3 ,
-                        self.simplex.noise2d(x/1000, y/1000)*10)))
-                noiseval_stone = 20 + \
-                    int(abs(lerp(self.simplex.noise2d(x/150, y/150)*2, self.simplex.noise2d(x/150, y/150)*40,
-                        self.simplex.noise2d(x/1000, y/1000)*100)))
+        for x in range(-self.parent.parent.chunk_size + self.parent.position['x'], self.parent.parent.chunk_size + self.parent.position['z']):
+            for z in range(-self.parent.parent.chunk_size + self.parent.position['x'], self.parent.parent.chunk_size + self.parent.position['z']):
                 
-                # get tree noise
-                tree_noise = randint(0,100)
-                if tree_noise < 2:
-                    tree_pos_y = noiseval_grass
-                    chunk.structures[(x,tree_pos_y,y)] = all_structures['birch_tree'](structure_data = {'structure_pos':{'x':x,'y':tree_pos_y,'z':y},'structure_type':'birch_tree'}, parent=chunk)
-                
-                # do the block generation
-                chunk.blocks[(x, noiseval_grass, y)] = blocks_all["grass"](
-                    block_data={"block_pos": {'x': x, 'y': noiseval_grass, 'z': y}}, parent=chunk)
-                for i in range(noiseval_grass-noiseval_dirt-1, noiseval_grass):
-                    if not self.simplex.noise3d(x/5, i/5, y/5)*2 > 0.5:
-                        chunk.blocks[(x, i, y)] = blocks_all["dirt"](
-                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=chunk)
-                for i in range(noiseval_grass-noiseval_dirt-noiseval_stone-1, noiseval_grass-noiseval_dirt):
-                    if not i == noiseval_grass-noiseval_dirt-noiseval_stone-1 and not self.simplex.noise3d(x/5, i/5, y/5)*2 > 0.5 and not self.simplex.noise3d(x/5, i/5, y/5)*2 > 0.7:
-                        chunk.blocks[(x, i, y)] = blocks_all["stone"](
-                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=chunk)
-                    if self.simplex.noise3d(x/5, i/5, y/5)*2 > 0.7 and not self.simplex.noise3d(x/5, i/5, y/5)*2 > 0.5:
-                        chunk.blocks[(x, i, y)] = blocks_all["iron_ore"](
-                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=chunk)
-                    if self.simplex.noise3d(x/5, i/5, y/5)*2 > 0.99 and not self.simplex.noise3d(x/5, i/5, y/5)*2 > 0.5:
-                        chunk.blocks[(x, i, y)] = blocks_all["gold_ore"](
-                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=chunk)
-                    elif i == noiseval_grass-noiseval_dirt-noiseval_stone-1:
-                        chunk.blocks[(x, i, y)] = blocks_all["bedrock"](
-                            block_data={"block_pos": {'x': x, 'y': i, 'z': y}}, parent=chunk)
-                    elif self.simplex.noise3d(x/5, i/5, y/5)*2 > 0.6 and not self.simplex.noise3d(x/5, i/5, y/5)*2 > 0.7:
-                        chunk.blocks[(x, i, y)] = None 
-        for i in chunk.blocks:
-            if chunk.blocks[i] is not None:
-                chunk.parent._all_blocks[i] = chunk.blocks[i]  
+                noiseval_grass = round(pycraft.lerp(self.noise.noise2d(x/10, z/10) * 2, self.noise.noise2d(x/100, z/100) * 10, self.noise.noise2d(x/500, z/500) * 50))
+                noiseval_dirt = 1+abs(round(pycraft.lerp(self.noise.noise2d(x/10, z/10) * 2, self.noise.noise2d(x/100, z/100) * 7, self.noise.noise2d(x/500, z/500) * 5)))                
+                noiseval_stone = 26+round(self.noise.noise2d(x/5000, z/5000) * 500)
 
-        for i in chunk.structures:
-            if chunk.structures[i] is not None:
-                chunk.parent._all_structures[i] = chunk.structures[i]
+                self._sched(lambda: self.parent.add_block("Grass", (x, noiseval_grass, z)))
 
-        chunk.generated = True
-        exit()
+                for y in range(noiseval_grass-noiseval_dirt, noiseval_grass):
+                    self._sched(lambda: self.parent.add_block("Dirt", (x, y, z)))
 
-    def add_to_batch(self,chunk):
-        for i in chunk.structures:
-            if chunk.structures[i] is not None:
-                chunk.structures[i].generate()
+                for y in range(noiseval_grass-noiseval_dirt-noiseval_stone, noiseval_grass-noiseval_dirt):
+                    self._sched(lambda: self.parent.add_block("Stone", (x, y, z)))
 
-        add_to_batch(chunk)
+                self._sched(lambda: self.parent.add_block("Bedrock", (x, noiseval_grass-noiseval_dirt-noiseval_stone-1, z)))
+
+    def _sched(self, func):
+        """
+        _sched
+        
+        * Schedules a function to be run in the next frame
+        
+        :func: the function to be run
+        """
+        self.queue.append(func)
+
+    def update(self):
+        """
+        update
+        
+        * Updates the chunk
+        """
+        if len(self.queue) > 0:
+            for i in range(self._size):
+                self.queue[-1]()
+                self.queue.pop(-1)

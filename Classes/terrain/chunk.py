@@ -1,121 +1,80 @@
 # imports
-from pyglet.gl import *
 import pyglet
-import random
-from opensimplex import OpenSimplex
-from logging import *
-from Classes.terrain.block.blocks import *
-from Classes.terrain.terrain_generator import *
-from Classes.util.math_util import *
-import threading
-from __main__ import test
+from pyglet.gl import *
 
-# values and noise generators
-seed = random.randint(-99999999, 99999999)
-log("Seed" ,str(seed))
-simplex_grass = OpenSimplex(seed)
-simplex_dirt = OpenSimplex(seed)
-simplex_stone = OpenSimplex(seed)
+# Inbuilt imports
+import Classes as pycraft
+from logger import *
 
-# Chunk Class
 class Chunk:
-    def __init__(self, X, Z, parent):
+    def __init__(self, parent, position):
         """
         Chunk
-
-        * Class for a chunk of blocks
-
-        :X: X position of chunk
-        :Z: Z position of chunk
-        :parent: parent world object
+        
+        * Initializes a chunk
+        
+        :parent: the parent world
+        :position: the position of the chunk (x, z)
         """
         self.parent = parent
-        self.CHUNK_DIST = parent.CHUNK_DIST
-        self.X = X
-        self.Z = Z
-        self.generated = False
-        self.blocks = {}
-        self.structures = {}
-        self._scheduled_frame_last = 0
-        self.added_to_batch = False
+        self.position = position
+
+        self.generator = pycraft.TerrainGenerator(self)
+
+        self.batch = pyglet.graphics.Batch()
+        
+    def add_block(self, type, position):
+        """
+        add
+        
+        * Adds a block to the world
+        
+        :position: the position of the block
+        """
+        self.parent.block_types[type].add(position=position, parent=self)
 
     def generate(self):
         """
         generate
-
-        * Generates the chunk
+        
+        * Generates a chunk
         """
-        # values and constants
-        self.batch = pyglet.graphics.Batch()
-        self.CHUNK_DIST = 8
-        self.generator = TerrainGenerator()
+        self.generator.generate()
 
-        self.blocks = {}
-
-        # get positions
-        self.X = self.X*self.CHUNK_DIST
-        self.Z = self.Z*self.CHUNK_DIST
-        threading.Thread(target = lambda: self.generator.generate_for(self), daemon = True).start()
-        self.generated = True
-
-    def add_block(self, type_, block_data, index):
+    def update(self):
         """
-        add_block
-
-        * Adds a block to the chunk
-
-        :type_: type of block
-        :block_data: data for block
-        :index: index of block
+        update
+        
+        * Updates the chunk
         """
-        self.blocks[index] = blocks_all[type_](block_data=block_data, parent=self)
-        self.parent._all_blocks[index] = self.blocks[index]
-        pyglet.clock.schedule_once(self.blocks[index].add_to_batch_and_save, randint(0, 1))
-
-    def remove_block(self, index):
-        """
-        remove_block
-
-        * Removes a block from the chunk
-
-        :index: index of block
-        """
-        self.blocks[index].remove()
-        self.blocks[index] = None
-
-    def block_exists(self, index):
-        """
-        block_exists
-
-        * Checks if a block exists in the chunk
-
-        :index: index of block
-        """
-        try:
-            return self.blocks[index].block_data
-        except:
-            return False
+        self.generator.update()
 
     def draw(self):
         """
         draw
-
+        
         * Draws the chunk
         """
-        if not test and self.generated and not distance_vector_2d(self.parent.player.pos[0], self.parent.player.pos[2], self.X, self.Z) > self.parent.chunk_distance*1.5*self.CHUNK_DIST:
-            self.batch.draw()
-        elif test:
-            self.batch.draw()
+        self.batch.draw()
 
-        if self.generated:
-            self.add_to_batch()
-
-    def add_to_batch(self):
+    def remove_block(self, position):
         """
-        add_to_batch
-
-        * Adds the chunk to the batch
+        remove
+        
+        * Removes a block from the chunk
+        
+        :position: the position of the block
         """
-        if not self.added_to_batch:
-            self.generator.add_to_batch(chunk=self)
-            self.added_to_batch = True
+        self.all_blocks[tuple(position)].remove()
+        del self.all_blocks[tuple(position)]
+        del self.parent.all_blocks[tuple(position)]
+
+    def block_exists(self, position):
+        """
+        block_exists
+        
+        * Checks if a block exists
+        
+        :position: the position of the block
+        """
+        return self.parent.block_exists(position)
