@@ -47,7 +47,7 @@ class Chunk:
         
         * Updates the chunk
         """
-        self.generator.update()
+        pass
 
     def draw(self):
         """
