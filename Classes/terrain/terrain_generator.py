@@ -42,7 +42,8 @@ class TerrainGenerator:
                     self.parent.add_preloaded_block("Dirt", (x, y, z))
 
                 for y in range(noiseval_grass-noiseval_dirt-noiseval_stone, noiseval_grass-noiseval_dirt):
-                    self.parent.add_preloaded_block("Stone", (x, y, z))
+                    if not self.noise.noise3d(x/10, y/10, z/10) > 0.5:
+                        self.parent.add_preloaded_block("Stone", (x, y, z))
 
                 self.parent.add_preloaded_block("Bedrock", (x, noiseval_grass-noiseval_dirt-noiseval_stone-1, z))
 
