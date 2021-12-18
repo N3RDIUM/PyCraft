@@ -1,6 +1,7 @@
 # imports
 import pyglet
 from pyglet.gl import *
+import random
 
 class Block:
     def __init__(self, name, parent):
@@ -17,8 +18,16 @@ class Block:
         self.texture = {}
         self.parent = parent
         self.instances = {}
+        self._preloads = {}
 
         self.tex_coords = ('t2f', (0, 0, 1, 0, 1, 1, 0, 1))
+
+        self._preload_queue = []
+    
+    def _preload_block(self, position, parent):
+        self.parent.all_blocks[tuple(position)] = [self.name, tuple(position)]
+        self._preloads[tuple(position)] = parent
+        self._preload_queue.append(parent)
 
     def add(self, position, parent):
         """
@@ -57,6 +66,16 @@ class Block:
 
         parent.parent.all_blocks[tuple(position)] = returned_data
         return returned_data
+
+    def _process_preloads(self, chunk):
+        for _ in self._preloads:
+            if self._preloads[_] == chunk:
+                self.add(_, self._preloads[_])
+
+        for i in range(len(self._preload_queue)):
+            if self._preload_queue[i] == chunk:
+                self._preload_queue.pop(i)
+                break
 
     def remove(self, position):
         """

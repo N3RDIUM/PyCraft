@@ -33,6 +33,27 @@ class Chunk:
         """
         self.parent.block_types[type].add(position=position, parent=self)
 
+    def add_preloaded_block(self, type, position):
+        """
+        add_preloaded
+        
+        * Adds a block to the chunk
+        
+        :position: the position of the block
+        """
+        self.parent.block_types[type]._preload_block(position=position, parent=self)
+        self.parent.all_blocks[tuple(position)] = self.parent.block_types[type]
+
+    def _process_preloads(self, *args, **kwargs):
+        """
+        _process_preloads
+        
+        * Processes the preloaded blocks
+        """
+        for block in self.parent.block_types:
+            if self.parent.block_types[block]._preload_queue:
+                self.parent.block_types[block]._process_preloads(self)
+
     def generate(self):
         """
         generate
