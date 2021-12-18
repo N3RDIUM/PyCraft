@@ -34,11 +34,11 @@ class Block:
         X, Y, Z = (x + 1, y + 1, z + 1)
         
         # Top
-        if not self.parent.block_exists((x, y - 1, z))[0]:
+        if not self.parent.block_exists((x, y + 1, z))[0]:
             data["faces"]["top"] = parent.batch.add(4, GL_QUADS, self.texture["top"], ('v3f', (x, Y, Z,  X, Y, Z,  X, Y, z,  x, Y, z)), self.tex_coords)
         
         # Bottom
-        if self.parent.block_exists((x, y + 1, z))[0]:
+        if self.parent.block_exists((x, y - 1, z))[0]:
             data["faces"]["bottom"] = parent.batch.add(4, GL_QUADS, self.texture["bottom"], ('v3f', (x, y, z, X, y, z, X, y, Z, x, y, Z)), self.tex_coords)
 
         # Front
