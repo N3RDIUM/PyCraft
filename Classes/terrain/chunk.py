@@ -68,13 +68,3 @@ class Chunk:
         self.all_blocks[tuple(position)].remove()
         del self.all_blocks[tuple(position)]
         del self.parent.all_blocks[tuple(position)]
-
-    def block_exists(self, position):
-        """
-        block_exists
-        
-        * Checks if a block exists
-        
-        :position: the position of the block
-        """
-        return self.parent.block_exists(position)

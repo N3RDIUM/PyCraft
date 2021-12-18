@@ -144,13 +144,12 @@ class World:
 
         * Checks if a block exists at a position
 
-        :position: the position to check
+        :position: the position to cdheck
         """
         if position in self.all_blocks:
-            _ = position
-            return [True, _]
+            return True
         else:
-            return [False, None]
+            return False
 
     def _process_queue_item(self):
         """
