@@ -1,6 +1,7 @@
 # imports
 import pyglet
 from pyglet.gl import *
+import threading
 
 # Inbuilt imports
 import Classes as pycraft
@@ -17,7 +18,7 @@ class Chunk:
         :position: the position of the chunk (x, z)
         """
         self.parent = parent
-        self.position = position
+        self.position = {'x': position['x'] * self.parent.chunk_size, 'z': position['z'] * self.parent.chunk_size}
 
         self.generator = pycraft.TerrainGenerator(self)
 
@@ -60,7 +61,7 @@ class Chunk:
         
         * Generates a chunk
         """
-        self.generator.generate()
+        threading.Thread(target = self.generator.generate, daemon = True).start()
 
     def update(self):
         """
