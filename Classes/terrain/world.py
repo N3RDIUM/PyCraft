@@ -141,6 +141,8 @@ class World:
         """
         for i in self.all_chunks:
             self.all_chunks[i].draw()
+        if self.parent.player.pointing_at[0] != None:
+            self.draw_cube(self.parent.player.pointing_at[0][0], self.parent.player.pointing_at[0][1], self.parent.player.pointing_at[0][2], 1)
 
     def draw_cube(self, x, y, z, size):
         """
@@ -249,6 +251,17 @@ class World:
         """
         self.all_blocks[position] = block
         chunk.add_block(position, block)
+
+    def remove_block(self, position, chunk):
+        """
+        remove_block
+
+        * Removes a block at a position
+
+        :position: the position to remove the block from
+        """
+        if tuple(position) in self.all_blocks:
+            chunk.remove_block(position)
 
     def add_row_x_minus(self):
         """

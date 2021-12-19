@@ -85,7 +85,6 @@ class Block:
 
         :position: the position of the block
         """
-        self.instances[position]
-
-        for i in self.instances[position]["faces"]:
-            self.instances[position]["faces"][i].delete()
+        if position in self.instances:
+            for i in self.instances[position]["faces"]:
+                self.instances[position]["faces"][i].delete()

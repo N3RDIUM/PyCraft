@@ -20,7 +20,6 @@ class Chunk:
         self.parent = parent
         self.position = {'x': position['x'] * self.parent.chunk_size, 'z': position['z'] * self.parent.chunk_size}
 
-        self.blocks = {}
         self.structures = {}
 
         self.generator = pycraft.TerrainGenerator(self)
@@ -90,6 +89,7 @@ class Chunk:
         
         :position: the position of the block
         """
-        self.all_blocks[tuple(position)].remove()
-        del self.all_blocks[tuple(position)]
+        _type = self.parent.all_blocks[tuple(position)][0]
+
+        self.parent.block_types[_type].remove(tuple(position))
         del self.parent.all_blocks[tuple(position)]

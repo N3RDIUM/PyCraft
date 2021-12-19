@@ -77,6 +77,12 @@ class PyCraftWindow(Window):
         self.model.update()
         self.player.update(self.keys)
 
+    def on_mouse_press(self, *args, **kwargs):
+        self.player.mouse_click = True
+    
+    def on_mouse_release(self, *args, **kwargs):
+        self.player.mouse_click = False
+
     def on_close(self):
         pyglet.app.exit()
 
