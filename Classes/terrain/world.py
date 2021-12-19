@@ -44,12 +44,15 @@ class World:
 
         self.textures = {}
         self.block_types = {}
+        self.structure_types = {}
         
         self.all_blocks = {}
+        self._independent_blocks = {}
         self.all_chunks = {}
 
         self._load_textures()
         self._load_block_types()
+        self._load_structures()
 
         self.render_distance = 3
         self.chunk_size = 8
@@ -84,6 +87,16 @@ class World:
                 self.block_types[i.split(".")[0]] = __import__("Classes.terrain.blocks." + i.split(".")[0], fromlist = [i.split(".")[0]]).Block(self)
         log("Block Loader", "Loaded " + str(len(self.block_types)) + " blocks")
 
+    def _load_structures(self):
+        """
+        _load_structures
+
+        * Loads all the structures
+        """
+        log("Structure Loader", "Loading structures...")
+        self.structure_types = pycraft.load_structures(self)
+        log("Structure Loader", "Loaded " + str(len(self.structure_types)) + " structures")
+
     def generate(self):
         """
         generate
@@ -91,8 +104,8 @@ class World:
         * Generates the world
         """
         info("World", "Generating world...")
-        for i in trange(-self.render_distance, self.render_distance):
-            for j in range(-self.render_distance, self.render_distance):
+        for i in trange(-self.render_distance+1, self.render_distance):
+            for j in range(-self.render_distance+1, self.render_distance):
                 self.all_chunks[(i, j)] = pycraft.Chunk(self, {'x': i, 'z': j})
                 self._queue.append((i, j))
 
@@ -155,6 +168,41 @@ class World:
         else:
             return False
 
+    def chunk_exists(self, position):
+        """
+        chunk_exists
+
+        * Checks if a chunk exists at a position
+
+        :position: the position to cdheck
+        """
+        if position in self.all_chunks:
+            return True
+        else:
+            return False
+
+    def make_chunk(self, position):
+        """
+        make_chunk
+
+        * Makes a chunk at a position
+
+        :position: the position to make the chunk at
+        """
+        self.all_chunks[position] = pycraft.Chunk(self, {'x': position[0], 'z': position[1]})
+        self._queue.append(position)
+
+    def make_structure(self, position, structure_type, chunk):
+        """
+        make_structures
+
+        * Makes all the structures at a position
+
+        :position: the position to make the structures at
+        """
+        chunk.structures[position] = self.structure_types[structure_type](chunk, position)
+        chunk.structures[position].generate()
+
     def _process_queue_item(self):
         """
         _process_queue_item
@@ -165,3 +213,28 @@ class World:
             item = self._queue[0]
             self.all_chunks[item].generate()
             self._queue.pop(0)
+
+    def get_block(self, position):
+        """
+        get_block
+
+        * Gets a block at a position
+
+        :position: the position to get the block from
+        """
+        if position in self.all_blocks:
+            return self.all_blocks[position]
+        else:
+            return None
+        
+    def add_block(self, position, block, chunk):
+        """
+        add_block
+
+        * Adds a block at a position
+
+        :position: the position to add the block to
+        :block: the block to add
+        """
+        self.all_blocks[position] = block
+        chunk.add_block(position, block)

@@ -20,6 +20,9 @@ class Chunk:
         self.parent = parent
         self.position = {'x': position['x'] * self.parent.chunk_size, 'z': position['z'] * self.parent.chunk_size}
 
+        self.blocks = {}
+        self.structures = {}
+
         self.generator = pycraft.TerrainGenerator(self)
 
         self.batch = pyglet.graphics.Batch()
