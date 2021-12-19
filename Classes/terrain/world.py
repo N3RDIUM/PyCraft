@@ -96,17 +96,6 @@ class World:
                 self.all_chunks[(i, j)] = pycraft.Chunk(self, {'x': i, 'z': j})
                 self._queue.append((i, j))
 
-    def add_row_x_minus(self):
-        """
-        add_row_x_minus
-
-        * Adds a row to the world
-        """
-        for i in range(self.position[1]+self.render_distance):
-            self.all_chunks[(i, self.position[1]+self.render_distance)] = pycraft.Chunk(self, {'x': i, 'z': self.render_distance})
-            self._queue.append((i, self.position[1]+self.render_distance))
-        self.position = (self.position[0]-1, self.position[1])
-
     def update(self):
         """
         update
@@ -119,10 +108,6 @@ class World:
 
         # Runs the queue
         self._process_queue_item()
-
-        # INFGEN
-        if self.position[0] * self.chunk_size > self.parent.player.pos[0]:
-            self.add_row_x_minus()
 
     def draw(self):
         """
