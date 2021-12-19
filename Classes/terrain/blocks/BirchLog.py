@@ -9,7 +9,7 @@ class Block(pycraft.Block):
         
         :parent: the parent window
         """
-        super().__init__("Dirt", *args, **kwargs)
+        super().__init__("BirchLog", *args, **kwargs)
 
         self.texture = {
             "top": self.parent.textures["birch_log_top"],

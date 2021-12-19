@@ -37,7 +37,7 @@ class Block:
 
         :position: the position of the block
         """
-        data = {"faces": {"top": None, "bottom": None, "front": None, "back": None, "left": None, "right": None}, parent: parent}
+        data = {"faces": {"top": None, "bottom": None, "front": None, "back": None, "left": None, "right": None}, "parent": parent}
 
         x, y, z = position
         X, Y, Z = (x + 1, y + 1, z + 1)
@@ -67,6 +67,14 @@ class Block:
         parent.parent.all_blocks[tuple(position)] = returned_data
         return returned_data
 
+    def _update_faces(self, position):
+        try:
+            _parent = self.instances[position]["parent"]
+            self.remove(position)
+            self.add(position, _parent)
+        except KeyError:
+            pass
+
     def _process_preloads(self, chunk):
         for _ in list(self._preloads).copy():
             if self._preloads[_] == chunk:
@@ -87,4 +95,6 @@ class Block:
         """
         if position in self.instances:
             for i in self.instances[position]["faces"]:
-                self.instances[position]["faces"][i].delete()
+                if self.instances[position]["faces"][i] is not None:
+                    self.instances[position]["faces"][i].delete()
+        del self.instances[position]
