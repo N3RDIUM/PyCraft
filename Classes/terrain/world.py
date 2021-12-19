@@ -56,7 +56,8 @@ class World:
 
         self.render_distance = 3
         self.chunk_size = 8
-        self.position = (0, 0)
+        self.infgen_threshold = 1
+        self.position = [0, 0]
 
         self.seed = random.randint(0, 100000)
 
@@ -121,6 +122,16 @@ class World:
 
         # Runs the queue
         self._process_queue_item()
+
+        # INFGEN
+        if self.parent.player.pos[0] / self.chunk_size > self.position[0] + self.infgen_threshold:
+            self.add_row_x_plus()
+        if self.parent.player.pos[0] / self.chunk_size < self.position[0] - self.infgen_threshold:
+            self.add_row_x_minus()
+        if self.parent.player.pos[2] / self.chunk_size > self.position[1] + self.infgen_threshold:
+            self.add_row_z_plus()
+        if self.parent.player.pos[2] / self.chunk_size < self.position[1] - self.infgen_threshold:
+            self.add_row_z_minus()
 
     def draw(self):
         """
@@ -238,3 +249,47 @@ class World:
         """
         self.all_blocks[position] = block
         chunk.add_block(position, block)
+
+    def add_row_x_minus(self):
+        """
+        add_row_x_minus
+
+        * Adds a row of blocks to the world.
+        """
+        for z in range(-self.render_distance, self.render_distance):
+            if not self.chunk_exists((self.position[0]-self.render_distance, self.position[1]+z)):
+                self.make_chunk((self.position[0]-self.render_distance, self.position[1]+z))
+        self.position[0] -= 1
+
+    def add_row_x_plus(self):
+        """
+        add_row_x_plus
+
+        * Adds a row of blocks to the world.
+        """
+        for z in range(-self.render_distance, self.render_distance):
+            if not self.chunk_exists((self.position[0]+self.render_distance, self.position[1]+z)):
+                self.make_chunk((self.position[0]+self.render_distance, self.position[1]+z))
+        self.position[0] += 1
+
+    def add_row_z_minus(self):
+        """
+        add_row_z_minus
+
+        * Adds a row of blocks to the world.
+        """
+        for x in range(-self.render_distance, self.render_distance):
+            if not self.chunk_exists((self.position[0]+x, self.position[1]-self.render_distance)):
+                self.make_chunk((self.position[0]+x, self.position[1]-self.render_distance))
+        self.position[1] -= 1
+
+    def add_row_z_plus(self):
+        """
+        add_row_z_plus
+
+        * Adds a row of blocks to the world.
+        """
+        for x in range(-self.render_distance, self.render_distance):
+            if not self.chunk_exists((self.position[0]+x, self.position[1]+self.render_distance)):
+                self.make_chunk((self.position[0]+x, self.position[1]+self.render_distance))
+        self.position[1] += 1
