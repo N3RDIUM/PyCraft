@@ -29,8 +29,8 @@ class TerrainGenerator:
         
         :position: the position of the chunk
         """
-        for x in range(self.parent.position['x'] - self.parent.parent.chunk_size, self.parent.parent.chunk_size + self.parent.position['z']):
-            for z in range(self.parent.position['x'] - self.parent.parent.chunk_size, self.parent.parent.chunk_size + self.parent.position['z']):
+        for x in range(self.parent.position['x'] - self.parent.parent.chunk_size, self.parent.parent.chunk_size + self.parent.position['x']):
+            for z in range(self.parent.position['z'] - self.parent.parent.chunk_size, self.parent.parent.chunk_size + self.parent.position['z']):
 
                 noiseval_grass = round(pycraft.lerp(self.noise.noise2d(x/10, z/10) * 2, self.noise.noise2d(x/100, z/100) * 10, self.noise.noise2d(x/500, z/500) * 50))
                 noiseval_dirt = 1+abs(round(pycraft.lerp(self.noise.noise2d(x/10, z/10) * 2, self.noise.noise2d(x/100, z/100) * 7, self.noise.noise2d(x/500, z/500) * 5)))                

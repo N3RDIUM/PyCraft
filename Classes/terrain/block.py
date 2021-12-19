@@ -68,9 +68,9 @@ class Block:
         return returned_data
 
     def _process_preloads(self, chunk):
-        for _ in self._preloads:
+        for _ in list(self._preloads).copy():
             if self._preloads[_] == chunk:
-                self.add(_, self._preloads[_])
+                self.add(position = _, parent = self._preloads[_])
 
         for i in range(len(self._preload_queue)):
             if self._preload_queue[i] == chunk:
