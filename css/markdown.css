@@ -1,0 +1,150 @@
+body {
+    background-color: #f2f2f2;
+}
+@keyframes animation_1 {
+    0% {
+        opacity: 1;
+    }
+    25% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 0;
+    }
+    90% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes animation_2 {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 0;
+    }
+    90% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes animation_3 {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    75% {
+        opacity: 0;
+    }
+    90% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes animation_4 {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes animation_5 {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 0;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes animation_5 {
+    0% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 0;
+    }
+    90% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+#Carousel {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    display: none;
+}
+#carousel_item_1{
+    animation: animation_1 10s ease-in-out infinite;
+    position: absolute;
+}
+#carousel_item_2{
+    animation: animation_2 10s ease-in-out infinite;
+    position: absolute;
+}
+#carousel_item_3{
+    animation: animation_3 10s ease-in-out infinite;
+    position: absolute;
+}
+#carousel_item_4{
+    animation: animation_4 10s ease-in-out infinite;
+    position: absolute;
+}
+#carousel_item_5{
+    animation: animation_5 10s ease-in-out infinite;
+    position: absolute;
+}
