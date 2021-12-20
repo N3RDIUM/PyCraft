@@ -103,10 +103,12 @@ class World:
         
         * Loads all the block types
         """
+        import importlib
+
         log("Block Loader", "Loading blocks...")
         for i in os.listdir("Classes/terrain/blocks"):
             if i.endswith(".py") and i != "__init__.py":
-                self.block_types[i.split(".")[0]] = __import__("Classes.terrain.blocks." + i.split(".")[0], fromlist = [i.split(".")[0]]).Block(self)
+                self.block_types[i.split(".")[0]] = importlib.import_module("Classes.terrain.blocks." + i.split(".")[0]).Block(self)
         log("Block Loader", "Loaded " + str(len(self.block_types)) + " blocks")
 
     def _load_structures(self):
