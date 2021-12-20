@@ -16,7 +16,7 @@ class Player:
         :rot: the rotation of the player
         :parent: the parent of the player
         """
-        self.pos = [0, 5, 0]
+        self.pos = [0, 80, 0]
         self.rot = [0, 0, 0]
         self.vel = [0, 0]
         self.x = 0

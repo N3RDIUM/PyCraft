@@ -54,9 +54,9 @@ class World:
         self._load_block_types()
         self._load_structures()
 
-        self.render_distance = 3
+        self.render_distance = 5
         self.chunk_size = 8
-        self.infgen_threshold = 1
+        self.infgen_threshold = 0
         self.position = [0, 0]
 
         self.seed = random.randint(0, 100000)
