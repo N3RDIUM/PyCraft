@@ -3,11 +3,10 @@ from logging import root
 from pyglet.window import key
 from pyglet.gl import *
 import math
-from Classes.util.math_util import _to_radians, normalize
 
 # player class
 class Player:
-    def __init__(self, pos=(0, 0, 0), rot=(0, 0), parent=None):
+    def __init__(self, parent=None):
         """
         Player
 
@@ -17,8 +16,8 @@ class Player:
         :rot: the rotation of the player
         :parent: the parent of the player
         """
-        self.pos = list(pos)
-        self.rot = list(rot)
+        self.pos = [0, 80, 0]
+        self.rot = [0, 0, 0]
         self.vel = [0, 0]
         self.x = 0
         self.y = 0
@@ -116,7 +115,7 @@ class Player:
         dx, dy, dz = vector
         previous = None
         for _ in range(0, max_distance):
-            key = normalize((x, y, z))
+            key = (round(x), round(y), round(z))
             if key != previous and self.parent.model.block_exists(key):
                 self.pointing_at[0] = key
                 self.pointing_at[1] = previous
@@ -198,7 +197,7 @@ class Player:
         elif self._collision_algorithm((x,y,z),0.45,(1,0,0),0.5) and self.vel[1] > 0 and self.block_exists["right"]:
             self.vel[1] = 0
 
-    def update(self, dt, keys):
+    def update(self, keys):
         """
         update
 
@@ -208,9 +207,8 @@ class Player:
         :keys: the keys pressed
         """
         sens = self.speed
-        s = dt*10
-        rotY = _to_radians(-self.rot[1])
-        rotX = _to_radians(-self.rot[0])
+        rotY = math.radians(-self.rot[1])
+        rotX = math.radians(-self.rot[0])
         dx, dz = math.sin(rotY), math.cos(rotY)
         dy = math.sin(rotX)
         self.hit_test(position=self.pos, vector=(dx, -dy, -dz), max_distance=self.hit_range)
@@ -242,7 +240,7 @@ class Player:
         self.collide()
 
         if self.mouse_click and not self.pointing_at[0] is None and not self.pointing_at[1] is None:
-            self.parent.model.remove_block([self.pointing_at[0][0], self.pointing_at[0][1], self.pointing_at[0][2]])
+            self.parent.model.remove_block([self.pointing_at[0][0], self.pointing_at[0][1], self.pointing_at[0][2]], self.parent.model.all_chunks[(round(self.pointing_at[0][0] / self.parent.model.chunk_size), round(self.pointing_at[0][2] / self.parent.model.chunk_size))])
 
         self.pos[1] += self.velocity_y
         self.pos[0] += self.vel[0]
@@ -250,3 +248,8 @@ class Player:
 
         self.vel[0] *= self.friction
         self.vel[1] *= self.friction
+
+    def _translate(self):
+        glRotatef(-self.rot[0], 1, 0, 0)
+        glRotatef(-self.rot[1], 0, 1, 0)
+        glTranslatef(-self.pos[0], -self.pos[1], -self.pos[2])

@@ -41,7 +41,7 @@ class CloudGenerator:
         """
         self.clouds = []
 
-        for i in range(self.parent.x-self.parent.chunk_distance, self.parent.x+self.parent.chunk_distance):
-            for j in range(self.parent.z-self.parent.chunk_distance, self.parent.z+self.parent.chunk_distance):
-                if abs(self.noise.noise2d(i, j))*2 > 0.7:
+        for i in range(self.parent.position[0]-self.parent.render_distance, self.parent.position[0]+self.parent.render_distance):
+            for j in range(self.parent.position[1]-self.parent.render_distance, self.parent.position[1]+self.parent.render_distance):
+                if abs(self.noise.noise2d(i, j))*2 > 0.7 and abs(self.noise.noise2d(i, j))*2 < 0.8:
                     self.clouds.append(Cloud((i*4, j*4), self))

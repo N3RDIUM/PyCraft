@@ -1,10 +1,13 @@
-def add_block(type, coords, parent):
+def add_block(type, coords, chunk):
     """
     Adds a block to the world at the given coordinates.
+
+    :type: type of block to add
     :coords: coordinates to add the block at
+    :chunk: chunk to add the block to
     """
     # Add the block to the chunk
-    parent.parent.add_block(coords, type, parent)
+    chunk.add_preloaded_block(type, coords)
 
 def remove_block(world, coords):
     """
@@ -27,18 +30,18 @@ def get_highest_block(world, x, z):
 
     for index, item in world._all_blocks.items():
         if index[1] == x and index[2] == z:
-            # If the block is a block, add it to the list
+            # If it is a block, add it to the list
             blocks.append(item)
+
     # Now get the highest block
     block = None
 
     for item in blocks:
         if block is None:
-            block = item
+            pass
         elif block.block_data['pos']['y'] < item.block_data['pos']['y']:
             block = item
 
-    print(block)
     # Return the highest block
     return block
 

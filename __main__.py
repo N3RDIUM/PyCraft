@@ -7,64 +7,24 @@
 # |_|         ||    |______| |_| \_\/_/      \|_|         |__|  *
 #################################################################
 
-# Make this true to enter debug mode
-test = False
-
-# import all the modules
-from logger import *
-from load_shaders import *
-from Classes import *
-from pyglet.gl import *
-from OpenGL.GL import *
+# imports
 import pyglet
+from pyglet.gl import *
 
-# Warn if game is in debug mode
-if test:
-    warn('Main', "This is a test!")
+# inbuilt imports
+import Classes as pycraft
+from logger import *
 
-# Use shaders function
-def use_shader(shader_name="default"):
-    # Link and use the shader program
-    shaders[shader_name].use()
-    log("main", f"Using shaders: {shader_name}:{shaders[shader_name]}")
+test = True
 
-# Load shaders
-use_shaders = True
-load_shaders()
-
+info('main', 'Initializing PyCraft...')
 if __name__ == '__main__':
-    # shaders: move it after window to enable, after we fix 'em.
-    if use_shaders:
-        use_shader()
+    # create window
+    window = pycraft.PyCraftWindow(width = 800, height = 500, resizable = True)
     
-    # Create window
-    _window = window.Window(width=400, height=300, caption='PyCraft',
-                    resizable=True)
-    _window.set_visible()
-    
-    # initialize opengl
-    # Background color
     glClearColor(0.5, 0.7, 1, 1)
-    # Enable depth test
-    glEnable(GL_DEPTH_TEST)
-    # Enable backface culling
-    glEnable(GL_CULL_FACE)
-    glCullFace(GL_BACK)
-    # Enable lighting
-    glEnable(GL_LIGHTING)
-    if not test:
-        # Enable fog
-        glEnable(GL_FOG)
-        glFogfv(GL_FOG_COLOR, (GLfloat * int(_window.model.chunk_distance*16))(0.5, 0.69, 1.0, 10))
-        glHint(GL_FOG_HINT, GL_DONT_CARE)
-        glFogi(GL_FOG_MODE, GL_LINEAR)
-        glFogf(GL_FOG_START, _window.model.chunk_distance*4)
-        glFogf(GL_FOG_END, _window.model.chunk_distance*5)
-        # Texture blending
-        glEnable (GL_LINE_SMOOTH)
-        glEnable (GL_BLEND)
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glHint (GL_LINE_SMOOTH_HINT, GL_DONT_CARE)
-    
-    # run the game
+    # Run the app
+    info('main', 'Running PyCraft...')
     pyglet.app.run()
+
+info('main', 'Stopping!')

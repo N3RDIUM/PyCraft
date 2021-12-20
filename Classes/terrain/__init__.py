@@ -1,7 +1,4 @@
-from .block import BlockBase, blocks_all
-
-from .chunk import Chunk
-
-from .terrain_generator import TerrainGenerator
-
-from .world import World
+from .world import *
+from .chunk import *
+from .block import *
+from .terrain_generator import *

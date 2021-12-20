@@ -42,11 +42,10 @@ class Cloud:
         self.pos = xz
         self.size = [16,16]
         self.parent = parent
-        self.foo_image = load_texture("assets/textures/environment/sun.png")
 
     def draw(self):
         x = self.pos[0] - self.size[0]
-        y = self.parent.parent.player.pos[1] * 0.75
+        y = self.parent.parent.render_distance / 5 * self.parent.parent.chunk_size
         z = self.pos[1] - self.size[0]
 
         X = self.pos[0] + self.size[0]

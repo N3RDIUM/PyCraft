@@ -1,9 +1,6 @@
-from .environment import *
-
-from .player import *
-
+from .window import *
 from .terrain import *
-
+from .player import *
 from .util import *
-
-from .window import Window
+from .structures import *
+from .environment import *

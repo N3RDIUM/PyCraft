@@ -1,115 +1,194 @@
 # imports
-import threading
-from logger import *
+import pyglet
 from pyglet.gl import *
+import os
+import random
+from tqdm import trange
 
-from Classes.terrain.chunk import *
-from Classes.environment.cloud_generator import CloudGenerator
+# Inbuilt imports
+from logger import *
+import Classes as pycraft
 
-# Task Scheduler Class
-class TaskScheduler:
-    def __init__(self):
-        """
-        TaskScheduler
+# all the block types
+blocks_all = {}
 
-        * The task scheduler class
-        """
-        self.tasks = []
-        self.task_lock = threading.Lock()
-        self._frame = 0
+# Function to load a texture
+def load_texture(filename):
+    """
+    load_texture
 
-    def add_task(self, tasklist):
-        """
-        add_task
+    * Loads a texture from a file
 
-        * Adds a task to the task scheduler.
-
-        :tasklist: The tasks to add.
-        """
-        # Calculate the appropriate frame to run the task
-        APPROPRIATE_FRAME = self._frame + 1
-        for i in self.tasks:
-            if i[1] == APPROPRIATE_FRAME:
-                APPROPRIATE_FRAME += 1
-
-        with self.task_lock:
-            self.tasks.append([tasklist, APPROPRIATE_FRAME])
-
-    def run(self):
-        """
-        run
-
-        * Runs the task scheduler.
-        """
-        try:
-            for task in self.tasks:
-                if task[1] == self._frame:
-                    task[0]()
-                    del self.tasks[0]
-        finally:
-            self._frame += 1
-
+    :filename: path of the file to load
+    """
+    try:
+        tex = pyglet.image.load(filename).get_texture()
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        return pyglet.graphics.TextureGroup(tex)
+    except:
+        warn("Texture Loader", "Failed to load texture: " + filename)
+        return None
 
 class World:
-    def __init__(self, window, player):
+    def __init__(self, parent):
         """
         World
 
-        * The world class.
+        * Initializes the world
 
-        :window: The window to draw to.
-        :player: The player to draw the world around.
+        :parent: the parent window
         """
-        self.CHUNK_DIST = 16
-        self.generated = False
-        self.chunk_distance = 3
-        self.parent = window
-        self.cloud_generator = CloudGenerator(self)
-        self.player = player
-        self._all_blocks = {}
-        self._all_structures = {}
+        self.parent = parent
+        self.generator = pycraft.TerrainGenerator
 
-        self.x = 0
-        self.z = 0
+        self.textures = {}
+        self.block_types = {}
+        self.structure_types = {}
+        
+        self.all_blocks = {}
+        self._independent_blocks = {}
+        self.all_chunks = {}
 
-        self.chunks = {}
-        self._scheduler = TaskScheduler()
-        self._scheduler_ = TaskScheduler()
+        self._load_textures()
+        self._load_block_types()
+        self._load_structures()
+
+        self.render_distance = 5
+        self.chunk_size = 8
+        self.infgen_threshold = 0
+        self.position = [0, 0]
+
+        self.seed = random.randint(0, 100000)
+
+        self._queue = []
         self.generate()
-        self._tick = 0
 
+        self.sky_color = (0.5, 0.7, 1)
         self.light_color = [5,5,5,5]
         self.daynight_min = 1
         self.daynight_max = 5
         self.light_change = 0.1
 
-    def get_chunk(self, coords):
+        # Enable fog
+        glEnable(GL_FOG)
+        glFogfv(GL_FOG_COLOR, (GLfloat * int(self.render_distance*16))(0.5, 0.69, 1.0, 10))
+        glHint(GL_FOG_HINT, GL_DONT_CARE)
+        glFogi(GL_FOG_MODE, GL_LINEAR)
+        glFogf(GL_FOG_START, self.render_distance*4)
+        glFogf(GL_FOG_END, self.render_distance*5)
+        # Texture blending
+        glEnable (GL_LINE_SMOOTH)
+        glEnable (GL_BLEND)
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glHint (GL_LINE_SMOOTH_HINT, GL_DONT_CARE)
+
+        self.cloud_generator = pycraft.CloudGenerator(self)
+
+    def _load_textures(self):
         """
-        get_chu
+        _load_textures
 
-        * Gets a chunk.
-
-        :coords: The coordinates of the chunk.
-
-        :returns: The chunk.
+        * Loads all the textures
         """
-        return self.chunks[(coords[0], coords[1])]
+        log("Texture Loader", "Loading textures...")
+        for i in os.listdir("assets/textures/block"):
+            if i.endswith(".png"):
+                self.textures[i.split(".")[0]] = load_texture("assets/textures/block"+"/"+i)
+        log("Texture Loader", "Loaded " + str(len(self.textures)) + " textures")
+
+    def _load_block_types(self):
+        """
+        _load_block_types
+        
+        * Loads all the block types
+        """
+        log("Block Loader", "Loading blocks...")
+        for i in os.listdir("Classes/terrain/blocks"):
+            if i.endswith(".py") and i != "__init__.py":
+                self.block_types[i.split(".")[0]] = __import__("Classes.terrain.blocks." + i.split(".")[0], fromlist = [i.split(".")[0]]).Block(self)
+        log("Block Loader", "Loaded " + str(len(self.block_types)) + " blocks")
+
+    def _load_structures(self):
+        """
+        _load_structures
+
+        * Loads all the structures
+        """
+        log("Structure Loader", "Loading structures...")
+        self.structure_types = pycraft.load_structures(self)
+        log("Structure Loader", "Loaded " + str(len(self.structure_types)) + " structures")
 
     def generate(self):
         """
         generate
 
-        * Generates the world.
+        * Generates the world
         """
-        self.generated = False
-        for i in range(-self.chunk_distance, self.chunk_distance):
-            for j in range(-self.chunk_distance, self.chunk_distance):
-                self.make_chunk((self.x+i, self.z+j),
-                                (i+self.chunk_distance, j+self.chunk_distance))
-        self.generated = True
+        info("World", "Generating world...")
+        for i in trange(-self.render_distance+1, self.render_distance):
+            for j in range(-self.render_distance+1, self.render_distance):
+                self.all_chunks[(i, j)] = pycraft.Chunk(self, {'x': i, 'z': j})
+                self._queue.append((i, j))
 
-    @staticmethod
-    def draw_cube(x, y, z, size):
+    def update(self):
+        """
+        update
+
+        * Updates the world
+        """
+        # Updates the chunks
+        for i in self.all_chunks:
+            self.all_chunks[i].update()
+
+        # Runs the queue
+        self._process_queue_item()
+
+        # INFGEN
+        if self.parent.player.pos[0] / self.chunk_size > self.position[0] + self.infgen_threshold:
+            self.add_row_x_plus()
+        if self.parent.player.pos[0] / self.chunk_size < self.position[0] - self.infgen_threshold:
+            self.add_row_x_minus()
+        if self.parent.player.pos[2] / self.chunk_size > self.position[1] + self.infgen_threshold:
+            self.add_row_z_plus()
+        if self.parent.player.pos[2] / self.chunk_size < self.position[1] - self.infgen_threshold:
+            self.add_row_z_minus()
+
+        # Daynight cycle
+        self._daynight_cycle()
+
+    def _daynight_cycle(self):
+        """
+        _daynight_cycle
+
+        * Updates the daynight cycle
+        """
+        if self.light_color[0] > self.daynight_max:
+            self.light_change = -0.0005
+        elif self.light_color[0] < self.daynight_min:
+            self.light_change = 0.0005
+        self.light_color[0] += self.light_change
+        self.light_color[1] += self.light_change
+        self.light_color[2] += self.light_change
+
+    def draw(self):
+        """
+        draw
+
+        * Draws the world
+        """
+        glClearColor(*self.sky_color, 255)
+        # Lights
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glEnable(GL_LIGHT7)
+        glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat * 4)(*self.light_color))
+        self.cloud_generator.draw()
+        for i in self.all_chunks:
+            self.all_chunks[i].draw()
+        if self.parent.player.pointing_at[0] != None:
+            self.draw_cube(self.parent.player.pointing_at[0][0], self.parent.player.pointing_at[0][1], self.parent.player.pointing_at[0][2], 1)
+
+    def draw_cube(self, x, y, z, size):
         """
         draw_cube
 
@@ -133,110 +212,100 @@ class World:
         pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (x, y, Z,  X, y, Z,  X, Y, Z,  x, Y, Z)), ('c4B', (255, 255, 255, 5) * 4))
         pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (X, y, z,  x, y, z,  x, Y, z,  X, Y, z)), ('c4B', (255, 255, 255, 5) * 4))
 
-    def draw_player_hitbox(self, pos):
-        """
-        draw_player_hitbox
-
-        * Draws the player hitbox.
-
-        :pos: The position of the player.
-        """
-        self.draw_cube(pos[0], pos[1], pos[2], 1)
-
-    def draw(self):
-        """
-        draw
-
-        * Draws the world.
-        """
-        # Lights
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glEnable(GL_LIGHT7)
-        glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat * 4)(*self.light_color))
-        self._tick += 1
-        if self.player.pointing_at[0] != None:
-            self.draw_player_hitbox(self.parent.player.pointing_at[0])
-        for i in self.chunks:
-            chunk = self.chunks[i]
-            if chunk is not None and chunk.generated:
-                chunk.draw()
-        self.cloud_generator.draw()
-        self._scheduler.run()
-        self._scheduler_.run()
-
-    def make_chunk(self, xz, index):
-        """
-        make_chunk
-
-        * Makes a chunk.
-
-        :xz: The xz coordinates of the chunk.
-        :index: The index of the chunk.
-        """
-        chunk = Chunk(xz[0], xz[1], self)
-        self.chunks[index] = chunk
-        chunk.generate()
-
-    def chunk_exists(self, index):
-        """
-        chunk_exists
-
-        * Checks if a chunk exists.
-
-        :index: The index of the chunk.
-
-        :returns: True if the chunk exists, False if not.
-        """
-        return index in self.chunks
-
-    def block_exists(self, coords):
+    def block_exists(self, position):
         """
         block_exists
 
-        * Checks if a block exists.
+        * Checks if a block exists at a position
 
-        :coords: The coordinates of the block.
-
-        :returns: True if the block exists, False if not.
+        :position: the position to cdheck
         """
-        try:
-            return self._all_blocks[(coords[0], coords[1], coords[2])].block_data
-        except:
+        if position in self.all_blocks:
+            return True
+        else:
             return False
 
-    def add_row_z_minus(self):
+    def chunk_exists(self, position):
         """
-        add_row_z_minus
+        chunk_exists
 
-        * Adds a row of blocks to the world.
-        """
-        data = {}
-        for x in range(-self.chunk_distance, self.chunk_distance):
-            if not self.chunk_exists((self.x+x, self.z-self.chunk_distance)):
-                data[(self.x+x, self.z-self.chunk_distance)
-                     ] = Chunk(self.x+x, self.z-self.chunk_distance, self)
-                self._scheduler_.add_task(
-                    data[self.x+x, self.z-self.chunk_distance].generate)
-        for i in data:
-            self.chunks[i] = data[i]
-        self.z -= 1
+        * Checks if a chunk exists at a position
 
-    def add_row_z_plus(self):
+        :position: the position to cdheck
         """
-        add_row_z_plus
+        if position in self.all_chunks:
+            return True
+        else:
+            return False
 
-        * Adds a row of blocks to the world.
+    def make_chunk(self, position):
         """
-        data = {}
-        for x in range(-self.chunk_distance, self.chunk_distance):
-            if not self.chunk_exists((self.x+x, self.z+self.chunk_distance)):
-                data[(self.x+x, self.z+self.chunk_distance)
-                     ] = Chunk(self.x+x, self.z+self.chunk_distance, self)
-                self._scheduler_.add_task(
-                    data[self.x+x, self.z+self.chunk_distance].generate)
-        for i in data:
-            self.chunks[i] = data[i]
-        self.z += 1
+        make_chunk
+
+        * Makes a chunk at a position
+
+        :position: the position to make the chunk at
+        """
+        self.all_chunks[position] = pycraft.Chunk(self, {'x': position[0], 'z': position[1]})
+        self._queue.append(position)
+
+    def make_structure(self, position, structure_type, chunk):
+        """
+        make_structures
+
+        * Makes all the structures at a position
+
+        :position: the position to make the structures at
+        """
+        chunk.structures[position] = self.structure_types[structure_type](chunk, position)
+        chunk.structures[position].generate()
+
+    def _process_queue_item(self):
+        """
+        _process_queue_item
+
+        * Processes an item in the queue
+        """
+        if len(self._queue) > 0:
+            item = self._queue[0]
+            self.all_chunks[item].generate()
+            self._queue.pop(0)
+
+    def get_block(self, position):
+        """
+        get_block
+
+        * Gets a block at a position
+
+        :position: the position to get the block from
+        """
+        if position in self.all_blocks:
+            return self.all_blocks[position]
+        else:
+            return None
+        
+    def add_block(self, position, block, chunk):
+        """
+        add_block
+
+        * Adds a block at a position
+
+        :position: the position to add the block to
+        :block: the block to add
+        """
+        self.all_blocks[position] = block
+        chunk.add_block(position, block)
+
+    def remove_block(self, position, chunk):
+        """
+        remove_block
+
+        * Removes a block at a position
+
+        :position: the position to remove the block from
+        """
+        if tuple(position) in self.all_blocks:
+            chunk.remove_block(position)
 
     def add_row_x_minus(self):
         """
@@ -244,16 +313,10 @@ class World:
 
         * Adds a row of blocks to the world.
         """
-        data = {}
-        for z in range(-self.chunk_distance, self.chunk_distance):
-            if not self.chunk_exists((self.x-self.chunk_distance, self.z+z)):
-                data[(self.x-self.chunk_distance, self.z+z)
-                     ] = Chunk(self.x-self.chunk_distance, self.z+z, self)
-                self._scheduler_.add_task(
-                    data[self.x-self.chunk_distance, self.z+z].generate)
-        for i in data:
-            self.chunks[i] = data[i]
-        self.x -= 1
+        for z in range(-self.render_distance, self.render_distance):
+            if not self.chunk_exists((self.position[0]-self.render_distance, self.position[1]+z)):
+                self.make_chunk((self.position[0]-self.render_distance, self.position[1]+z))
+        self.position[0] -= 1
 
     def add_row_x_plus(self):
         """
@@ -261,80 +324,29 @@ class World:
 
         * Adds a row of blocks to the world.
         """
-        data = {}
-        for z in range(-self.chunk_distance, self.chunk_distance):
-            if not self.chunk_exists((self.x+self.chunk_distance, self.z+z)):
-                data[(self.x+self.chunk_distance, self.z+z)
-                     ] = Chunk(self.x+self.chunk_distance, self.z+z, self)
-                self._scheduler_.add_task(
-                    data[self.x+self.chunk_distance, self.z+z].generate)
-        for i in data:
-            self.chunks[i] = data[i]
-        self.x += 1
+        for z in range(-self.render_distance, self.render_distance):
+            if not self.chunk_exists((self.position[0]+self.render_distance, self.position[1]+z)):
+                self.make_chunk((self.position[0]+self.render_distance, self.position[1]+z))
+        self.position[0] += 1
 
-    def _check_no_holes(self):
+    def add_row_z_minus(self):
         """
-        _check_no_holes
+        add_row_z_minus
 
-        * Checks if there are any holes in the world.
+        * Adds a row of blocks to the world.
         """
-        for i in range(self.x-self.chunk_distance+1, self.x+self.chunk_distance-1):
-            for j in range(self.z-self.chunk_distance+1, self.z+self.chunk_distance-1):
-                if not self.chunk_exists((i, j)):
-                    self.make_chunk((i, j), (i, j))
+        for x in range(-self.render_distance, self.render_distance):
+            if not self.chunk_exists((self.position[0]+x, self.position[1]-self.render_distance)):
+                self.make_chunk((self.position[0]+x, self.position[1]-self.render_distance))
+        self.position[1] -= 1
 
-    def remove_block(self, coords):
+    def add_row_z_plus(self):
         """
-        remove_block
+        add_row_z_plus
 
-        * Removes a block from the world.
+        * Adds a row of blocks to the world.
         """
-        if self._all_blocks[(coords[0], coords[1], coords[2])].generated:
-            self._all_blocks[(coords[0], coords[1], coords[2])].chunk.remove_block(tuple(coords))
-            self._all_blocks[(coords[0], coords[1], coords[2])].remove()
-
-    def add_block(self, coords, block_type, parent):
-        """
-        add_block
-
-        * Adds a block to the world.
-        """
-        parent.add_block(type_=block_type, block_data={"block_pos":{"x":coords[0], "y":coords[1], "z":coords[2]}}, index=tuple(coords))
-
-    def _do_daynight(self):
-        """
-        _do_daynight
-
-        * Updates the day/night cycle.
-        """
-        if self.light_color[0] > self.daynight_max:
-            self.light_change = -0.0001
-        elif self.light_color[0] < self.daynight_min:
-            self.light_change = 0.0001
-        self.light_color[0] += self.light_change
-        self.light_color[1] += self.light_change
-        self.light_color[2] += self.light_change
-
-    def update(self, dt):
-        """
-        update
-
-        * Updates the world.
-
-        :dt: The time since the last update.
-        """
-        self._do_daynight()
-        x = int(self.player.pos[0]/self.CHUNK_DIST*2)
-        z = int(self.player.pos[2]/self.CHUNK_DIST*2)                
-        self._check_no_holes()
-
-        if x != self.x:
-            if x+1 > self.x:
-                self.add_row_x_plus()
-            elif x-1 < self.x:
-                self.add_row_x_minus()
-        if z != self.z:
-            if z+1 > self.z:
-                self.add_row_z_plus()
-            elif z-1 < self.z:
-                self.add_row_z_minus()
+        for x in range(-self.render_distance, self.render_distance):
+            if not self.chunk_exists((self.position[0]+x, self.position[1]+self.render_distance)):
+                self.make_chunk((self.position[0]+x, self.position[1]+self.render_distance))
+        self.position[1] += 1
