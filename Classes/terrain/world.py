@@ -83,6 +83,8 @@ class World:
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glHint (GL_LINE_SMOOTH_HINT, GL_DONT_CARE)
 
+        self.cloud_generator = pycraft.CloudGenerator(self)
+
     def _load_textures(self):
         """
         _load_textures
@@ -180,6 +182,7 @@ class World:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glEnable(GL_LIGHT7)
         glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat * 4)(*self.light_color))
+        self.cloud_generator.draw()
         for i in self.all_chunks:
             self.all_chunks[i].draw()
         if self.parent.player.pointing_at[0] != None:
