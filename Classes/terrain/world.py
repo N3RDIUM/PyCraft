@@ -64,6 +64,25 @@ class World:
         self._queue = []
         self.generate()
 
+        self.sky_color = (0.5, 0.7, 1)
+        self.light_color = [5,5,5,5]
+        self.daynight_min = 1
+        self.daynight_max = 5
+        self.light_change = 0.1
+
+        # Enable fog
+        glEnable(GL_FOG)
+        glFogfv(GL_FOG_COLOR, (GLfloat * int(self.render_distance*16))(0.5, 0.69, 1.0, 10))
+        glHint(GL_FOG_HINT, GL_DONT_CARE)
+        glFogi(GL_FOG_MODE, GL_LINEAR)
+        glFogf(GL_FOG_START, self.render_distance*4)
+        glFogf(GL_FOG_END, self.render_distance*5)
+        # Texture blending
+        glEnable (GL_LINE_SMOOTH)
+        glEnable (GL_BLEND)
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glHint (GL_LINE_SMOOTH_HINT, GL_DONT_CARE)
+
     def _load_textures(self):
         """
         _load_textures
@@ -133,12 +152,34 @@ class World:
         if self.parent.player.pos[2] / self.chunk_size < self.position[1] - self.infgen_threshold:
             self.add_row_z_minus()
 
+        # Daynight cycle
+        self._daynight_cycle()
+
+    def _daynight_cycle(self):
+        """
+        _daynight_cycle
+
+        * Updates the daynight cycle
+        """
+        if self.light_color[0] > self.daynight_max:
+            self.light_change = -0.0005
+        elif self.light_color[0] < self.daynight_min:
+            self.light_change = 0.0005
+        self.light_color[0] += self.light_change
+        self.light_color[1] += self.light_change
+        self.light_color[2] += self.light_change
+
     def draw(self):
         """
         draw
 
         * Draws the world
         """
+        glClearColor(*self.sky_color, 255)
+        # Lights
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glEnable(GL_LIGHT7)
+        glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat * 4)(*self.light_color))
         for i in self.all_chunks:
             self.all_chunks[i].draw()
         if self.parent.player.pointing_at[0] != None:

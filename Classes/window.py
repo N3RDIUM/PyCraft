@@ -21,8 +21,6 @@ class PyCraftWindow(Window):
         pyglet.clock.schedule(self.update)
 
         # initialize opengl
-        # Background color
-        glClearColor(0.5, 0.7, 1, 1)
         # Enable depth test
         glEnable(GL_DEPTH_TEST)
         # Enable backface culling
