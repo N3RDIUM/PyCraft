@@ -12,8 +12,3 @@
     dep_installer
     python __main__.py
 ##### (assuming that you already have git and python installed)
-
-## Known issues
-- [x] - Will be fixed soon.
-#####
-- [x] 1. All contributors don't appear on the README.
