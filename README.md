@@ -1,2 +1,0 @@
-# PyCraftRemake
-PyCraft remake.
