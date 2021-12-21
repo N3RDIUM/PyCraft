@@ -222,10 +222,7 @@ class World:
 
         :position: the position to cdheck
         """
-        if position in self.all_blocks:
-            return True
-        else:
-            return False
+        return position in self.all_blocks
 
     def chunk_exists(self, position):
         """
@@ -235,10 +232,7 @@ class World:
 
         :position: the position to cdheck
         """
-        if position in self.all_chunks:
-            return True
-        else:
-            return False
+        return position in self.all_chunks
 
     def make_chunk(self, position):
         """
