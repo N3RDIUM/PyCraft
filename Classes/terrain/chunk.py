@@ -8,11 +8,14 @@ import Classes as pycraft
 from logger import *
 
 class Chunk:
+    """
+    Chunk
+
+    * Initializes a chunk
+    """
     def __init__(self, parent, position):
         """
-        Chunk
-
-        * Initializes a chunk
+        Chunk.__init__
 
         :parent: the parent world
         :position: the position of the chunk (x, z)

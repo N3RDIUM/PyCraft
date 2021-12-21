@@ -30,11 +30,14 @@ noise = OpenSimplex(seed=seed)
 
 # Single Cloud Class
 class Cloud:
+    """
+    Cloud
+
+    * This is used to draw a single cloud.
+    """
     def __init__(self, xz, parent):
         """
-        class Cloud
-
-        *Makes a single cloud and draws it.
+        Cloud.__init__
 
         :x: x position
         :z: z position
@@ -44,6 +47,11 @@ class Cloud:
         self.parent = parent
 
     def draw(self):
+        """
+        draw
+
+        * Draws the cloud
+        """
         x = self.pos[0] - self.size[0]
         y = self.parent.parent.render_distance / 5 * self.parent.parent.chunk_size
         z = self.pos[1] - self.size[0]
@@ -58,11 +66,14 @@ class Cloud:
         glPopMatrix()
 
 class Sun:
+    """
+    Sun
+
+    * This is used to draw the sun.
+    """
     def __init__(self, position):
         """
-        class Sun
-
-        *Makes a single sun and draws it.
+        Sun.__init__
 
         :x: x position
         :z: z position
@@ -72,16 +83,20 @@ class Sun:
         self.texture = load_texture("assets/textures/environment/sun.png")
 
     def draw(self):
+        """
+        draw
+
+        * Draws the sun
+        """
         x = self.pos[0]
         y = 50
         z = self.pos[1]
 
         X = x+self.size[0]
-        Y = y+10
         Z = z+self.size[1]
 
         glPushMatrix()
         glColor3f(1, 1, 0)
-        #pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, self.texture, ('v3f', (x, y, Z,  X, y, Z,  X, y, z,  x, y, z)))
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, self.texture, ('v3f', (x, y, Z,  X, y, Z,  X, y, z,  x, y, z)))
         glColor3f(1, 1, 1)
         glPopMatrix()

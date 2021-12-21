@@ -8,11 +8,14 @@ import Classes as pycraft
 from logger import *
 
 class TerrainGenerator:
+    """
+    TerrainGenerator
+
+    * Initializes the terrain generator
+    """
     def __init__(self, parent):
         """
-        TerrainGenerator
-
-        * Initializes the terrain generator
+        TerrainGenerator.__init__
 
         :parent: the parent window
         """

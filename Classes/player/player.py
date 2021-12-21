@@ -6,11 +6,14 @@ import math
 
 # player class
 class Player:
+    """
+    Player
+
+    * the first person controller
+    """
     def __init__(self, parent=None):
         """
-        Player
-
-        * the first person controller
+        Player.__init__
 
         :pos: the position of the player
         :rot: the rotation of the player

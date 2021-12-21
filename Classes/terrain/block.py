@@ -4,11 +4,14 @@ from pyglet.gl import *
 import random
 
 class Block:
+    """
+    Block
+
+    * Base block class
+    """
     def __init__(self, name, parent):
         """
-        Block
-
-        * Initializes a block
+        Block.__init__
 
         :name: name of the block
         :texture: texture of the block
@@ -25,6 +28,14 @@ class Block:
         self._preload_queue = []
     
     def _preload_block(self, position, parent):
+        """
+        _preload_block
+
+        * Preloads a block
+
+        :position: the position of the block
+        :parent: the parent window
+        """
         self.parent.all_blocks[tuple(position)] = [self.name, tuple(position)]
         self._preloads[tuple(position)] = parent
         self._preload_queue.append(parent)
@@ -68,6 +79,13 @@ class Block:
         return returned_data
 
     def _update_faces(self, position):
+        """
+        _update_faces
+
+        * Updates the faces of a block
+
+        :position: the position of the block
+        """
         try:
             _parent = self.instances[position]["parent"]
             self.remove(position)
@@ -76,6 +94,13 @@ class Block:
             pass
 
     def _process_preloads(self, chunk):
+        """
+        _process_preloads
+
+        * Processes the preloads
+
+        :chunk: the chunk to process
+        """
         for _ in list(self._preloads).copy():
             if self._preloads[_] == chunk:
                 self.add(position = _, parent = self._preloads[_])

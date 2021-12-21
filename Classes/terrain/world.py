@@ -31,11 +31,14 @@ def load_texture(filename):
         return None
 
 class World:
+    """
+    World
+
+    * Initializes the world
+    """
     def __init__(self, parent):
         """
-        World
-
-        * Initializes the world
+        World.__init__
 
         :parent: the parent window
         """

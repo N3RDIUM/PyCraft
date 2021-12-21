@@ -8,11 +8,14 @@ from pyglet.graphics import Batch
 
 # Cloud Generator
 class CloudGenerator:
+    """
+    CloudGenerator
+
+    *This is a cloud generator for the world.
+    """
     def __init__(self, parent):
         """
-        CloudGenerator
-
-        *This is a cloud generator for the world.
+        CloudGenerator.__init__
 
         :parent: the parent world
         """

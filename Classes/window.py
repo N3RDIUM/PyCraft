@@ -9,7 +9,17 @@ from logger import *
 from pyglet.window import key
 
 class PyCraftWindow(Window):
+    """
+    PyCraftWindow
+
+    * The PyCraft Window
+    """
     def __init__(self, *args, **kwargs):
+        """
+        PyCraftWindow.__init__
+
+        * Initializes the window
+        """
         super().__init__(*args, **kwargs, caption = 'PyCraft')
         info('Window', 'Initializing PyCraftWindow...')
 

@@ -22,6 +22,13 @@ info('main', 'Initializing PyCraft...')
 load_shaders()
 
 def use_shader(shader):
+    """
+    use_shader
+
+    * Uses the shader
+
+    :shader: the shader to use
+    """
     shader.use()
 
 if __name__ == '__main__':

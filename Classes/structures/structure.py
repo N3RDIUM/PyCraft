@@ -1,11 +1,14 @@
 import Classes as pycraft
 
 class StructureBase:
+    """
+    StructureBase
+
+    * Base class for all structures
+    """
     def __init__(self, parent):
         """
-        StructureBase
-
-        * Base class for all structures
+        StructureBase.__init__
 
         :structure_data: data of the structure
         :parent: parent chunk
