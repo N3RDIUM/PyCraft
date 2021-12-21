@@ -113,7 +113,7 @@ def load_shaders():
 	* Loads all the shaders from a directory
 	"""
 	for i in os.listdir("./shaders"):
-		if not "." in i:
+		if "." not in i:
 			try:
 				# load the vertex and fragment shader
 				log("load_shaders", f"Loading shader: {i}")
