@@ -81,7 +81,8 @@ class PyCraftWindow(Window):
     def on_mouse_release(self, *args, **kwargs):
         self.player.mouse_click = False
 
-    def on_close(self):
+    @staticmethod
+    def on_close():
         pyglet.app.exit()
 
     def _setup_3d(self):
