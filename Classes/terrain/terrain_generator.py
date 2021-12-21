@@ -11,9 +11,9 @@ class TerrainGenerator:
     def __init__(self, parent):
         """
         TerrainGenerator
-        
+
         * Initializes the terrain generator
-        
+
         :parent: the parent window
         """
         self.parent = parent
@@ -24,9 +24,9 @@ class TerrainGenerator:
     def generate(self):
         """
         generate
-        
+
         * Generates a chunk
-        
+
         :position: the position of the chunk
         """
         for x in range(self.parent.position['x'] - self.parent.parent.chunk_size, self.parent.parent.chunk_size + self.parent.position['x']):

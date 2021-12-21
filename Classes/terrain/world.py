@@ -100,7 +100,7 @@ class World:
     def _load_block_types(self):
         """
         _load_block_types
-        
+
         * Loads all the block types
         """
         import importlib

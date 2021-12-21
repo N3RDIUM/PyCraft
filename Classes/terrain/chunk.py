@@ -11,9 +11,9 @@ class Chunk:
     def __init__(self, parent, position):
         """
         Chunk
-        
+
         * Initializes a chunk
-        
+
         :parent: the parent world
         :position: the position of the chunk (x, z)
         """
@@ -29,9 +29,9 @@ class Chunk:
     def add_block(self, type, position):
         """
         add
-        
+
         * Adds a block to the world
-        
+
         :position: the position of the block
         """
         self.parent.block_types[type].add(position=position, parent=self)
@@ -39,9 +39,9 @@ class Chunk:
     def add_preloaded_block(self, type, position):
         """
         add_preloaded
-        
+
         * Adds a block to the chunk
-        
+
         :position: the position of the block
         """
         self.parent.block_types[type]._preload_block(position=position, parent=self)
@@ -50,7 +50,7 @@ class Chunk:
     def _process_preloads(self, *args, **kwargs):
         """
         _process_preloads
-        
+
         * Processes the preloaded blocks
         """
         for block in self.parent.block_types:
@@ -60,7 +60,7 @@ class Chunk:
     def generate(self):
         """
         generate
-        
+
         * Generates a chunk
         """
         threading.Thread(target = self.generator.generate, daemon = True).start()
@@ -68,7 +68,7 @@ class Chunk:
     def update(self):
         """
         update
-        
+
         * Updates the chunk
         """
         pass
@@ -76,7 +76,7 @@ class Chunk:
     def draw(self):
         """
         draw
-        
+
         * Draws the chunk
         """
         self.batch.draw()
@@ -84,9 +84,9 @@ class Chunk:
     def remove_block(self, position):
         """
         remove
-        
+
         * Removes a block from the chunk
-        
+
         :position: the position of the block
         """
         _type = self.parent.all_blocks[tuple(position)][0]
