@@ -5,7 +5,7 @@ class Block(pycraft.Block):
         """
         Grass
         
-        * Initializes the grass block
+        * Initializes the block
         
         :parent: the parent window
         """

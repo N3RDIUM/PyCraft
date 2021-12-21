@@ -3,7 +3,7 @@ import Classes as pycraft
 class Block(pycraft.Block):
     def __init__(self, *args, **kwargs):
         """
-        Stone
+        CoalOre
         
         * Initializes the block
         
@@ -13,7 +13,7 @@ class Block(pycraft.Block):
 
         self.texture = {
             "top": self.parent.textures["stone"],
-            "front": self.parent.textures["stone"],
+            "front": self.parent.textures["coal_ore"],
             "back": self.parent.textures["stone"],
             "left": self.parent.textures["stone"],
             "right": self.parent.textures["stone"],

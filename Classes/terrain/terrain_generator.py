@@ -47,9 +47,16 @@ class TerrainGenerator:
                         self.parent.add_preloaded_block("Dirt", (x, y, z))
 
                 for y in range(noiseval_grass-noiseval_dirt-noiseval_stone, noiseval_grass-noiseval_dirt):
-                    if not self.noise.noise3d(x/10, y/10, z/10) > 0.2:
+                    if not abs(self.noise.noise3d(x/10, y/10, z/10)) > 0.2 and abs(self.noise.noise3d(x/10, y/10, z/10)) > 0.1:
                         self.parent.add_preloaded_block("Stone", (x, y, z))
-
+                    elif not abs(self.noise.noise3d(x/10, y/10, z/10)) > 0.1 and abs(self.noise.noise3d(x/10, y/10, z/10)) > 0.05:
+                        self.parent.add_preloaded_block("CoalOre", (x, y, z))
+                    elif not abs(self.noise.noise3d(x/10, y/10, z/10)) > 0.05 and abs(self.noise.noise3d(x/10, y/10, z/10)) > 0.01:
+                        self.parent.add_preloaded_block("IronOre", (x, y, z))
+                    elif not abs(self.noise.noise3d(x/10, y/10, z/10)) > 0.01 and abs(self.noise.noise3d(x/10, y/10, z/10)) > 0.005:
+                        self.parent.add_preloaded_block("GoldOre", (x, y, z))
+                    elif not abs(self.noise.noise3d(x/10, y/10, z/10)) > 0.005 and abs(self.noise.noise3d(x/10, y/10, z/10)) > 0.001:
+                        self.parent.add_preloaded_block("DiamondOre", (x, y, z))
                 self.parent.add_preloaded_block("Bedrock", (x, noiseval_grass-noiseval_dirt-noiseval_stone-1, z))
 
                 if abs(self.noise.noise2d(x, y)) * 10 < 0.4:

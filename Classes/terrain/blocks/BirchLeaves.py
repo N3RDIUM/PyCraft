@@ -3,9 +3,9 @@ import Classes as pycraft
 class Block(pycraft.Block):
     def __init__(self, *args, **kwargs):
         """
-        Grass
+        BirchLeaves
         
-        * Initializes the grass block
+        * Initializes the block
         
         :parent: the parent window
         """

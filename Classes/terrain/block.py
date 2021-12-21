@@ -73,7 +73,7 @@ class Block:
 
         self.instances[tuple(position)] = data
 
-        returned_data = [self.name, tuple(position)]
+        returned_data = [self.name, tuple(position), lambda: self._update_faces(tuple(position))]
 
         parent.parent.all_blocks[tuple(position)] = returned_data
         return returned_data
@@ -123,3 +123,9 @@ class Block:
                 if self.instances[position]["faces"][i] is not None:
                     self.instances[position]["faces"][i].delete()
         del self.instances[position]
+
+        for x in range(position[0] - 1, position[0] + 1):
+            for y in range(position[1] - 1, position[1] + 1):
+                for z in range(position[2] - 1, position[2] + 1):
+                    if self.parent.block_exists((x, y, z)):
+                        self.parent.all_blocks[(x, y, z)][2]()
