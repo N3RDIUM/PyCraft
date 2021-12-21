@@ -81,4 +81,4 @@ def load_shaders():
                 shader = Shader("./shaders/" + i + "/vert.glsl", "./shaders/" + i + "/frag.glsl")
                 shaders[i] = shader
             except:
-                warn(f"load_shaders: Failed to load shader: {i}")
+                warn("load_shaders", f"Failed to load shader: {i}")
