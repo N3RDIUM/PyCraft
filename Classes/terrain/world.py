@@ -187,7 +187,7 @@ class World:
         self.cloud_generator.draw()
         for i in self.all_chunks:
             self.all_chunks[i].draw()
-        if self.parent.player.pointing_at[0] != None:
+        if self.parent.player.pointing_at[0] is not None:
             self.draw_cube(self.parent.player.pointing_at[0][0], self.parent.player.pointing_at[0][1], self.parent.player.pointing_at[0][2], 1)
 
     @staticmethod
