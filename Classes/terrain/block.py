@@ -88,7 +88,7 @@ class Block:
         """
         try:
             _parent = self.instances[position]["parent"]
-            self.remove(position)
+            self._remove(position)
             self.add(position, _parent)
         except KeyError:
             pass
@@ -110,6 +110,25 @@ class Block:
                 self._preload_queue.pop(i)
                 break
 
+    def _remove(self, position):
+        if self.instances[position]["faces"]["top"] is not None:
+            self.instances[position]["faces"]["top"].delete()
+
+        if self.instances[position]["faces"]["bottom"] is not None:
+            self.instances[position]["faces"]["bottom"].delete()
+
+        if self.instances[position]["faces"]["front"] is not None:
+            self.instances[position]["faces"]["front"].delete()
+
+        if self.instances[position]["faces"]["back"] is not None:
+            self.instances[position]["faces"]["back"].delete()
+
+        if self.instances[position]["faces"]["left"] is not None:
+            self.instances[position]["faces"]["left"].delete()
+
+        if self.instances[position]["faces"]["right"] is not None:
+            self.instances[position]["faces"]["right"].delete()
+
     def remove(self, position):
         """
         remove
@@ -118,14 +137,32 @@ class Block:
 
         :position: the position of the block
         """
-        if position in self.instances:
-            for i in self.instances[position]["faces"]:
-                if self.instances[position]["faces"][i] is not None:
-                    self.instances[position]["faces"][i].delete()
-        del self.instances[position]
+        self._remove(position)
 
-        for x in range(position[0] - 1, position[0] + 1):
-            for y in range(position[1] - 1, position[1] + 1):
-                for z in range(position[2] - 1, position[2] + 1):
-                    if self.parent.block_exists((x, y, z)):
-                        self.parent.all_blocks[(x, y, z)][2]()
+        x = position[0]
+        y = position[1]
+        z = position[2]
+        
+        try:
+            del self.instances[position]
+            del self.parent.all_blocks[position]
+        except KeyError:
+            pass
+
+        if (x, y + 1, z) in self.parent.all_blocks:
+            self.parent.all_blocks[(x, y + 1, z)][2]()
+
+        if (x, y - 1, z) in self.parent.all_blocks:
+            self.parent.all_blocks[(x, y - 1, z)][2]()
+
+        if (x - 1, y, z) in self.parent.all_blocks:
+            self.parent.all_blocks[(x - 1, y, z)][2]()
+
+        if (x + 1, y, z) in self.parent.all_blocks:
+            self.parent.all_blocks[(x + 1, y, z)][2]()
+
+        if (x, y, z + 1) in self.parent.all_blocks:
+            self.parent.all_blocks[(x, y, z + 1)][2]()
+
+        if (x, y, z - 1) in self.parent.all_blocks:
+            self.parent.all_blocks[(x, y, z - 1)][2]()

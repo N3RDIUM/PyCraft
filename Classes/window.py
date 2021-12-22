@@ -87,6 +87,7 @@ class PyCraftWindow(Window):
 
     def on_mouse_press(self, *args, **kwargs):
         self.player.mouse_click = True
+        pyglet.clock.schedule_once(self.on_mouse_release, 0.1)
     
     def on_mouse_release(self, *args, **kwargs):
         self.player.mouse_click = False

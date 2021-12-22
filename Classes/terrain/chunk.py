@@ -95,4 +95,3 @@ class Chunk:
         _type = self.parent.all_blocks[tuple(position)][0]
 
         self.parent.block_types[_type].remove(tuple(position))
-        del self.parent.all_blocks[tuple(position)]
