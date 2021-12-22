@@ -43,6 +43,7 @@ class Player:
         self.terminal_velocity = 5
 
         self.mouse_click = False
+        self.right_click = False
 
     def mouse_motion(self, dx, dy):
         """
@@ -244,6 +245,8 @@ class Player:
 
         if self.mouse_click and not self.pointing_at[0] is None and not self.pointing_at[1] is None:
             self.parent.model.remove_block([self.pointing_at[0][0], self.pointing_at[0][1], self.pointing_at[0][2]], self.parent.model.all_chunks[(round(self.pointing_at[0][0] / self.parent.model.chunk_size), round(self.pointing_at[0][2] / self.parent.model.chunk_size))])
+        if self.right_click and not self.pointing_at[1] is None:
+            self.parent.model.add_block(position = (self.pointing_at[1][0], self.pointing_at[1][1], self.pointing_at[1][2]), block = "Stone", chunk = self.parent.model.all_chunks[(round(self.pos[1] / self.parent.model.chunk_size), round(self.pos[2] / self.parent.model.chunk_size))])
 
         self.pos[1] += self.velocity_y
         self.pos[0] += self.vel[0]

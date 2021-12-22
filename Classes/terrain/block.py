@@ -111,23 +111,26 @@ class Block:
                 break
 
     def _remove(self, position):
-        if self.instances[position]["faces"]["top"] is not None:
-            self.instances[position]["faces"]["top"].delete()
+        try:
+            if self.instances[position]["faces"]["top"] is not None:
+                self.instances[position]["faces"]["top"].delete()
 
-        if self.instances[position]["faces"]["bottom"] is not None:
-            self.instances[position]["faces"]["bottom"].delete()
+            if self.instances[position]["faces"]["bottom"] is not None:
+                self.instances[position]["faces"]["bottom"].delete()
 
-        if self.instances[position]["faces"]["front"] is not None:
-            self.instances[position]["faces"]["front"].delete()
+            if self.instances[position]["faces"]["front"] is not None:
+                self.instances[position]["faces"]["front"].delete()
 
-        if self.instances[position]["faces"]["back"] is not None:
-            self.instances[position]["faces"]["back"].delete()
+            if self.instances[position]["faces"]["back"] is not None:
+                self.instances[position]["faces"]["back"].delete()
 
-        if self.instances[position]["faces"]["left"] is not None:
-            self.instances[position]["faces"]["left"].delete()
+            if self.instances[position]["faces"]["left"] is not None:
+                self.instances[position]["faces"]["left"].delete()
 
-        if self.instances[position]["faces"]["right"] is not None:
-            self.instances[position]["faces"]["right"].delete()
+            if self.instances[position]["faces"]["right"] is not None:
+                self.instances[position]["faces"]["right"].delete()
+        except KeyError:
+            pass
 
     def remove(self, position):
         """

@@ -297,7 +297,7 @@ class World:
         :block: the block to add
         """
         self.all_blocks[position] = block
-        chunk.add_block(position, block)
+        chunk.add_block(block, position)
 
     def remove_block(self, position, chunk):
         """
