@@ -65,6 +65,7 @@ class World:
         self.seed = random.randint(0, 100000)
 
         self._queue = []
+        self._frame = 0
         self.generate()
 
         self.sky_color = (0.5, 0.7, 1)
@@ -147,7 +148,8 @@ class World:
             self.all_chunks[i].update()
 
         # Runs the queue
-        self._process_queue_item()
+        if self._frame % 2 == 0:
+            self._process_queue_item()
 
         # INFGEN
         if self.parent.player.pos[0] / self.chunk_size > self.position[0] + self.infgen_threshold:
@@ -182,6 +184,7 @@ class World:
 
         * Draws the world
         """
+        self._frame += 1
         glClearColor(*self.sky_color, 255)
         # Lights
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -211,12 +214,12 @@ class World:
         x = x - 0.01
         y = y - 0.01
         z = z - 0.01
-        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (x, Y, Z,  X, Y, Z,  X, Y, z,  x, Y, z)), ('c4B', (255, 255, 255, 5) * 4))
-        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (x, y, z,  X, y, z,  X, y, Z,  x, y, Z)), ('c4B', (255, 255, 255, 5) * 4))
-        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z)), ('c4B', (255, 255, 255, 5) * 4))
-        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z)), ('c4B', (255, 255, 255, 5) * 4))
-        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (x, y, Z,  X, y, Z,  X, Y, Z,  x, Y, Z)), ('c4B', (255, 255, 255, 5) * 4))
-        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (X, y, z,  x, y, z,  x, Y, z,  X, Y, z)), ('c4B', (255, 255, 255, 5) * 4))
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (x, Y, Z,  X, Y, Z,  X, Y, z,  x, Y, z)), ('c3B', (255, 255, 255) * 4))
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (x, y, z,  X, y, z,  X, y, Z,  x, y, Z)), ('c3B', (255, 255, 255) * 4))
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z)), ('c3B', (255, 255, 255) * 4))
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z)), ('c3B', (255, 255, 255) * 4))
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (x, y, Z,  X, y, Z,  X, Y, Z,  x, Y, Z)), ('c3B', (255, 255, 255) * 4))
+        pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v3f', (X, y, z,  x, y, z,  x, Y, z,  X, Y, z)), ('c3B', (255, 255, 255) * 4))
 
     def block_exists(self, position):
         """
