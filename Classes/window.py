@@ -75,6 +75,8 @@ class PyCraftWindow(Window):
         self._setup_3d()
         self.player._translate()
         self.model.draw()
+        self.fps_display.label.text = self.fps_display.label.text + "     " + "Block: " + self.player.current_block_type if not "Block: " + self.player.current_block_type in self.fps_display.label.text else self.fps_display.label.text
+        self.fps_display.label.color = (0, 0, 0, 200)
         self.fps_display.draw()
 
     def on_mouse_motion(self, x, y, dx, dy):
