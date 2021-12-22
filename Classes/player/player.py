@@ -45,6 +45,11 @@ class Player:
         self.mouse_click = False
         self.right_click = False
 
+        self.block_type_names = []
+        self.current_block_type = "Stone"
+        for block in self.parent.model.block_types:
+            self.block_type_names.append(block)
+
     def mouse_motion(self, dx, dy):
         """
         mouse_motion
@@ -201,6 +206,23 @@ class Player:
         elif self._collision_algorithm((x,y,z),0.45,(1,0,0),0.5) and self.vel[1] > 0 and self.block_exists["right"]:
             self.vel[1] = 0
 
+    def change_block(self, scroll):
+        """
+        change_block
+
+        * changes a block
+
+        :position: the position of the block
+        :block: the block to change
+        """
+        index = self.block_type_names.index(self.current_block_type)
+        index += round(scroll)
+        if index > len(self.block_type_names)-1:
+            index = 0
+        elif index < 0:
+            index = len(self.block_type_names)-1
+        self.current_block_type = self.block_type_names[index]
+
     def update(self, keys):
         """
         update
@@ -246,7 +268,7 @@ class Player:
         if self.mouse_click and not self.pointing_at[0] is None and not self.pointing_at[1] is None:
             self.parent.model.remove_block([self.pointing_at[0][0], self.pointing_at[0][1], self.pointing_at[0][2]], self.parent.model.all_chunks[(round(self.pointing_at[0][0] / self.parent.model.chunk_size), round(self.pointing_at[0][2] / self.parent.model.chunk_size))])
         if self.right_click and not self.pointing_at[1] is None:
-            self.parent.model.add_block(position = (self.pointing_at[1][0], self.pointing_at[1][1], self.pointing_at[1][2]), block = "Stone", chunk = self.parent.model.all_chunks[(round(self.pos[1] / self.parent.model.chunk_size), round(self.pos[2] / self.parent.model.chunk_size))])
+            self.parent.model.add_block(position = (self.pointing_at[1][0], self.pointing_at[1][1], self.pointing_at[1][2]), block = self.current_block_type, chunk = self.parent.model.all_chunks[(round(self.pos[1] / self.parent.model.chunk_size), round(self.pos[2] / self.parent.model.chunk_size))])
 
         self.pos[1] += self.velocity_y
         self.pos[0] += self.vel[0]

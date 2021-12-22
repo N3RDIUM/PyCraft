@@ -92,6 +92,9 @@ class PyCraftWindow(Window):
         else:
             self.player.right_click = True
             pyglet.clock.schedule_once(self.release, 0.1)
+
+    def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
+        self.player.change_block(scroll_y)
     
     def release(self, dt):
         self.player.mouse_click = False

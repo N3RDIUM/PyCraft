@@ -5,6 +5,19 @@
 
 ### <p align = "center"> A Minecraft clone written in python and pyglet. </p>
 
+## Controls
+    Move Forward  : W
+    Move Left     : A
+    Move Backward : S
+    Move Right    : D
+    Lock mouse    : E
+    Jump          : Space
+    Sprint        : Ctrl
+    Crouch        : Shift
+    Break Block   : Left Click
+    Place Block   : Right Click
+    Change Block  : Scroll
+
 ## Running PyCraft
 ##### To run PyCraft, run the following code:
     git clone https://github.com/1upCommunity/PyCraft.git
