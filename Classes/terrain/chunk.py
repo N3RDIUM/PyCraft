@@ -27,7 +27,7 @@ class Chunk:
 
         self.generator = pycraft.TerrainGenerator(self)
 
-        self.batch = pyglet.graphics.Batch()
+        self.batch = self.parent.batch
         
     def add_block(self, type, position):
         """

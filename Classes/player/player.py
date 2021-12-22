@@ -49,6 +49,11 @@ class Player:
         self.current_block_type = "Stone"
         for block in self.parent.model.block_types:
             self.block_type_names.append(block)
+        self.current_block_label = pyglet.text.Label("Block: Stone",
+            font_name='Arial',
+            font_size=12,
+            x=100, y=10,
+            anchor_x='right', anchor_y='bottom')
 
     def mouse_motion(self, dx, dy):
         """
@@ -107,6 +112,10 @@ class Player:
             self.velocity_y -= self.gravity
 
         self._collide(self.pos)
+
+    def _draw_label(self):
+        self.current_block_label.text = "Block: " + self.current_block_type
+        self.current_block_label.draw()
 
     def hit_test(self, position, vector, max_distance=8):
         """
@@ -222,6 +231,8 @@ class Player:
         elif index < 0:
             index = len(self.block_type_names)-1
         self.current_block_type = self.block_type_names[index]
+
+        self.current_block_label.setText(self.current_block_type)
 
     def update(self, keys):
         """

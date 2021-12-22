@@ -44,6 +44,7 @@ class World:
         """
         self.parent = parent
         self.generator = pycraft.TerrainGenerator
+        self.batch = pyglet.graphics.Batch()
 
         self.textures = {}
         self.block_types = {}
@@ -191,10 +192,13 @@ class World:
         glEnable(GL_LIGHT7)
         glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat * 4)(*self.light_color))
         self.cloud_generator.draw()
-        for i in self.all_chunks:
-            self.all_chunks[i].draw()
+
+        self.batch.draw()
+
         if self.parent.player.pointing_at[0] is not None:
             self.draw_cube(self.parent.player.pointing_at[0][0], self.parent.player.pointing_at[0][1], self.parent.player.pointing_at[0][2], 1)
+
+        self.parent.player._draw_label()
 
     @staticmethod
     def draw_cube(x, y, z, size):
