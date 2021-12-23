@@ -24,4 +24,4 @@
     cd PyCraft
     dep_installer
     python __main__.py
-##### (assuming that you already have git and python installed)
+##### (assuming that you already have git, python and a c++ compiler installed)
