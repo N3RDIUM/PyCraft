@@ -74,7 +74,6 @@ class Chunk:
 
         * Updates the chunk
         """
-        pass
 
     def draw(self):
         """
@@ -83,15 +82,3 @@ class Chunk:
         * Draws the chunk
         """
         self.batch.draw()
-
-    def remove_block(self, position):
-        """
-        remove
-
-        * Removes a block from the chunk
-
-        :position: the position of the block
-        """
-        _type = self.parent.all_blocks[tuple(position)][0]
-
-        self.parent.block_types[_type].remove(tuple(position))

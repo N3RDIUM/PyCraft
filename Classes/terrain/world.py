@@ -4,6 +4,7 @@ from pyglet.gl import *
 import os
 import random
 from tqdm import trange
+import opensimplex
 
 # Inbuilt imports
 from logger import *
@@ -64,6 +65,7 @@ class World:
         self.position = [0, 0]
 
         self.seed = random.randint(0, 100000)
+        self._noise = opensimplex.OpenSimplex(self.seed)
 
         self._queue = []
         self._frame = 0
@@ -301,7 +303,7 @@ class World:
         self.all_blocks[position] = block
         chunk.add_block(block, position)
 
-    def remove_block(self, position, chunk):
+    def remove_block(self, position):
         """
         remove_block
 
@@ -310,7 +312,11 @@ class World:
         :position: the position to remove the block from
         """
         if tuple(position) in self.all_blocks:
-            chunk.remove_block(position)
+            try:
+                blocktype = self.all_blocks[tuple(position)][0]
+                self.block_types[blocktype].remove(tuple(position))
+            except TypeError:
+                pass
 
     def add_row_x_minus(self):
         """

@@ -269,7 +269,7 @@ class Player:
         self.collide()
 
         if self.mouse_click and not self.pointing_at[0] is None and not self.pointing_at[1] is None:
-            self.parent.model.remove_block([self.pointing_at[0][0], self.pointing_at[0][1], self.pointing_at[0][2]], self.parent.model.all_chunks[(round(self.pointing_at[0][0] / self.parent.model.chunk_size), round(self.pointing_at[0][2] / self.parent.model.chunk_size))])
+            self.parent.model.remove_block([self.pointing_at[0][0], self.pointing_at[0][1], self.pointing_at[0][2]])
         if self.right_click and not self.pointing_at[1] is None:
             self.parent.model.add_block(position = (self.pointing_at[1][0], self.pointing_at[1][1], self.pointing_at[1][2]), block = self.current_block_type, chunk = self.parent.model.all_chunks[(round(self.pos[1] / self.parent.model.chunk_size), round(self.pos[2] / self.parent.model.chunk_size))])
 

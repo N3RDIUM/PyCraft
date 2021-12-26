@@ -1,3 +1,9 @@
+# imports
+import opensimplex
+
+# Inbuilt imports
+import Classes as pycraft
+
 def add_block(type, coords, chunk):
     """
     Adds a block to the world at the given coordinates.
@@ -25,28 +31,10 @@ def get_highest_block(world, x, z):
 
     :return: highest block at the given coordinates
     """
-    # First get all the blocks at the given coordinates
-    blocks = []
-
-    for index, item in world._all_blocks.items():
-        if index[1] == x and index[2] == z:
-            # If it is a block, add it to the list
-            blocks.append(item)
-
-    # Now get the highest block
-    block = None
-
-    for item in blocks:
-        if block is None:
-            pass
-        elif block.block_data['pos']['y'] < item.block_data['pos']['y']:
-            block = item
-
-    # Return the highest block
-    return block
+    return round(pycraft.lerp(world._noise.noise2d(x/10, z/10) * 2, world._noise.noise2d(x/100, z/100) * 10, world._noise.noise2d(x/500, z/500) * 50))
 
 def clear_area(world, size, coords):
-    for i in range(size[0]+coords[0]):
-        for j in range(size[1]+coords[1]):
-            for k in range(coords[2], get_highest_block(world, i, k).block_data['pos']['y']):
-                remove_block(world, (i, j, k))
+    for i in range(coords[0] - size[0], coords[0] + size[0]):
+        for j in range(coords[1] - size[1], coords[1] + size[1]):
+            for k in range(coords[2], get_highest_block(world, i, j)):
+                remove_block(world, (i, k, j))

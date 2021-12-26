@@ -36,7 +36,7 @@ class Block:
         :position: the position of the block
         :parent: the parent window
         """
-        self.parent.all_blocks[tuple(position)] = [self.name, tuple(position)]
+        self.parent.all_blocks[tuple(position)] = [self.name, tuple(position), lambda: self._update_faces(tuple(position))]
         self._preloads[tuple(position)] = parent
         self._preload_queue.append(parent)
 

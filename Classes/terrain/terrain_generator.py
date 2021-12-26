@@ -2,6 +2,7 @@
 import pyglet
 import random
 import opensimplex
+import statistics
 
 # inbuilt imports
 import Classes as pycraft
@@ -24,6 +25,9 @@ class TerrainGenerator:
         self.queue = []
         self._size = 6
 
+        # Sea level
+        self.sea_level = self.noise.noise2d(0, 0) * 100
+
     def generate(self):
         """
         generate
@@ -41,6 +45,9 @@ class TerrainGenerator:
 
                 if not self.noise.noise3d(x/10, noiseval_grass/10, z/10) > 0.4:
                     self.parent.add_preloaded_block("Grass", (x, noiseval_grass, z))
+
+                for y in range(noiseval_grass+1, round(self.sea_level)):
+                    self.parent.add_preloaded_block("Water", (x, y, z))
                 
                 for y in range(noiseval_grass-noiseval_dirt, noiseval_grass):
                     if not self.noise.noise3d(x/10, y/10, z/10) > 0.3:
