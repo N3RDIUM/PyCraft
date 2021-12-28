@@ -161,7 +161,8 @@ class World:
             self.all_chunks[i].update()
 
         # Runs the queue
-        self._process_queue_item()
+        if self._frame % 2 == 0:
+            self._process_queue_item()
 
         # INFGEN
         if self.parent.player.pos[0] / self.chunk_size > self.position[0] + self.infgen_threshold:
