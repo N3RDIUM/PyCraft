@@ -75,7 +75,7 @@ class World:
         self.light_color = [5,5,5,5]
         self.daynight_min = 1
         self.daynight_max = 5
-        self.light_change = 0.1
+        self.light_change = 0
 
         # Enable fog
         glEnable(GL_FOG)
@@ -84,11 +84,21 @@ class World:
         glFogi(GL_FOG_MODE, GL_LINEAR)
         glFogf(GL_FOG_START, self.render_distance*4)
         glFogf(GL_FOG_END, self.render_distance*5)
+
         # Texture blending
         glEnable (GL_LINE_SMOOTH)
         glEnable (GL_BLEND)
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glHint (GL_LINE_SMOOTH_HINT, GL_DONT_CARE)
+
+        # Lighting
+        glEnable(GL_LIGHTING)
+        glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat*4)(1,1,1,1))
+        glLightfv(GL_LIGHT7, GL_DIFFUSE, (GLfloat*4)(1,1,1,1))
+        glLightfv(GL_LIGHT7, GL_SPECULAR, (GLfloat*4)(1,1,1,1))
+        glLightfv(GL_LIGHT7, GL_POSITION, (GLfloat*4)(0,0,0,1))
+        glEnable(GL_LIGHT7)
+        glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE)
 
         self.cloud_generator = pycraft.CloudGenerator(self)
 
@@ -151,8 +161,7 @@ class World:
             self.all_chunks[i].update()
 
         # Runs the queue
-        if self._frame % 2 == 0:
-            self._process_queue_item()
+        self._process_queue_item()
 
         # INFGEN
         if self.parent.player.pos[0] / self.chunk_size > self.position[0] + self.infgen_threshold:
@@ -174,9 +183,9 @@ class World:
         * Updates the daynight cycle
         """
         if self.light_color[0] > self.daynight_max:
-            self.light_change = -0.0005
+            self.light_change = -0.001
         elif self.light_color[0] < self.daynight_min:
-            self.light_change = 0.0005
+            self.light_change = 0.001
         self.light_color[0] += self.light_change
         self.light_color[1] += self.light_change
         self.light_color[2] += self.light_change
@@ -190,13 +199,13 @@ class World:
         self._frame += 1
         glClearColor(*self.sky_color, 255)
         # Lights
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glEnable(GL_LIGHT7)
         glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat * 4)(*self.light_color))
+        
         self.cloud_generator.draw()
 
         self.batch.draw()
 
+        glNormal3f(0, 0, 0)
         if self.parent.player.pointing_at[0] is not None:
             self.draw_cube(self.parent.player.pointing_at[0][0], self.parent.player.pointing_at[0][1], self.parent.player.pointing_at[0][2], 1)
 
@@ -274,9 +283,11 @@ class World:
         * Processes an item in the queue
         """
         if len(self._queue) > 0:
-            item = self._queue[0]
+            random_index = random.randint(0, len(self._queue) - 1)
+
+            item = self._queue[random_index]
             self.all_chunks[item].generate()
-            self._queue.pop(0)
+            self._queue.pop(random_index)
 
     def get_block(self, position):
         """
