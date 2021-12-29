@@ -5,6 +5,7 @@ import os
 import random
 from tqdm import trange
 import opensimplex
+import multiprocessing
 
 # Inbuilt imports
 from logger import *
@@ -63,6 +64,12 @@ class World:
         self.chunk_size = 8
         self.infgen_threshold = 0
         self.position = [0, 0]
+        self._process_per_frame = round(multiprocessing.cpu_count() * 0.2)
+
+        if self._process_per_frame <= 0:
+            self._process_per_frame = 1
+
+        info("World", "Processes per frame: " + str(self._process_per_frame))
 
         self.seed = random.randint(0, 100000)
         self._noise = opensimplex.OpenSimplex(self.seed)
@@ -201,9 +208,9 @@ class World:
         glClearColor(*self.sky_color, 255)
         # Lights
         glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat * 4)(*self.light_color))
-        
-        self.cloud_generator.draw()
 
+        # Draw clouds and chunks
+        self.cloud_generator.draw()
         self.batch.draw()
 
         glNormal3f(0, 0, 0)
@@ -283,12 +290,13 @@ class World:
 
         * Processes an item in the queue
         """
-        if len(self._queue) > 0:
-            random_index = random.randint(0, len(self._queue) - 1)
+        for i in range(self._process_per_frame):
+            if len(self._queue) > 0:
+                random_index = random.randint(0, len(self._queue) - 1)
 
-            item = self._queue[random_index]
-            self.all_chunks[item].generate()
-            self._queue.pop(random_index)
+                item = self._queue[random_index]
+                self.all_chunks[item].generate()
+                self._queue.pop(random_index)
 
     def get_block(self, position):
         """
