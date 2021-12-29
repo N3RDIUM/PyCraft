@@ -88,7 +88,7 @@ class World:
         self.light_change = 0
 
         # Enable fog
-        #glEnable(GL_FOG)
+        glEnable(GL_FOG)
         glFogfv(GL_FOG_COLOR, (GLfloat * int(self.render_distance*16))(0.5, 0.69, 1.0, 10))
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
@@ -188,11 +188,6 @@ class World:
         if self._frame % 2 == 0:
             self._process_queue_item()
 
-        # Update liquids
-        for i in self.liquid_types:
-            self.liquid_types[i].update()
-            pass
-
         # INFGEN
         if self.parent.player.pos[0] / self.chunk_size > self.position[0] + self.infgen_threshold:
             self.add_row_x_plus()
@@ -233,6 +228,8 @@ class World:
 
         # Process liquid instances
         self._process_liquid_instances()
+        for i in self.liquid_types:
+            self.liquid_types[i].update()
 
         # Draw clouds and chunks
         self.cloud_generator.draw()
