@@ -50,14 +50,17 @@ class World:
 
         self.textures = {}
         self.block_types = {}
+        self.liquid_types = {}
         self.structure_types = {}
         
         self.all_blocks = {}
         self._independent_blocks = {}
+        self.all_liquids = {}
         self.all_chunks = {}
 
         self._load_textures()
         self._load_block_types()
+        self._load_liquid_types()
         self._load_structures()
 
         self.render_distance = 5
@@ -85,7 +88,7 @@ class World:
         self.light_change = 0
 
         # Enable fog
-        glEnable(GL_FOG)
+        #glEnable(GL_FOG)
         glFogfv(GL_FOG_COLOR, (GLfloat * int(self.render_distance*16))(0.5, 0.69, 1.0, 10))
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
@@ -135,6 +138,20 @@ class World:
                 self.block_types[i.split(".")[0]] = importlib.import_module("Classes.terrain.blocks." + i.split(".")[0]).Block(self)
         log("Block Loader", "Loaded " + str(len(self.block_types)) + " blocks")
 
+    def _load_liquid_types(self):
+        """
+        _load_liquid_types
+
+        * Loads all the liquid types
+        """
+        import importlib
+
+        log("Liquid Loader", "Loading liquids...")
+        for i in os.listdir("Classes/terrain/liquids"):
+            if i.endswith(".py") and i != "__init__.py":
+                self.liquid_types[i.split(".")[0]] = importlib.import_module("Classes.terrain.liquids." + i.split(".")[0]).Liquid(self)
+        log("Liquid Loader", "Loaded " + str(len(self.all_liquids)) + " liquids")
+
     def _load_structures(self):
         """
         _load_structures
@@ -170,6 +187,11 @@ class World:
         # Runs the queue
         if self._frame % 2 == 0:
             self._process_queue_item()
+
+        # Update liquids
+        for i in self.liquid_types:
+            self.liquid_types[i].update()
+            pass
 
         # INFGEN
         if self.parent.player.pos[0] / self.chunk_size > self.position[0] + self.infgen_threshold:
@@ -209,11 +231,13 @@ class World:
         # Lights
         glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat * 4)(*self.light_color))
 
+        # Process liquid instances
+        self._process_liquid_instances()
+
         # Draw clouds and chunks
         self.cloud_generator.draw()
         self.batch.draw()
 
-        glNormal3f(0, 0, 0)
         if self.parent.player.pointing_at[0] is not None:
             self.draw_cube(self.parent.player.pointing_at[0][0], self.parent.player.pointing_at[0][1], self.parent.player.pointing_at[0][2], 1)
 
@@ -251,6 +275,25 @@ class World:
         :position: the position to cdheck
         """
         return position in self.all_blocks
+
+    def liquid_exists(self, position):
+        """
+        liquid_exists
+
+        * Checks if a liquid exists at a position
+
+        :position: the position to cdheck
+        """
+        return position in self.all_liquids
+
+    def _process_liquid_instances(self):
+        """
+        _process_liquid_instances
+
+        * Processes the liquid instances
+        """
+        for i in self.liquid_types:
+            self.liquid_types[i]._process_preloads()
 
     def chunk_exists(self, position):
         """
@@ -322,6 +365,18 @@ class World:
         """
         self.all_blocks[position] = block
         chunk.add_block(block, position)
+
+    def add_liquid(self, position, liquid):
+        """
+        add_liquid
+
+        * Adds a liquid at a position
+
+        :position: the position to add the liquid to
+        :liquid: the liquid to add
+        """
+        self.all_liquids[position] = liquid
+        self.liquid_types[liquid].add_preloaded_instance(position)
 
     def remove_block(self, position):
         """

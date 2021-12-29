@@ -1,7 +1,5 @@
 # imports
-import pyglet
 from pyglet.gl import *
-import random
 
 class Block:
     """
