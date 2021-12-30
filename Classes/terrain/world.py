@@ -150,7 +150,7 @@ class World:
         for i in os.listdir("Classes/terrain/liquids"):
             if i.endswith(".py") and i != "__init__.py":
                 self.liquid_types[i.split(".")[0]] = importlib.import_module("Classes.terrain.liquids." + i.split(".")[0]).Liquid(self)
-        log("Liquid Loader", "Loaded " + str(len(self.all_liquids)) + " liquids")
+        log("Liquid Loader", "Loaded " + str(len(self.liquid_types)) + " liquids")
 
     def _load_structures(self):
         """
@@ -226,8 +226,7 @@ class World:
         # Lights
         glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat * 4)(*self.light_color))
 
-        # Process liquid instances
-        self._process_liquid_instances()
+        # Updates the liquids
         for i in self.liquid_types:
             self.liquid_types[i].update()
 

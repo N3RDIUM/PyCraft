@@ -45,9 +45,12 @@ class TerrainGenerator:
 
                 if not self.noise.noise3d(x/10, noiseval_grass/10, z/10) > 0.4:
                     self.parent.add_preloaded_block("Grass", (x, noiseval_grass, z))
+                    if not abs(self.noise.noise3d(x/100, noiseval_grass/100, z/100)) > 0.02 and abs(self.noise.noise3d(x/100, noiseval_grass/100, z/100)) < 0.021:
+                        self.parent.parent.add_liquid((x, noiseval_grass + 1, z),  "Lava")
 
                 if noiseval_grass < self.sea_level:
-                    self.parent.parent.add_liquid((x, self.sea_level, z),  "Water")
+                    for i in range(noiseval_grass+1, int(self.sea_level)):
+                        self.parent.parent.add_liquid((x, i, z),  "Water")
                 
                 for y in range(noiseval_grass-noiseval_dirt, noiseval_grass):
                     if not self.noise.noise3d(x/10, y/10, z/10) > 0.3:
@@ -64,10 +67,14 @@ class TerrainGenerator:
                         self.parent.add_preloaded_block("GoldOre", (x, y, z))
                     elif not abs(self.noise.noise3d(x/10, y/10, z/10)) > 0.005 and abs(self.noise.noise3d(x/10, y/10, z/10)) > 0.001:
                         self.parent.add_preloaded_block("DiamondOre", (x, y, z))
+                    elif not abs(self.noise.noise3d(x/10, y/10, z/10)) > 0.2 and abs(self.noise.noise3d(x/10, y/10, z/10)) < 0.8:
+                        self.parent.parent.add_liquid((x, y, z),  "Lava")
                 self.parent.add_preloaded_block("Bedrock", (x, noiseval_grass-noiseval_dirt-noiseval_stone-1, z))
 
                 if abs(self.noise.noise2d(x, y)) * 10 < 0.4:
-                    self.parent.parent.make_structure((x, noiseval_grass, z), "BirchTree", self.parent)
+                    #self.parent.parent.make_structure((x, noiseval_grass, z), "BirchTree", self.parent)
+                    pass
 
         pyglet.clock.schedule_once(self.parent._process_preloads, random.randint(1,3))
+        pyglet.clock.schedule_once(lambda x: self.parent.parent._process_liquid_instances(), 0)
         exit()

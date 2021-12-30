@@ -6,3 +6,5 @@ class Liquid(pycraft.Liquid):
 
         self.texture_still = self.parent.textures["water_still"]
         self.texture_flow = self.parent.textures["water_flow"]
+
+        self.texture_rate = 5
