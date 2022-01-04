@@ -12,10 +12,10 @@ class Block(pycraft.Block):
         super().__init__("Grout", *args, **kwargs)
 
         self.texture = {
-            "top": self.parent.textures["grout"],
-            "front": self.parent.textures["grout"],
-            "back": self.parent.textures["grout"],
-            "left": self.parent.textures["grout"],
-            "right": self.parent.textures["grout"],
-            "bottom": self.parent.textures["grout"]
+            "top": self.parent.textures["grout_sand"],
+            "front": self.parent.textures["grout_sand"],
+            "back": self.parent.textures["grout_sand"],
+            "left": self.parent.textures["grout_sand"],
+            "right": self.parent.textures["grout_sand"],
+            "bottom": self.parent.textures["grout_sand"]
         }
