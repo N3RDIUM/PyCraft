@@ -88,7 +88,7 @@ class World:
         self.light_change = 0
 
         # Enable fog
-        glEnable(GL_FOG)
+        #glEnable(GL_FOG)
         glFogfv(GL_FOG_COLOR, (GLfloat * int(self.render_distance*16))(0.5, 0.69, 1.0, 10))
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
@@ -104,11 +104,7 @@ class World:
         # Lighting
         glEnable(GL_LIGHTING)
         glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat*4)(1,1,1,1))
-        glLightfv(GL_LIGHT7, GL_DIFFUSE, (GLfloat*4)(1,1,1,1))
-        glLightfv(GL_LIGHT7, GL_SPECULAR, (GLfloat*4)(1,1,1,1))
-        glLightfv(GL_LIGHT7, GL_POSITION, (GLfloat*4)(0,0,0,1))
         glEnable(GL_LIGHT7)
-        glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE)
 
         self.cloud_generator = pycraft.CloudGenerator(self)
 

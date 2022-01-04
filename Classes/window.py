@@ -14,7 +14,7 @@ class PyCraftWindow(Window):
 
     * The PyCraft Window
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self, shader, *args, **kwargs):
         """
         PyCraftWindow.__init__
 
@@ -24,7 +24,7 @@ class PyCraftWindow(Window):
         info('Window', 'Initializing PyCraftWindow...')
 
         self.model = pycraft.World(self)
-        self.player = pycraft.Player(self)
+        self.player = pycraft.Player(shader, self)
 
         self.keys = key.KeyStateHandler()
         self.push_handlers(self.keys)
@@ -33,9 +33,6 @@ class PyCraftWindow(Window):
         # initialize opengl
         # Enable depth test
         glEnable(GL_DEPTH_TEST)
-        # Enable backface culling
-        glEnable(GL_CULL_FACE)
-        glCullFace(GL_BACK)
 
         self.fps_display = pyglet.window.FPSDisplay(window=self)
 
@@ -71,6 +68,7 @@ class PyCraftWindow(Window):
             self.mouse_lock = not self.mouse_lock
         
     def on_draw(self):
+        self.player._update_shader()
         self.clear()
         self._setup_3d()
         self.player._translate()
@@ -78,6 +76,7 @@ class PyCraftWindow(Window):
         self.fps_display.label.text = self.fps_display.label.text + "     " + "Block: " + self.player.current_block_type if not "Block: " + self.player.current_block_type in self.fps_display.label.text else self.fps_display.label.text
         self.fps_display.label.color = (0, 0, 0, 200)
         self.fps_display.draw()
+        glFinish()
 
     def on_mouse_motion(self, x, y, dx, dy):
         if self.lock:

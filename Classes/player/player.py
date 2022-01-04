@@ -2,7 +2,7 @@
 from logging import root
 from pyglet.window import key
 from pyglet.gl import *
-import math
+import math, matrix
 
 # player class
 class Player:
@@ -11,7 +11,7 @@ class Player:
 
     * the first person controller
     """
-    def __init__(self, parent=None):
+    def __init__(self, shader, parent=None):
         """
         Player.__init__
 
@@ -44,6 +44,11 @@ class Player:
 
         self.mouse_click = False
         self.right_click = False
+
+        self.mv_matrix = matrix.Matrix()
+        self.p_matrix = matrix.Matrix()
+        self.shader = shader
+        self.shader_matrix_location = self.shader.find_uniform(b"u_ModelViewProjMatrix")
 
         self.block_type_names = []
         self.current_block_type = "Stone"
@@ -284,3 +289,23 @@ class Player:
         glRotatef(-self.rot[0], 1, 0, 0)
         glRotatef(-self.rot[1], 0, 1, 0)
         glTranslatef(-self.pos[0], -self.pos[1], -self.pos[2])
+
+    def _update_shader(self):
+        # create projection matrix
+
+        self.p_matrix.load_identity()
+
+        self.p_matrix.perspective(
+            90 + 20 * (self.speed - 0.3) / (0.5 - 0.3),
+            float(self.parent.width) / self.parent.height, 0.1, 500)
+
+        # create modelview matrix
+
+        self.mv_matrix.load_identity()
+        self.mv_matrix.rotate_2d(self.rot[0] + math.tau / 4, self.rot[1])
+        self.mv_matrix.translate(-self.pos[0], -self.pos[1], -self.pos[2])
+
+        # modelviewprojection matrix
+
+        mvp_matrix = self.p_matrix * self.mv_matrix
+        #self.shader.uniform_matrix(self.shader_matrix_location, mvp_matrix)

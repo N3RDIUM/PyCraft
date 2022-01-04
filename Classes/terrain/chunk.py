@@ -28,6 +28,8 @@ class Chunk:
         self.generator = pycraft.TerrainGenerator(self)
 
         self.batch = self.parent.batch
+
+        self.parent._queue.append((self.position['x'] / self.parent.chunk_size, self.position['z'] / self.parent.chunk_size))
         
     def add_block(self, type, position):
         """

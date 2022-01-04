@@ -72,8 +72,7 @@ class TerrainGenerator:
                 self.parent.add_preloaded_block("Bedrock", (x, noiseval_grass-noiseval_dirt-noiseval_stone-1, z))
 
                 if abs(self.noise.noise2d(x, y)) * 10 < 0.4:
-                    #self.parent.parent.make_structure((x, noiseval_grass, z), "BirchTree", self.parent)
-                    pass
+                    self.parent.parent.make_structure((x, noiseval_grass, z), "BirchTree", self.parent)
 
         pyglet.clock.schedule_once(self.parent._process_preloads, random.randint(1,3))
         pyglet.clock.schedule_once(lambda x: self.parent.parent._process_liquid_instances(), 0)

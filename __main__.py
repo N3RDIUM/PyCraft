@@ -21,24 +21,10 @@ info('main', 'Initializing PyCraft...')
 # Load all the shaders
 load_shaders()
 
-def use_shader(shader):
-    """
-    use_shader
-
-    * Uses the shader
-
-    :shader: the shader to use
-    """
-    shaders[shader].link()
-
 if __name__ == '__main__':
     # create window
-    window = pycraft.PyCraftWindow(width = 800, height = 500, resizable = True)
-
-    # use shaders
-    use_shader('default')
-
-    glClearColor(0.5, 0.7, 1, 1)
+    window = pycraft.PyCraftWindow(shader = shaders['default'], width = 800, height = 500, resizable = True)
+    
     # Run the app
     info('main', 'Running PyCraft...')
     pyglet.app.run()
