@@ -31,7 +31,7 @@ def get_highest_block(world, x, z):
 
     :return: highest block at the given coordinates
     """
-    return round(pycraft.lerp(world._noise.noise2d(x/10, z/10) * 2, world._noise.noise2d(x/100, z/100) * 10, world._noise.noise2d(x/500, z/500) * 50))
+    return round(pycraft.lerp(world._noise.noise2(x/10, z/10) * 2, world._noise.noise2(x/100, z/100) * 10, world._noise.noise2(x/500, z/500) * 50))
 
 def clear_area(world, size, coords):
     for i in range(coords[0] - size[0], coords[0] + size[0]):
