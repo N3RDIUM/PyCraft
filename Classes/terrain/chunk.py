@@ -59,8 +59,7 @@ class Chunk:
         * Processes the preloaded blocks
         """
         for block in self.parent.block_types:
-            if self.parent.block_types[block]._preload_queue:
-                self.parent.block_types[block]._process_preloads(self)
+            self.parent.block_types[block]._process_preloads(self)
 
     def generate(self):
         """

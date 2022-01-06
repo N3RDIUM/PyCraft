@@ -52,16 +52,21 @@ class World:
         self.block_types = {}
         self.liquid_types = {}
         self.structure_types = {}
+        self.biomes = {}
         
         self.all_blocks = {}
         self._independent_blocks = {}
         self.all_liquids = {}
         self.all_chunks = {}
 
+        self.seed = random.randint(0, 100000)
+        self._noise = opensimplex.OpenSimplex(self.seed)
+
         self._load_textures()
         self._load_block_types()
         self._load_liquid_types()
         self._load_structures()
+        self._load_biomes()
 
         self.render_distance = 5
         self.chunk_size = 8
@@ -74,9 +79,6 @@ class World:
 
         info("World", "Processes per frame: " + str(self._process_per_frame))
 
-        self.seed = random.randint(0, 100000)
-        self._noise = opensimplex.OpenSimplex(self.seed)
-
         self._queue = []
         self._frame = 0
         self.generate()
@@ -88,7 +90,7 @@ class World:
         self.light_change = 0
 
         # Enable fog
-        glEnable(GL_FOG)
+        #glEnable(GL_FOG)
         glFogfv(GL_FOG_COLOR, (GLfloat * int(self.render_distance*16))(0.5, 0.69, 1.0, 10))
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
@@ -157,6 +159,16 @@ class World:
         log("Structure Loader", "Loading structures...")
         self.structure_types = pycraft.load_structures(self)
         log("Structure Loader", "Loaded " + str(len(self.structure_types)) + " structures")
+
+    def _load_biomes(self):
+        """
+        _load_biomes
+
+        * Loads all the biomes
+        """
+        log("Biome Loader", "Loading biomes...")
+        self.biomes = pycraft.load_biomes(self)
+        log("Biome Loader", "Loaded " + str(len(self.biomes)) + " biomes")
 
     def generate(self):
         """
