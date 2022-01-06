@@ -90,7 +90,7 @@ class World:
         self.light_change = 0
 
         # Enable fog
-        #glEnable(GL_FOG)
+        glEnable(GL_FOG)
         glFogfv(GL_FOG_COLOR, (GLfloat * int(self.render_distance*16))(0.5, 0.69, 1.0, 10))
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
