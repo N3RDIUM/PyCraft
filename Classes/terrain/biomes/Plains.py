@@ -4,12 +4,12 @@ import Classes as pycraft
 class Biome(pycraft.Biome):
     def __init__(self, parent):
         super().__init__("Plains", parent)
-        self.sea_level = int(self.noise.noise2(self.parent.seed, self.parent.seed)) * 10
+        self.sea_level = int(self.noise.noise2(self.parent.seed, self.parent.seed)) * 100
 
     def generate(self, coords, chunk):
         noise_grass = round(pycraft.lerp(self.noise.noise2(coords[0]/10, coords[1]/10) * 2, self.noise.noise2(coords[0]/100, coords[1]/100) * 10, self.noise.noise2(coords[0]/500, coords[1]/500) * 50))
         noise_dirt = 1+abs(round(pycraft.lerp(self.noise.noise2(coords[0]/10, coords[1]/10) * 2, self.noise.noise2(coords[0]/100, coords[1]/100) * 7, self.noise.noise2(coords[0]/500, coords[1]/500) * 5)))                
-        noise_stone = 10+round(self.noise.noise2(coords[0]/5000, coords[1]/5000) * 500)
+        noise_stone = 26+round(self.noise.noise2(coords[0]/5000, coords[1]/5000) * 500)
 
         if noise_grass < self.sea_level:
             for i in range(self.sea_level, noise_grass):

@@ -56,6 +56,8 @@ class Player:
             self.block_type_names.append(block)
         self.current_block_label = pyglet.text.Label("Block: Stone", font_name='Arial', anchor_x='right', anchor_y='bottom')
 
+        self._falling_first_time = True
+
     def mouse_motion(self, dx, dy):
         """
         mouse_motion
@@ -94,12 +96,12 @@ class Player:
         else:
             self.block_exists["right"] = True
 
-        if not self.parent.model.block_exists((x_int, y_int, z_int-1)) or self.parent.model.block_exists((x_int, y_int-1, z_int+1)):
+        if not self.parent.model.block_exists((x_int, y_int, z_int+1)) or self.parent.model.block_exists((x_int, y_int-1, z_int+1)):
             self.block_exists["backward"] = False
         else:
             self.block_exists["backward"] = True
 
-        if not self.parent.model.block_exists((x_int, y_int, z_int+1)) or self.parent.model.block_exists((x_int, y_int-1, z_int-1)):
+        if not self.parent.model.block_exists((x_int, y_int, z_int-1)) or self.parent.model.block_exists((x_int, y_int-1, z_int-1)):
             self.block_exists["forward"] = False
         else:
             self.block_exists["forward"] = True
@@ -108,10 +110,10 @@ class Player:
             self.falling = False
             if self.velocity_y < 0:
                 self.velocity_y = 0
+            self._falling_first_time = False
         else:
             self.falling = True
             self.velocity_y -= self.gravity
-
         self._collide(self.pos)
 
     def hit_test(self, position, vector, max_distance=8):
@@ -246,6 +248,15 @@ class Player:
         dx, dz = math.sin(rotY), math.cos(rotY)
         dy = math.sin(rotX)
         self.hit_test(position=self.pos, vector=(dx, -dy, -dz), max_distance=self.hit_range)
+
+        if self._falling_first_time:
+            highest = 0
+            for i in self.parent.model.all_blocks:
+                if i[0] == self.pos[0] and i[2] == self.pos[2]:
+                    if i[1] > highest:
+                        highest = i[1]
+
+            self.pos[1] = highest + 7
         
         if self.velocity_y > self.terminal_velocity:
             self.velocity_y = self.terminal_velocity
