@@ -73,6 +73,7 @@ class World:
         self.infgen_threshold = 0
         self.position = [0, 0]
         self._process_per_frame = 1 + round(multiprocessing.cpu_count() * 0.2)
+        self.chunk_generation_delay = 2
 
         if self._process_per_frame <= 0:
             self._process_per_frame = 1
@@ -182,8 +183,7 @@ class World:
         info("World", "Generating world...")
         for i in trange(-self.render_distance+1, self.render_distance):
             for j in range(-self.render_distance+1, self.render_distance):
-                self.all_chunks[(i, j)] = pycraft.Chunk(self, {'x': i, 'z': j})
-                self._queue.append((i, j))
+                self.make_chunk((i, j))
 
     def update(self):
         """
@@ -345,7 +345,7 @@ class World:
                 random_index = random.randint(0, len(self._queue) - 1)
 
                 item = self._queue[random_index]
-                self.all_chunks[item].generate()
+                pyglet.clock.schedule_once(lambda x: self.all_chunks[item].generate(), random.randint(0, self.chunk_generation_delay))
                 self._queue.pop(random_index)
 
     def get_block(self, position):

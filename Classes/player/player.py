@@ -111,7 +111,7 @@ class Player:
             if self.velocity_y < 0:
                 self.velocity_y = 0
             self._falling_first_time = False
-        elif not self._falling_first_time:
+        else:
             self.falling = True
             self.velocity_y -= self.gravity
         self._collide(self.pos)
