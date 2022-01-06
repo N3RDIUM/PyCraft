@@ -73,7 +73,7 @@ class World:
         self.infgen_threshold = 0
         self.position = [0, 0]
         self._process_per_frame = 1 + round(multiprocessing.cpu_count() * 0.2)
-        self.chunk_generation_delay = 2
+        self.chunk_generation_delay = 0.5
 
         if self._process_per_frame <= 0:
             self._process_per_frame = 1
