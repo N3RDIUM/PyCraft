@@ -72,7 +72,7 @@ class World:
         self.chunk_size = 8
         self.infgen_threshold = 0
         self.position = [0, 0]
-        self._process_per_frame = round(multiprocessing.cpu_count() * 0.2)
+        self._process_per_frame = 1 + round(multiprocessing.cpu_count() * 0.2)
 
         if self._process_per_frame <= 0:
             self._process_per_frame = 1
@@ -107,6 +107,9 @@ class World:
         glEnable(GL_LIGHTING)
         glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat*4)(1,1,1,1))
         glEnable(GL_LIGHT7)
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 
         self.cloud_generator = pycraft.CloudGenerator(self)
 
