@@ -354,7 +354,6 @@ class World:
                 item = self._queue[random_index]
                 pyglet.clock.schedule_once(lambda x: self.all_chunks[item].generate(), random.randint(0, self.chunk_generation_delay))
                 self._queue.pop(random_index)
-        print(len(self._queue))
 
     def get_block(self, position):
         """
