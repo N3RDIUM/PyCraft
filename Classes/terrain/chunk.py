@@ -22,14 +22,11 @@ class Chunk:
         """
         self.parent = parent
         self.position = {'x': position['x'] * self.parent.chunk_size, 'z': position['z'] * self.parent.chunk_size}
-
         self.structures = {}
-
         self.generator = pycraft.TerrainGenerator(self)
-
         self.batch = self.parent.batch
-
         self.parent._queue.append((self.position['x'] / self.parent.chunk_size, self.position['z'] / self.parent.chunk_size))
+        self.generated = False
         
     def add_block(self, type, position):
         """
@@ -68,6 +65,7 @@ class Chunk:
         * Generates a chunk
         """
         threading.Thread(target = self.generator.generate, daemon = True).start()
+        self.generated = True
 
     def update(self):
         """

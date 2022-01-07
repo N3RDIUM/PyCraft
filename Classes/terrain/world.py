@@ -6,6 +6,7 @@ import random
 from tqdm import trange
 import opensimplex
 import multiprocessing
+import subprocess
 import pyximport
 pyximport.install()
 
@@ -13,6 +14,7 @@ pyximport.install()
 from logger import *
 import Classes as pycraft
 from helpers.fast_func_executor import *
+#from helpers.shared_pointer_wrapper import set_shared
 
 # all the block types
 blocks_all = {}
@@ -116,6 +118,8 @@ class World:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 
         self.cloud_generator = pycraft.CloudGenerator(self)
+        #self.shared_manager = _SharedPtr()
+        #self.shared_manager.setter("PyCraftWorld", self)
 
     def _load_textures(self):
         """
@@ -184,8 +188,8 @@ class World:
         * Generates the world
         """
         info("World", "Generating world...")
-        for i in trange(-self.render_distance+1, self.render_distance):
-            for j in range(-self.render_distance+1, self.render_distance):
+        for i in trange(-self.render_distance, self.render_distance):
+            for j in range(-self.render_distance, self.render_distance):
                 fast_exec(lambda: self.make_chunk((i, j)))
 
     def update(self):
@@ -350,6 +354,7 @@ class World:
                 item = self._queue[random_index]
                 pyglet.clock.schedule_once(lambda x: self.all_chunks[item].generate(), random.randint(0, self.chunk_generation_delay))
                 self._queue.pop(random_index)
+        print(len(self._queue))
 
     def get_block(self, position):
         """
