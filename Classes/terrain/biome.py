@@ -1,5 +1,5 @@
 # imports
-import pyglet, opensimplex
+import opensimplex
 
 # Inbuilt imports
 import Classes as pycraft

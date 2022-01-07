@@ -6,10 +6,13 @@ import random
 from tqdm import trange
 import opensimplex
 import multiprocessing
+import pyximport
+pyximport.install()
 
 # Inbuilt imports
 from logger import *
 import Classes as pycraft
+from helpers.fast_func_executor import *
 
 # all the block types
 blocks_all = {}
@@ -183,7 +186,7 @@ class World:
         info("World", "Generating world...")
         for i in trange(-self.render_distance+1, self.render_distance):
             for j in range(-self.render_distance+1, self.render_distance):
-                self.make_chunk((i, j))
+                fast_exec(lambda: self.make_chunk((i, j)))
 
     def update(self):
         """
@@ -197,11 +200,11 @@ class World:
 
         # Runs the queue
         if self._frame % 2 == 0:
-            self._process_queue_item()
+            fast_exec(self._process_queue_item)
 
         # Updates the liquids
         for i in self.liquid_types:
-            self.liquid_types[i].update()
+            fast_exec(self.liquid_types[i].update)
 
         # INFGEN
         if self.parent.player.pos[0] / self.chunk_size > self.position[0] + self.infgen_threshold:

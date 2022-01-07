@@ -1,5 +1,10 @@
 # imports
 from pyglet.gl import *
+import pyximport
+pyximport.install()
+
+# inbuilt imports
+from helpers.fast_func_executor import *
 
 class Block:
     """
@@ -101,7 +106,7 @@ class Block:
         """
         for _ in list(self._preloads).copy():
             if self._preloads[_] == chunk:
-                self.add(position = _, parent = self._preloads[_])
+                fast_exec(lambda: self.add(position = _, parent = self._preloads[_]))
 
         for i in range(len(self._preload_queue)):
             if self._preload_queue[i] == chunk:
