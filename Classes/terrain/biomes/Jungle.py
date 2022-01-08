@@ -3,7 +3,7 @@ import Classes as pycraft
 
 class Biome(pycraft.Biome):
     def __init__(self, parent):
-        super().__init__("Plains", parent)
+        super().__init__("Jungle", parent)
         self.sea_level = int(self.noise.noise2(self.parent.seed, self.parent.seed)) * 1000
 
     def generate(self, coords, chunk):

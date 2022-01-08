@@ -36,9 +36,11 @@ class TerrainGenerator:
         """
         for x in range(self.parent.position['x'] - self.parent.parent.chunk_size, self.parent.parent.chunk_size + self.parent.position['x']):
             for z in range(self.parent.position['z'] - self.parent.parent.chunk_size, self.parent.parent.chunk_size + self.parent.position['z']):
-                if abs(self.noise.noise2(x / 100, z / 100)) > 0 and abs(self.noise.noise2(x / 100, z / 100)) < 0.6:
+                if abs(self.noise.noise2(x / 100, z / 100)) > 0 and abs(self.noise.noise2(x / 100, z / 100)) < 0.6 and not abs(self.noise.noise2(x / 100, z / 100)) > 0.65:
                     fast_exec(lambda: self.parent.parent.biomes['Plains'].generate((x,z), self.parent))
-                elif abs(self.noise.noise2(x / 100, z / 100)) > 0.6 and abs(self.noise.noise2(x / 100, z / 100)) < 0.7:
+                elif abs(self.noise.noise2(x / 100, z / 100)) > 0.6 and abs(self.noise.noise2(x / 100, z / 100)) < 0.65 and not abs(self.noise.noise2(x / 100, z / 100)) > 0.7:
+                    fast_exec(lambda: self.parent.parent.biomes['Jungle'].generate((x,z), self.parent))
+                elif abs(self.noise.noise2(x / 100, z / 100)) > 0.6 and abs(self.noise.noise2(x / 100, z / 100)) < 0.75 and not abs(self.noise.noise2(x / 100, z / 100)) > 8:
                     fast_exec(lambda: self.parent.parent.biomes['Desert'].generate((x,z), self.parent))
 
         pyglet.clock.schedule_once(self.parent._process_preloads, random.randint(1,3))
