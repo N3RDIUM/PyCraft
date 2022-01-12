@@ -1,16 +1,6 @@
-# import the necessary modules
-import pyximport
-pyximport.install()
-from .shared_pointer_wrapper import get_shared
+import random
 
 def start_generaion(world):
-    # We don't have to worry about infinite loops, because
-    # this is going to be run in another thread, using popen.
-    while True:
-        for i in world.all_chunks:
-            if world.all_chunks[i].generated == False:
-                world.all_chunks[i].generate()
-
-if __name__ == "__main__":
-    world = get_shared('PyCraftWorld')
-    start_generaion(world)
+    random_index = world._queue[random.randint(0, len(world._queue) - 1)]
+    world.all_chunks[random_index].generate()
+    world._queue.remove(random_index)

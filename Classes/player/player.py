@@ -251,10 +251,13 @@ class Player:
 
         if self._falling_first_time:
             highest = 0
-            for i in self.parent.model.all_blocks:
-                if i[0] == self.pos[0] and i[2] == self.pos[2]:
-                    if i[1] > highest:
-                        highest = i[1]
+            try:
+                for i in self.parent.model.all_blocks:
+                    if i[0] == self.pos[0] and i[2] == self.pos[2]:
+                        if i[1] > highest:
+                            highest = i[1]
+            except:
+                pass
 
             self.pos[1] = highest + 7
         

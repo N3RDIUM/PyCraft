@@ -33,7 +33,7 @@ class Biome(pycraft.Biome):
             chunk.add_preloaded_block("Dirt", (coords[0], i, coords[1]))
         chunk.add_preloaded_block("Grass", (coords[0], noise_grass, coords[1]))
 
-        if abs(self.noise.noise2(coords[0] / 1000, coords[1] / 1000)) * 10 < 0.4 and abs(self.noise.noise2(coords[0] / 1000, coords[1] / 1000)) * 10 > 0.5:
+        if abs(self.noise.noise2(coords[0] * 1000, coords[1] * 1000)) * 10 < 0.9:
             self.parent.make_structure((coords[0], noise_grass, coords[1]), "BirchTree", chunk)
-        elif abs(self.noise.noise2(coords[0] / 1000, coords[1] / 1000)) * 10 < 0.5:
+        elif abs(self.noise.noise2(coords[0] * 1500, coords[1] * 1500)) * 10 < 0.7:
             self.parent.make_structure((coords[0], noise_grass, coords[1]), "OakTree", chunk)

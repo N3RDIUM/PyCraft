@@ -14,7 +14,6 @@ pyximport.install()
 from logger import *
 import Classes as pycraft
 from helpers.fast_func_executor import *
-#from helpers.shared_pointer_wrapper import set_shared
 
 # all the block types
 blocks_all = {}
@@ -77,14 +76,7 @@ class World:
         self.chunk_size = 8
         self.infgen_threshold = 0
         self.position = [0, 0]
-        self._process_per_frame = 1 + round(multiprocessing.cpu_count() * 0.2)
-        self.chunk_generation_delay = 1
-
-        if self._process_per_frame <= 0:
-            self._process_per_frame = 1
-
-        info("World", "Processes per frame: " + str(self._process_per_frame))
-
+        
         self._queue = []
         self._frame = 0
         self.generate()
@@ -114,12 +106,7 @@ class World:
         glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat*4)(1,1,1,1))
         glEnable(GL_LIGHT7)
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-
         self.cloud_generator = pycraft.CloudGenerator(self)
-        #self.shared_manager = _SharedPtr()
-        #self.shared_manager.setter("PyCraftWorld", self)
 
     def _load_textures(self):
         """
@@ -202,9 +189,8 @@ class World:
         for i in self.all_chunks:
             self.all_chunks[i].update()
 
-        # Runs the queue
         if self._frame % 2 == 0:
-            fast_exec(self._process_queue_item)
+            self.parent.world_update_func(self)
 
         # Updates the liquids
         for i in self.liquid_types:
@@ -340,20 +326,6 @@ class World:
         """
         chunk.structures[position] = self.structure_types[structure_type](chunk, position)
         chunk.structures[position].generate()
-
-    def _process_queue_item(self):
-        """
-        _process_queue_item
-
-        * Processes an item in the queue
-        """
-        for i in range(self._process_per_frame):
-            if len(self._queue) > 0:
-                random_index = random.randint(0, len(self._queue) - 1)
-
-                item = self._queue[random_index]
-                pyglet.clock.schedule_once(lambda x: self.all_chunks[item].generate(), random.randint(0, self.chunk_generation_delay))
-                self._queue.pop(random_index)
 
     def get_block(self, position):
         """

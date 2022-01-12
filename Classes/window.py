@@ -14,7 +14,7 @@ class PyCraftWindow(Window):
 
     * The PyCraft Window
     """
-    def __init__(self, shader, *args, **kwargs):
+    def __init__(self, shader, world_update_func, *args, **kwargs):
         """
         PyCraftWindow.__init__
 
@@ -35,6 +35,7 @@ class PyCraftWindow(Window):
         glEnable(GL_DEPTH_TEST)
 
         self.fps_display = pyglet.window.FPSDisplay(window=self)
+        self.world_update_func = world_update_func
 
     def setLock(self, state):
         """

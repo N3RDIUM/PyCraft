@@ -17,7 +17,7 @@ class Structure(pycraft.StructureBase):
         self.name = "OakTree"
         self.position = {"x": position[0], "y": position[1], "z": position[2]}
         self.height = random.randint(5,6)
-        self.leaf_height = random.randint(2,3)
+        self.leaf_height = 3
         self.side = random.randint(1,2)
 
     def generate(self, *args, **kwargs):
