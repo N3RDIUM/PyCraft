@@ -11,6 +11,8 @@
 import pyglet
 import threading
 from pyglet.gl import *
+import pyximport
+pyximport.install()
 
 # inbuilt imports
 import Classes as pycraft
@@ -24,7 +26,7 @@ info('main', 'Initializing PyCraft...')
 load_shaders()
 
 def _update_world(world):
-    world_gen_process = threading.Thread(target = start_generaion, args = ([world]), daemon = True)
+    world_gen_process = threading.Thread(target = start_world_generation, args = ([world]), daemon = True)
     world_gen_process.start()
 
 if __name__ == '__main__':

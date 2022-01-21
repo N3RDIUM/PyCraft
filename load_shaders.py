@@ -75,6 +75,9 @@ class Shader:
 		sampler_location = self.find_uniform(b"u_TextureArraySampler")
 		gl.glUniform1i(sampler_location, 0)
 
+	def unuse(self):
+		gl.glUseProgram(0)
+
 
 shaders = {}
 
