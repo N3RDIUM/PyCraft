@@ -104,6 +104,9 @@ class World:
         # Lighting
         glEnable(GL_LIGHTING)
         glLightfv(GL_LIGHT7, GL_AMBIENT, (GLfloat*4)(1,1,1,1))
+        glLightfv(GL_LIGHT7, GL_DIFFUSE, (GLfloat*4)(1,1,1,1))
+        glLightfv(GL_LIGHT7, GL_SPECULAR, (GLfloat*4)(1,1,1,1))
+        glLightfv(GL_LIGHT7, GL_POSITION, (GLfloat*4)(0,0,0,1))
         glEnable(GL_LIGHT7)
 
         self.cloud_generator = pycraft.CloudGenerator(self)

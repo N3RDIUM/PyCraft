@@ -30,10 +30,6 @@ class PyCraftWindow(Window):
         self.push_handlers(self.keys)
         pyglet.clock.schedule(self.update)
 
-        # initialize opengl
-        # Enable depth test
-        glEnable(GL_DEPTH_TEST)
-
         self.fps_display = pyglet.window.FPSDisplay(window=self)
         self.world_update_func = world_update_func
 
