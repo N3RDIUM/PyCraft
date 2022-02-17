@@ -8,31 +8,58 @@
 #################################################################
 
 # imports
-import pyglet
-import threading
-from pyglet.gl import *
-import pyximport
-pyximport.install()
+from calendar import c
+import glfw
+from OpenGL.GL import *
+from OpenGL.GLU import *
 
-# inbuilt imports
-import Classes as pycraft
-from logger import *
-from load_shaders import *
-from helpers.terrain_generator_helper import *
+# internal imports
+from renderer import *
 
-info('main', 'Initializing PyCraft...')
+if not glfw.init():
+    raise Exception("glfw can not be initialized!")
 
-# Load all the shaders
-load_shaders()
+window = glfw.create_window(800, 500, "PyCraft", None, None)
+glfw.make_context_current(window)
+renderer = TerrainRenderer(window)
 
-def _update_world(world):
-    world_gen_process = threading.Thread(target = start_world_generation, args = ([world]), daemon = True)
-    world_gen_process.start()
+glEnable(GL_DEPTH_TEST)
 
-if __name__ == '__main__':
-    # create window
-    window = pycraft.PyCraftWindow(shader = shaders['default'], world_update_func = _update_world, width = 800, height = 500, resizable = True) 
+renderer.add_cube((0, 0, -5))
 
-    # Run the app
-    info('main', 'Running PyCraft...')
-    pyglet.app.run()
+camrot = [0, 0]
+campos = [0, 0, 0]
+
+# get window size
+def get_window_size():
+    width, height = glfw.get_window_size(window)
+    return width, height
+
+def _setup_3d():
+    w, h = get_window_size()
+
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluPerspective(70, w / h, 0.1, 1000)
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+
+# mainloop
+while not glfw.window_should_close(window):
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+    _setup_3d()
+    glClearColor(0.0, 0.0, 0.0, 1.0)
+    glColor3f(1.0, 1.0, 1.0)
+    glTranslatef(0, 0, -10)
+
+    glRotatef(camrot[0], 1, 0, 0)
+    glRotatef(camrot[1], 0, 0, 1)
+    glTranslatef(-campos[0], -campos[1], -campos[2])
+
+    renderer.render()
+
+    glfw.poll_events()
+    glfw.swap_buffers(window)
+
+glfw.terminate()
