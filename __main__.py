@@ -8,22 +8,31 @@
 #################################################################
 
 # imports
-import glfw
-from OpenGL.GL import *
-from OpenGL.GLU import *
+import pyglet
+import threading
+from pyglet.gl import *
+import pyximport
+pyximport.install()
 
-if not glfw.init():
-    raise Exception("glfw can not be initialized")
+# inbuilt imports
+import Classes as pycraft
+from logger import *
+from load_shaders import *
+from helpers.terrain_generator_helper import *
 
-context = glfw.create_window(800, 500, "PyCraft", None, None)
-glfw.make_context_current(context)
+info('main', 'Initializing PyCraft...')
 
-# mainloop
-while not glfw.window_should_close(context):
-    glfw.poll_events()
-    glfw.swap_buffers(context)
+# Load all the shaders
+load_shaders()
 
-    glClear(GL_COLOR_BUFFER_BIT)
-    glClearColor(0.13, 0.2, 0.3, 1.0)
+def _update_world(world):
+    world_gen_process = threading.Thread(target = start_world_generation, args = ([world]), daemon = True)
+    world_gen_process.start()
 
-glfw.terminate()
+if __name__ == '__main__':
+    # create window
+    window = pycraft.PyCraftWindow(shader = shaders['default'], world_update_func = _update_world, width = 800, height = 500, resizable = True) 
+
+    # Run the app
+    info('main', 'Running PyCraft...')
+    pyglet.app.run()
