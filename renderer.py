@@ -3,6 +3,9 @@ import glfw
 import pygame
 from OpenGL.GL import *
 from ctypes import *
+import threading, time
+
+event = threading.Event()
 
 glfw.init()
 
