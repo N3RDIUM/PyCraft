@@ -15,6 +15,7 @@ from OpenGL.GLU import *
 
 # internal imports
 from renderer import *
+from player import *
 
 if not glfw.init():
     raise Exception("glfw can not be initialized!")
@@ -22,15 +23,98 @@ if not glfw.init():
 window = glfw.create_window(800, 500, "PyCraft", None, None)
 glfw.make_context_current(window)
 renderer = TerrainRenderer(window)
+player = Player(window)
 
 glEnable(GL_DEPTH_TEST)
+
+
+# generate cube faces
+def generate_faces(position):
+    x, y, z = position
+    X, Y, Z = x + 1, y + 1, z + 1
+
+    return [
+        # top
+        x, y, z,
+        x, y, Z,
+        X, y, Z,
+        X, y, z,
+
+        # bottom
+        x, Y, z,
+        X, Y, z,
+        X, Y, Z,
+        x, Y, Z,
+
+        # left
+        x, y, z,
+        x, Y, z,
+        x, Y, Z,
+        x, y, Z,
+
+        # right
+        X, y, z,
+        X, y, Z,
+        X, Y, Z,
+        X, Y, z,
+
+        # front
+        x, y, z,
+        x, Y, z,
+        X, Y, z,
+        X, y, z,
+
+        # back
+        x, y, Z,
+        X, y, Z,
+        X, Y, Z,
+        x, Y, Z,
+    ]
+
+defaultTexCoords = [
+    # top
+    0, 0,
+    0, 1,
+    1, 1,
+    1, 0,
+
+    # bottom
+    0, 0,
+    1, 0,
+    1, 1,
+    0, 1,
+
+    # left
+    0, 0,
+    0, 1,
+    1, 1,
+    1, 0,
+
+    # right
+    0, 0,
+    1, 0,
+    1, 1,
+    0, 1,
+
+    # front
+    0, 0,
+    0, 1,
+    1, 1,
+    1, 0,
+
+    # back
+    0, 0,
+    1, 0,
+    1, 1,
+    0, 1,
+]
 
 for i in range(-10, 10):
     for j in range(-10, 10):
         x = i
         y = random.randint(-1, 1)
         z = j
-        renderer.add_cube((x, y, z))
+        renderer.add(generate_faces([x, y, z]), defaultTexCoords)
 
 camrot = [0, 0]
 campos = [0, 0, 0]
@@ -63,38 +147,8 @@ while not glfw.window_should_close(window):
     glClearColor(0.0, 0.0, 0.0, 1.0)
     glColor3f(1.0, 1.0, 1.0)
 
-    # First person camera translation and rotation
-    glRotatef(camrot[0], 1, 0, 0)
-    glRotatef(camrot[1], 0, 1, 0)
-    glTranslatef(-campos[0], -campos[1], -campos[2])
-
-    # keyboard input
-    if glfw.get_key(window, glfw.KEY_ESCAPE) == glfw.PRESS:
-        glfw.set_window_should_close(window, True)
-    # wasd movement
-    if glfw.get_key(window, glfw.KEY_W) == glfw.PRESS:
-        campos[2] -= 0.1
-    if glfw.get_key(window, glfw.KEY_S) == glfw.PRESS:
-        campos[2] += 0.1
-    if glfw.get_key(window, glfw.KEY_A) == glfw.PRESS:
-        campos[0] -= 0.1
-    if glfw.get_key(window, glfw.KEY_D) == glfw.PRESS:
-        campos[0] += 0.1
-    # Space and shift
-    if glfw.get_key(window, glfw.KEY_SPACE) == glfw.PRESS:
-        campos[1] += 0.1
-    if glfw.get_key(window, glfw.KEY_LEFT_SHIFT) == glfw.PRESS:
-        campos[1] -= 0.1
-    # Arrow keys rotation
-    if glfw.get_key(window, glfw.KEY_UP) == glfw.PRESS:
-        camrot[0] -= 1
-    if glfw.get_key(window, glfw.KEY_DOWN) == glfw.PRESS:
-        camrot[0] += 1
-    if glfw.get_key(window, glfw.KEY_LEFT) == glfw.PRESS:
-        camrot[1] -= 1
-    if glfw.get_key(window, glfw.KEY_RIGHT) == glfw.PRESS:
-        camrot[1] += 1
-
+    player.update()
+    player._translate()
     renderer.render()
 
     glfw.poll_events()

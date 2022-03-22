@@ -60,86 +60,9 @@ class TerrainRenderer:
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)
 
-    def add_cube(self, pos):
-        x, y, z = pos
-        X, Y, Z = x + 1, y + 1, z + 1
-
-        # add a quad
-        self.vertices.extend([
-            # top
-            x, y, z,
-            x, y, Z,
-            X, y, Z,
-            X, y, z,
-
-            # bottom
-            x, Y, z,
-            X, Y, z,
-            X, Y, Z,
-            x, Y, Z,
-
-            # left
-            x, y, z,
-            x, Y, z,
-            x, Y, Z,
-            x, y, Z,
-
-            # right
-            X, y, z,
-            X, y, Z,
-            X, Y, Z,
-            X, Y, z,
-
-            # front
-            x, y, z,
-            x, Y, z,
-            X, Y, z,
-            X, y, z,
-
-            # back
-            x, y, Z,
-            X, y, Z,
-            X, Y, Z,
-            x, Y, Z,
-        ])
-
-        self.texCoords.extend([
-            # top
-            0, 0,
-            0, 1,
-            1, 1,
-            1, 0,
-
-            # bottom
-            0, 0,
-            1, 0,
-            1, 1,
-            0, 1,
-
-            # left
-            0, 0,
-            0, 1,
-            1, 1,
-            1, 0,
-
-            # right
-            0, 0,
-            1, 0,
-            1, 1,
-            0, 1,
-
-            # front
-            0, 0,
-            0, 1,
-            1, 1,
-            1, 0,
-
-            # back
-            0, 0,
-            1, 0,
-            1, 1,
-            0, 1,
-        ])
+    def add(self, posList, texCoords):
+        self.vertices.extend(posList)
+        self.texCoords.extend(texCoords)
 
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         glBufferData(GL_ARRAY_BUFFER, len(self.vertices) * 4, (c_float * len(self.vertices))(*self.vertices), GL_STATIC_DRAW)
