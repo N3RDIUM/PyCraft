@@ -3,26 +3,12 @@ import glfw
 import pygame
 from OpenGL.GL import *
 from ctypes import *
-import threading, time
+import threading
+from texture_manager import *
 
 event = threading.Event()
 
 glfw.init()
-
-def loadTexture(path):
-    texSurface = pygame.image.load(path)
-    texData = pygame.image.tostring(texSurface, "RGBA", 1)
-    width = texSurface.get_width()
-    height = texSurface.get_height()
-    texid = glGenTextures(1)
-    glBindTexture(GL_TEXTURE_2D, texid)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 
-            0, GL_RGBA, GL_UNSIGNED_BYTE, texData)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    return texid
 
 class TerrainRenderer:
     def __init__(self, window):
@@ -36,7 +22,7 @@ class TerrainRenderer:
 
         self.vbo, self.vbo_1 = glGenBuffers (2)
 
-        self.texture = loadTexture("assets/textures/block/bricks.png",)
+        self.texture_manager = TextureAtlas()
 
         glEnable(GL_TEXTURE_2D)
         glEnable(GL_BLEND)

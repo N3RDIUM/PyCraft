@@ -27,24 +27,23 @@ player = Player(window)
 
 glEnable(GL_DEPTH_TEST)
 
-
 # generate cube faces
 def generate_faces(position):
     x, y, z = position
     X, Y, Z = x + 1, y + 1, z + 1
 
-    return [
+    return (
         # top
-        x, y, z,
-        x, y, Z,
-        X, y, Z,
-        X, y, z,
+        x, Y, z,
+        x, Y, Z,
+        X, Y, Z,
+        X, Y, z,
 
         # bottom
-        x, Y, z,
-        X, Y, z,
-        X, Y, Z,
-        x, Y, Z,
+        x, y, z,
+        X, y, z,
+        X, y, Z,
+        x, y, Z,
 
         # left
         x, y, z,
@@ -69,52 +68,25 @@ def generate_faces(position):
         X, y, Z,
         X, Y, Z,
         x, Y, Z,
-    ]
+    )
 
-defaultTexCoords = [
-    # top
-    0, 0,
-    0, 1,
-    1, 1,
-    1, 0,
-
-    # bottom
-    0, 0,
-    1, 0,
-    1, 1,
-    0, 1,
-
-    # left
-    0, 0,
-    0, 1,
-    1, 1,
-    1, 0,
-
-    # right
-    0, 0,
-    1, 0,
-    1, 1,
-    0, 1,
-
-    # front
-    0, 0,
-    0, 1,
-    1, 1,
-    1, 0,
-
-    # back
-    0, 0,
-    1, 0,
-    1, 1,
-    0, 1,
-]
+renderer.texture_manager.add_from_folder("assets/textures/block/")
+renderer.texture_manager.save("atlas.png")
+renderer.texture_manager.bind()
 
 for i in range(-10, 10):
     for j in range(-10, 10):
         x = i
-        y = random.randint(-1, 1)
+        y = random.randint(-3, 3)
         z = j
-        renderer.add(generate_faces([x, y, z]), defaultTexCoords)
+        renderer.add(generate_faces([x, y, z]), (
+            *renderer.texture_manager.texture_coords["base.png"],
+            *renderer.texture_manager.texture_coords["grass.png"],
+            *renderer.texture_manager.texture_coords["grass_side.png"],
+            *renderer.texture_manager.texture_coords["dirt.png"],
+            *renderer.texture_manager.texture_coords["stone.png"],
+            *renderer.texture_manager.texture_coords["wood_planks.png"],
+        ))
 
 camrot = [0, 0]
 campos = [0, 0, 0]
