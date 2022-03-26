@@ -2,7 +2,7 @@ from OpenGL.GL import *
 from PIL import Image
 
 class TextureAtlasGenerator:
-    def __init__(self, texture_size=32, n_textures = 32):
+    def __init__(self, texture_size=32, n_textures = 100):
         self.texture_size = texture_size * n_textures
         self.n_textures = n_textures
         self.texture_atlas = Image.new("RGBA", (self.texture_size, self.texture_size), (0, 0, 0, 0))
