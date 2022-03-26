@@ -80,12 +80,12 @@ for i in range(-10, 10):
         y = random.randint(-3, 3)
         z = j
         renderer.add(generate_faces([x, y, z]), (
-            *renderer.texture_manager.texture_coords["base.png"],
             *renderer.texture_manager.texture_coords["grass.png"],
-            *renderer.texture_manager.texture_coords["grass_side.png"],
             *renderer.texture_manager.texture_coords["dirt.png"],
-            *renderer.texture_manager.texture_coords["stone.png"],
-            *renderer.texture_manager.texture_coords["wood_planks.png"],
+            *renderer.texture_manager.texture_coords["grass_side.png"],
+            *renderer.texture_manager.texture_coords["grass_side.png"],
+            *renderer.texture_manager.texture_coords["grass_side.png"],
+            *renderer.texture_manager.texture_coords["grass_side.png"],
         ))
 
 camrot = [0, 0]
