@@ -34,40 +34,17 @@ def generate_faces(position):
 
     return (
         # top
-        x, Y, z,
-        x, Y, Z,
-        X, Y, Z,
-        X, Y, z,
-
+        x, Y, Z,  X, Y, Z,  X, Y, z,  x, Y, z,
         # bottom
-        x, y, z,
-        X, y, z,
-        X, y, Z,
-        x, y, Z,
-
+        x, y, z,  X, y, z,  X, y, Z,  x, y, Z,
         # left
-        x, y, z,
-        x, Y, z,
-        x, Y, Z,
-        x, y, Z,
-
+        x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z,
         # right
-        X, y, z,
-        X, y, Z,
-        X, Y, Z,
-        X, Y, z,
-
+        X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z,
         # front
-        x, y, z,
-        x, Y, z,
-        X, Y, z,
-        X, y, z,
-
+        x, y, Z,  X, y, Z,  X, Y, Z,  x, Y, Z,
         # back
-        x, y, Z,
-        X, y, Z,
-        X, Y, Z,
-        x, Y, Z,
+        X, y, z,  x, y, z,  x, Y, z,  X, Y, z
     )
 
 renderer.texture_manager.add_from_folder("assets/textures/block/")
@@ -87,9 +64,6 @@ for i in range(-10, 10):
             *renderer.texture_manager.texture_coords["grass_side.png"],
             *renderer.texture_manager.texture_coords["grass_side.png"],
         ))
-
-camrot = [0, 0]
-campos = [0, 0, 0]
 
 # get window size
 def get_window_size():

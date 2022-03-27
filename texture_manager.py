@@ -59,17 +59,17 @@ class TextureAtlas:
         h = _[4]
         # TexCoords for OpenGL
         self.texture_coords[name] = (
-            x / self.atlas_generator.texture_size,
-            y / self.atlas_generator.texture_size,
-
-            (x + w) / self.atlas_generator.texture_size,
-            y / self.atlas_generator.texture_size,
-
             (x + w) / self.atlas_generator.texture_size,
             (y - h) / self.atlas_generator.texture_size,
 
             x / self.atlas_generator.texture_size,
-            (y - h) / self.atlas_generator.texture_size
+            (y - h) / self.atlas_generator.texture_size,
+
+            x / self.atlas_generator.texture_size,
+            y / self.atlas_generator.texture_size,
+
+            (x + w) / self.atlas_generator.texture_size,
+            y / self.atlas_generator.texture_size,
         )
 
     def save(self, path):
