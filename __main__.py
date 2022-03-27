@@ -8,13 +8,13 @@
 #################################################################
 
 # imports
-import random
 import glfw
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
 # internal imports
-from renderer import *
+from core.renderer import *
+from terrain import *
 from player import *
 
 if not glfw.init():
@@ -27,43 +27,19 @@ player = Player(window)
 
 glEnable(GL_DEPTH_TEST)
 
-# generate cube faces
-def generate_faces(position):
-    x, y, z = position
-    X, Y, Z = x + 1, y + 1, z + 1
-
-    return (
-        # top
-        x, Y, Z,  X, Y, Z,  X, Y, z,  x, Y, z,
-        # bottom
-        x, y, z,  X, y, z,  X, y, Z,  x, y, Z,
-        # left
-        x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z,
-        # right
-        X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z,
-        # front
-        x, y, Z,  X, y, Z,  X, Y, Z,  x, Y, Z,
-        # back
-        X, y, z,  x, y, z,  x, Y, z,  X, Y, z
-    )
+glEnable(GL_FOG)
+glFogfv(GL_FOG_COLOR, (GLfloat * int(8))(0.5, 0.69, 1.0, 10))
+glHint(GL_FOG_HINT, GL_DONT_CARE)
+glFogi(GL_FOG_MODE, GL_LINEAR)
+glFogf(GL_FOG_START, 3)
+glFogf(GL_FOG_END, 10)
 
 renderer.texture_manager.add_from_folder("assets/textures/block/")
 renderer.texture_manager.save("atlas.png")
 renderer.texture_manager.bind()
 
-for i in range(-10, 10):
-    for j in range(-10, 10):
-        x = i
-        y = random.randint(-3, 3)
-        z = j
-        renderer.add(generate_faces([x, y, z]), (
-            *renderer.texture_manager.texture_coords["grass.png"],
-            *renderer.texture_manager.texture_coords["dirt.png"],
-            *renderer.texture_manager.texture_coords["grass_side.png"],
-            *renderer.texture_manager.texture_coords["grass_side.png"],
-            *renderer.texture_manager.texture_coords["grass_side.png"],
-            *renderer.texture_manager.texture_coords["grass_side.png"],
-        ))
+chunk = Chunk(renderer, [0, 0])
+chunk.generate()
 
 # get window size
 def get_window_size():
@@ -90,8 +66,7 @@ while not glfw.window_should_close(window):
     update_on_resize()
 
     _setup_3d()
-    glClearColor(0.0, 0.0, 0.0, 1.0)
-    glColor3f(1.0, 1.0, 1.0)
+    glClearColor(0.5, 0.7, 1, 1.0)
 
     player.update()
     player._translate()

@@ -3,7 +3,7 @@ import glfw
 from OpenGL.GL import *
 from ctypes import *
 import threading
-from texture_manager import *
+from core.texture_manager import *
 
 event = threading.Event()
 
@@ -49,6 +49,7 @@ class TerrainRenderer:
         self.vertices.extend(posList)
         self.texCoords.extend(texCoords)
 
+    def update_vbo(self):
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         glBufferData(GL_ARRAY_BUFFER, len(self.vertices) * 4, (c_float * len(self.vertices))(*self.vertices), GL_STATIC_DRAW)
         glFlush()
