@@ -26,7 +26,8 @@ renderer = TerrainRenderer(window)
 player = Player(window)
 
 glEnable(GL_DEPTH_TEST)
-
+glEnable(GL_CULL_FACE)
+glCullFace(GL_BACK)
 glEnable(GL_FOG)
 glFogfv(GL_FOG_COLOR, (GLfloat * int(8))(0.5, 0.69, 1.0, 10))
 glHint(GL_FOG_HINT, GL_DONT_CARE)
