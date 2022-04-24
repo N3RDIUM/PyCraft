@@ -8,31 +8,72 @@
 #################################################################
 
 # imports
-import pyglet
-import threading
-from pyglet.gl import *
-import pyximport
-pyximport.install()
+import glfw
+from OpenGL.GL import *
+from OpenGL.GLU import *
 
-# inbuilt imports
-import Classes as pycraft
-from logger import *
-from load_shaders import *
-from helpers.terrain_generator_helper import *
+# internal imports
+from core.renderer import *
+from terrain import *
+from player import *
 
-info('main', 'Initializing PyCraft...')
+if not glfw.init():
+    raise Exception("glfw can not be initialized!")
 
-# Load all the shaders
-load_shaders()
+window = glfw.create_window(800, 500, "PyCraft", None, None)
+glfw.make_context_current(window)
+renderer = TerrainRenderer(window)
+player = Player(window)
 
-def _update_world(world):
-    world_gen_process = threading.Thread(target = start_world_generation, args = ([world]), daemon = True)
-    world_gen_process.start()
+glEnable(GL_DEPTH_TEST)
+glEnable(GL_CULL_FACE)
+glCullFace(GL_BACK)
+glEnable(GL_FOG)
+glFogfv(GL_FOG_COLOR, (GLfloat * int(8))(0.5, 0.69, 1.0, 10))
+glHint(GL_FOG_HINT, GL_DONT_CARE)
+glFogi(GL_FOG_MODE, GL_LINEAR)
+glFogf(GL_FOG_START, 3)
+glFogf(GL_FOG_END, 10)
 
-if __name__ == '__main__':
-    # create window
-    window = pycraft.PyCraftWindow(shader = shaders['default'], world_update_func = _update_world, width = 800, height = 500, resizable = True) 
+renderer.texture_manager.add_from_folder("assets/textures/block/")
+renderer.texture_manager.save("atlas.png")
+renderer.texture_manager.bind()
 
-    # Run the app
-    info('main', 'Running PyCraft...')
-    pyglet.app.run()
+world = World(renderer, player)
+world.generate()
+
+# get window size
+def get_window_size():
+    width, height = glfw.get_window_size(window)
+    return width, height
+
+def _setup_3d():
+    w, h = get_window_size()
+
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluPerspective(70, w / h, 0.1, 1000)
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+
+def update_on_resize():
+    _setup_3d()
+    glViewport(0, 0, *get_window_size())
+
+# mainloop
+while not glfw.window_should_close(window):
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+    update_on_resize()
+
+    _setup_3d()
+    glClearColor(0.5, 0.7, 1, 1.0)
+
+    player.update()
+    player._translate()
+    world.render()
+
+    glfw.poll_events()
+    glfw.swap_buffers(window)
+
+glfw.terminate()
