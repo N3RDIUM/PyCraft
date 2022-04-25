@@ -21,7 +21,7 @@ class Block:
         self.renderer = renderer
         self.tex_coords = {}
         self.preloads = []
-        self.preloads_per_frame = 160
+        self.preloads_per_frame = 128
         
         self.added_data = []
 
