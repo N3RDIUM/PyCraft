@@ -29,13 +29,8 @@ class World:
         for i in range(self.position[0] - self.render_distance, self.position[0] + self.render_distance + 1):
             for j in range(self.position[1] - self.render_distance, self.position[1] + self.render_distance + 1):
                 if (i, j) not in self.chunks:
-                    threading.Thread(target=self.add_chunk((i, j))).start()
-
-    def update(self):
-        player_position = self.player.position
+                    self.add_chunk((i, j))
 
     def render(self):
         self.parent.render()
-        for i in self.chunks:
-            self.chunks[i].update()
                     

@@ -1,4 +1,9 @@
 from OpenGL.GL import *
+import threading
+import random
+
+def execute_with_delay(func, delay):
+    threading.Timer(delay, func).start()
 
 class Block:
     """
@@ -16,6 +21,9 @@ class Block:
         self.renderer = renderer
         self.tex_coords = {}
         self.preloads = []
+        self.preloads_per_frame = 160
+        
+        self.added_data = []
 
     def preload(self, position, chunk):
         """
@@ -34,31 +42,38 @@ class Block:
         x, y, z = position
         X, Y, Z = (x + 1, y + 1, z + 1)
 
+        face_ids = {}
+
         if not chunk.block_exists((x, Y, z)):
-            self.renderer.add((x, Y, Z,  X, Y, Z,  X, Y, z,  x, Y, z), self.tex_coords["top"])
+            face_ids["top"] = self.renderer.add((x, Y, Z,  X, Y, Z,  X, Y, z,  x, Y, z), self.tex_coords["top"])
         if not chunk.block_exists((x, y - 1, z)):
-            self.renderer.add((x, y, z, X, y, z, X, y, Z, x, y, Z), self.tex_coords["bottom"])
+            face_ids["bottom"] = self.renderer.add((x, y, z, X, y, z, X, y, Z, x, y, Z), self.tex_coords["bottom"])
         if not chunk.block_exists((x - 1, y, z)):
-            self.renderer.add((x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z), self.tex_coords["left"])
+            face_ids["left"] = self.renderer.add((x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z), self.tex_coords["left"])
         if not chunk.block_exists((X, y, z)):
-            self.renderer.add((X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z), self.tex_coords["right"])
+            face_ids["right"] = self.renderer.add((X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z), self.tex_coords["right"])
         if not chunk.block_exists((x, y, Z)):
-            self.renderer.add((x, y, Z,  X, y, Z,  X, Y, Z,  x, Y, Z), self.tex_coords["front"])
+            face_ids["front"] = self.renderer.add((x, y, Z,  X, y, Z,  X, Y, Z,  x, Y, Z), self.tex_coords["front"])
         if not chunk.block_exists((x, y, z - 1)):
-            self.renderer.add((X, y, z,  x, y, z,  x, Y, z,  X, Y, z), self.tex_coords["back"])
+            face_ids["back"] = self.renderer.add((X, y, z,  x, y, z,  x, Y, z,  X, Y, z), self.tex_coords["back"])
+
+        self.added_data.append({
+            "position": position,
+            "chunk": chunk,
+            "face_ids": face_ids # To make urgent draw calls, e.g. when the player breaks a block
+        })
 
     def process_preloads(self):
         """
         process_preloads
         * Processes the preloads
         """
-        try:
-            for i in range(len(self.preloads) - 1):
-                self.add(self.preloads[i][0], self.preloads[i][1])
-                self.preloads.pop(i)
-            self.preloads = {}
-        except:
-            pass
+        for i in range(self.preloads_per_frame):
+            if len(self.preloads) > 0:
+                position, chunk = self.preloads.pop(0)
+                self.add(position, chunk)
+            else:
+                break
         
 class GrassBlock(Block):
     def __init__(self, renderer):
