@@ -35,7 +35,7 @@ class TerrainRenderer:
         self.texCoords = []
 
         self.to_add = []
-        self.to_add_count = 128
+        self.to_add_count = 256
 
         self.vbo, self.vbo_1 = glGenBuffers (2)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
