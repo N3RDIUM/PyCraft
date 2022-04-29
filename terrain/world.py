@@ -10,7 +10,7 @@ class World:
         self.parent = renderer
         self.chunks = {}
         self.position = (0 * 16, 0 * 16)
-        self.render_distance = 1
+        self.render_distance = 2
         self.block_types = {"grass_block": GrassBlock(renderer), "dirt": DirtBlock(renderer)}
         self.to_generate = []
         self.player = player
@@ -20,7 +20,7 @@ class World:
 
     def _add_chunk(self, position):
         self.chunks[position] = Chunk(self.parent, self, position)
-        target=self.chunks[position].generate()
+        threading.Thread(target=lambda: self.chunks[position].generate(), daemon=True).start()
 
     def add_chunk(self, position):
         execute_with_delay(lambda: self._add_chunk(position), random.randrange(1, 2))
