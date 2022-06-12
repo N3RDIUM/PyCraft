@@ -9,9 +9,11 @@ class World:
     def __init__(self, renderer, player):
         self.parent = renderer
         self.chunks = {}
+        self.blocks = {}
         self.position = (0 * 16, 0 * 16)
-        self.render_distance = 2
-        self.block_types = {"grass_block": GrassBlock(renderer), "dirt": DirtBlock(renderer)}
+        self.render_distance = 3
+        self.infgen_threshold = 1
+        self.block_types = all_blocks(renderer)
         self.to_generate = []
         self.player = player
 
@@ -31,6 +33,23 @@ class World:
                 if (i, j) not in self.chunks:
                     self.add_chunk((i, j))
 
+    def update_infgen(self, position):
+        player_pos = (position[0] // 16, position[2] // 16)
+
+        if player_pos[0] - self.position[0] > self.infgen_threshold:
+            self.position = (self.position[0] + 1, self.position[1])
+            self.generate()
+        elif player_pos[0] - self.position[0] < -self.infgen_threshold:
+            self.position = (self.position[0] - 1, self.position[1])
+            self.generate()
+        if player_pos[1] - self.position[1] > self.infgen_threshold:
+            self.position = (self.position[0], self.position[1] + 1)
+            self.generate()
+        elif player_pos[1] - self.position[1] < -self.infgen_threshold:
+            self.position = (self.position[0], self.position[1] - 1)
+            self.generate()
+
     def render(self):
         self.parent.render()
+        self.update_infgen(self.player.pos)
                     

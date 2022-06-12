@@ -10,7 +10,15 @@ class Generator:
         for i in range(x - 8, x + 8):
             for j in range(y - 8, y + 8):
                 noise = round(self.noise.noise2(i / 16, j / 16) * 10)
-                chunk.add_generated((i, noise, j), "grass_block")
+                noise_sand  = (self.noise.noise2(-i / 16, -j / 16) * 10) - 5
+                if not noise_sand > 0:
+                    chunk.add_generated((i, noise, j), "grass")
+                else:
+                    chunk.add_generated((i, noise, j), "sand")
 
-                for k in range(noise - 63, noise):
+                for k in range(noise - 3, noise):
                     chunk.add_generated((i, k, j), "dirt")
+
+                # stone 35 levels
+                for k in range(noise - 12, noise - 3):
+                    chunk.add_generated((i, k, j), "stone")
