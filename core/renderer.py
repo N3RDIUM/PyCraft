@@ -46,9 +46,9 @@ class TerrainRenderer:
 
         self.vbo, self.vbo_1 = glGenBuffers (2)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-        glBufferData(GL_ARRAY_BUFFER, 16000000, None, GL_STATIC_DRAW)
+        glBufferData(GL_ARRAY_BUFFER, 640000000, None, GL_STATIC_DRAW)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo_1)
-        glBufferData(GL_ARRAY_BUFFER, 16000000, None, GL_STATIC_DRAW)
+        glBufferData(GL_ARRAY_BUFFER, 640000000, None, GL_STATIC_DRAW)
         self.vbo_manager = VBOManager(self)
 
         self.texture_manager = TextureAtlas()
@@ -60,6 +60,7 @@ class TerrainRenderer:
         glEnableClientState (GL_VERTEX_ARRAY)
 
     def render(self):
+        self.to_add_count = round(len(self.to_add) / 32)
         self.vbo_manager.run()
 
         glClear (GL_COLOR_BUFFER_BIT)

@@ -25,15 +25,10 @@ glfw.make_context_current(window)
 renderer = TerrainRenderer(window)
 player = Player(window)
 
+glEnable (GL_LINE_SMOOTH)
 glEnable(GL_DEPTH_TEST)
 glEnable(GL_CULL_FACE)
 glCullFace(GL_BACK)
-#glEnable(GL_FOG)
-glFogfv(GL_FOG_COLOR, (GLfloat * int(8))(0.5, 0.69, 1.0, 10))
-glHint(GL_FOG_HINT, GL_DONT_CARE)
-glFogi(GL_FOG_MODE, GL_LINEAR)
-glFogf(GL_FOG_START, 3)
-glFogf(GL_FOG_END, 10)
 
 renderer.texture_manager.add_from_folder("assets/textures/block/")
 renderer.texture_manager.save("atlas.png")
@@ -41,6 +36,17 @@ renderer.texture_manager.bind()
 
 world = World(renderer, player)
 world.generate()
+
+glEnable(GL_FOG)
+glFogfv(GL_FOG_COLOR, (GLfloat *
+        int(world.render_distance*16))(0.5, 0.69, 1.0, 10))
+glFogfv(GL_FOG_COLOR, (GLfloat * int(world.render_distance*16))(0.5, 0.69, 1.0, 10))
+glHint(GL_FOG_HINT, GL_DONT_CARE)
+glFogi(GL_FOG_MODE, GL_LINEAR)
+glFogf(GL_FOG_START, world.render_distance*3)
+glFogf(GL_FOG_END, world.render_distance*4)
+glFogf(GL_FOG_START, world.render_distance*4)
+glFogf(GL_FOG_END, world.render_distance*5)
 
 # get window size
 def get_window_size():
