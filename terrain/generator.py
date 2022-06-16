@@ -16,9 +16,5 @@ class Generator:
                 else:
                     chunk.add_generated((i, noise, j), "sand")
 
-                for k in range(noise - 3, noise):
+                for k in range(noise - 8, noise):
                     chunk.add_generated((i, k, j), "dirt")
-
-                # stone 35 levels
-                for k in range(noise - 12, noise - 3):
-                    chunk.add_generated((i, k, j), "stone")
