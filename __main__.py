@@ -37,7 +37,7 @@ renderer.texture_manager.bind()
 world = World(renderer, player)
 world.generate()
 
-glEnable(GL_FOG)
+#glEnable(GL_FOG)
 glFogfv(GL_FOG_COLOR, (GLfloat *
         int(world.render_distance*16))(0.5, 0.69, 1.0, 10))
 glFogfv(GL_FOG_COLOR, (GLfloat * int(world.render_distance*16))(0.5, 0.69, 1.0, 10))
@@ -58,7 +58,10 @@ def _setup_3d():
 
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-    gluPerspective(70, w / h, 0.1, 1000)
+    try:
+        gluPerspective(70, w / h, 0.1, 1000)
+    except:
+        pass
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
 

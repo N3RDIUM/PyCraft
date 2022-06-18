@@ -12,13 +12,20 @@ class Chunk:
         self.blocks = {}
         self.position = (position[0] * 16, position[1] * 16)
 
-    def add_generated(self, position, type):
-        self.block_types[type].preload(position, self)
+        self._scheduled = []
+
+    def add_generated(self, position, type, storage):
+        self._scheduled.append(lambda: self.block_types[type].preload(position, self, storage))
         self.blocks[position] = type
         self.world.blocks[position] = type
 
     def block_exists(self, position):
         return position in self.blocks
 
-    def generate(self):
-        generator.generate(self, self.position)
+    def process(self,):
+        for i in range(len(self._scheduled)):
+            self._scheduled[i]()
+        self._scheduled = []
+
+    def generate(self, storage):
+        generator.generate(self, self.position, storage)

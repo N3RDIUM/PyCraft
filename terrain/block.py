@@ -19,21 +19,19 @@ class Block:
         self.renderer = renderer
         self.tex_coords = {}
         self.preloads = []
-        self.preloads_per_frame = 64
+        self.preloads_per_frame = 1
         self.preloaded = 0
         
         self.added_data = []
-        self.process_preloads_thread = threading.Thread(target=self.process_preloads, daemon=True)
-        self.process_preloads_thread.start()
 
-    def preload(self, position, chunk):
+    def preload(self, position, chunk, storage):
         """
         preload
         * Preloads the textures of the block
         """
-        self.preloads.append((position, chunk))
+        self.add(position, chunk, storage)
 
-    def add(self, position, chunk):
+    def add(self, position, chunk, storage):
         """
         add
         * Adds a block to the world
@@ -43,34 +41,18 @@ class Block:
         x, y, z = position
         X, Y, Z = (x + 1, y + 1, z + 1)
 
-        if not chunk.block_exists((x, Y, z)):
-            self.renderer.add((x, Y, Z,  X, Y, Z,  X, Y, z,  x, Y, z), self.tex_coords["top"])
-        if not chunk.block_exists((x, y - 1, z)):
-            self.renderer.add((x, y, z, X, y, z, X, y, Z, x, y, Z), self.tex_coords["bottom"])
-        if not chunk.block_exists((x - 1, y, z)):
-            self.renderer.add((x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z), self.tex_coords["left"])
-        if not chunk.block_exists((X, y, z)):
-            self.renderer.add((X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z), self.tex_coords["right"])
-        if not chunk.block_exists((x, y, Z)):
-            self.renderer.add((x, y, Z,  X, y, Z,  X, Y, Z,  x, Y, Z), self.tex_coords["front"])
-        if not chunk.block_exists((x, y, z - 1)):
-            self.renderer.add((X, y, z,  x, y, z,  x, Y, z,  X, Y, z), self.tex_coords["back"])
-
-    def process_preloads(self):
-        """
-        process_preloads
-        * Processes the preloads
-        """
-        while True:
-            try:
-                for i in range(self.preloads_per_frame):
-                    if len(self.preloads) > 0:
-                        random_index = random.randrange(0, len(self.preloads))
-                        position, chunk = self.preloads.pop(random_index)
-                        self.add(position, chunk)
-            except Exception as e:
-                pass
-            time.sleep(1/60000)
+        if not chunk.world.block_exists((x, Y, z)):
+            storage.add((x, Y, Z,  X, Y, Z,  X, Y, z,  x, Y, z), self.tex_coords["top"])
+        if not chunk.world.block_exists((x, y - 1, z)):
+            storage.add((x, y, z, X, y, z, X, y, Z, x, y, Z), self.tex_coords["bottom"])
+        if not chunk.world.block_exists((x - 1, y, z)):
+            storage.add((x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z), self.tex_coords["left"])
+        if not chunk.world.block_exists((X, y, z)):
+            storage.add((X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z), self.tex_coords["right"])
+        if not chunk.world.block_exists((x, y, Z)):
+            storage.add((x, y, Z,  X, y, Z,  X, Y, Z,  x, Y, Z), self.tex_coords["front"])
+        if not chunk.world.block_exists((x, y, z - 1)):
+            storage.add((X, y, z,  x, y, z,  x, Y, z,  X, Y, z), self.tex_coords["back"])
 
 def all_blocks(renderer):
     """
