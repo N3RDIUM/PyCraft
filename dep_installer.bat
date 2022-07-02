@@ -5,3 +5,7 @@ python -m pip install --upgrade PyShaders
 python -m pip install --upgrade tqdm
 python -m pip install --upgrade pyglm
 python -m pip install --upgrade ratcave
+python -m pip install --upgrade glfw
+python -m pip install --upgrade PyOpenGL
+python -m pip install --upgrade pillow
+python -m pip install --upgrade pygame
