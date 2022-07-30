@@ -72,6 +72,9 @@ class TextureAtlas:
             y / self.atlas_generator.texture_size,
         )
 
+    def get_texture(self, name):
+        return self.texture_coords[name + ".png"]
+
     def save(self, path):
         self.atlas_generator.save(path)
         self.save_path = path
@@ -102,6 +105,6 @@ class TextureAtlas:
 # example usage
 if __name__ == "__main__":
     atlas = TextureAtlas()
-    atlas.add_from_folder("assets/textures/block")
+    atlas.add_from_folder("assets/textures/block/")
     atlas.save("atlas.png")
     print(atlas.texture_coords)

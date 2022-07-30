@@ -113,6 +113,8 @@ class Player:
         self.vel[1] *= self.friction
         self.vel[2] *= self.friction
 
+        self._translate()
+
     def _translate(self):
         glRotatef(-self.rot[0], 1, 0, 0)
         glRotatef(-self.rot[1], 0, 1, 0)
