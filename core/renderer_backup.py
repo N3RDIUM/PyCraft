@@ -1,5 +1,5 @@
 # imports
-import glfw, numpy as np
+import glfw, numpy
 from OpenGL.GL import *
 from ctypes import *
 from core.texture_manager import *
@@ -13,40 +13,33 @@ class VBOManager:
     
     def run(self):
         for i in self.renderer.to_add[:self.renderer.to_add_count]:
-            print(i)
-            vertices = np.array(i[0], dtype=np.float32)
-            texCoords = np.array(i[1], dtype=np.float32)
-
-            # use glBufferSubData
-            glBindBuffer(GL_ARRAY_BUFFER, self.renderer.vbo)
-            glBufferData(GL_ARRAY_BUFFER, self.renderer.vertices.nbytes, vertices.nbytes, (c_float * len(vertices))(*vertices))
-            glFlush()
-            glVertexPointer(3, GL_FLOAT, 0, None)
-            glTexCoordPointer(3, GL_FLOAT, 0, None)
-            glBindBuffer(GL_ARRAY_BUFFER, self.renderer.vbo_1)
-            glBufferSubData(GL_ARRAY_BUFFER, self.renderer.texCoords.nbytes, texCoords.nbytes, (c_float * len(texCoords))(*texCoords))
-            glFlush()
-
             self.renderer.vertices.extend(i[0])
             self.renderer.texCoords.extend(i[1])
 
             self.renderer.to_add.remove(i)
 
+        glBindBuffer(GL_ARRAY_BUFFER, self.renderer.vbo)
+        glBufferData(GL_ARRAY_BUFFER, len(self.renderer.vertices) * 4, (c_float * len(self.renderer.vertices))(*self.renderer.vertices), GL_STATIC_DRAW)
+        glFlush()
+        glVertexPointer(3, GL_FLOAT, 0, None)
+        glTexCoordPointer(3, GL_FLOAT, 0, None)
+        glBindBuffer(GL_ARRAY_BUFFER, self.renderer.vbo_1)
+        glBufferData(GL_ARRAY_BUFFER, len(self.renderer.texCoords) * 4, (c_float * len(self.renderer.texCoords))(*self.renderer.texCoords), GL_STATIC_DRAW)
+        glFlush()
+
 class TerrainRenderer:
     def __init__(self, window):
         self.window = window
 
-        self.vertices = np.array([])
-        self.texCoords = np.array([])
+        self.vertices = []
+        self.texCoords = []
 
         self.to_add = []
         self.to_add_count = 256
 
         self.vbo, self.vbo_1 = glGenBuffers (2)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-        glBufferData(GL_ARRAY_BUFFER, 8*16*256*4, None, GL_STATIC_DRAW)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbo_1)
-        glBufferData(GL_ARRAY_BUFFER, 8*16*256*4, None, GL_STATIC_DRAW)
+        glBufferData(GL_ARRAY_BUFFER, 12 * 4, None, GL_STATIC_DRAW)
         self.vbo_manager = VBOManager(self)
 
         self.texture_manager = TextureAtlas()
@@ -78,8 +71,7 @@ class TerrainRenderer:
         glDisable(GL_BLEND)
 
     def add(self, posList, texCoords):
-        self.to_add.append((np.array(posList), np.array(texCoords)))
-        print(self.to_add[-1])
+        self.to_add.append((numpy.array(posList), numpy.array(texCoords)))
 
     def update_vbo(self):
         pass
