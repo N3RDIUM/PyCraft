@@ -2,8 +2,7 @@
 import logging
 
 # set up logging
-logging.basicConfig(level=logging.INFO)
-
+logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
 def log(source, message):
     """
@@ -63,3 +62,14 @@ def critical(source, message):
     :message: the message to log
     """
     logging.critical(f'(critical) [{source}]: {message}')
+
+def log_vertex_addition(data, bytes, total_length, left_to_add):
+    """
+    vertex_addition
+
+    * Logs an addition of vertex data to the VBO from the thread
+
+    :data: a tuple of the vertex data
+    :bytes: the number of bytes of the data
+    """
+    info('TerrainRenderer', f"Vertices: {data[1][:4]}@{bytes[0]} | TexCoords: {data[1][:4]}@{bytes[1]} | Total Length: {total_length} bytes | Scheduled: {left_to_add}")

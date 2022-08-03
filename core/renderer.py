@@ -5,6 +5,8 @@ from ctypes import *
 from core.texture_manager import *
 import threading
 import numpy as np
+from core.logger import *
+from constants import *
 
 glfw.init()
 
@@ -26,8 +28,9 @@ class TerrainRenderer:
         glEnable(GL_TEXTURE_2D)
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY)
-        glEnableClientState (GL_VERTEX_ARRAY)
+        if not USING_RENDERDOC:
+            glEnableClientState(GL_TEXTURE_COORD_ARRAY)
+            glEnableClientState (GL_VERTEX_ARRAY)
 
 
     def shared_context(self, window):
@@ -40,21 +43,28 @@ class TerrainRenderer:
             if len(self.to_add) > 0:
                 i = self.to_add.pop(0)
 
-                bytes_vertices = np.array(i[0]).nbytes
-                bytes_texCoords = np.array(i[1]).nbytes
+                vertices = np.array(i[0], dtype=np.float32)
+                texture_coords = np.array(i[1], dtype=np.float32)
+
+                bytes_vertices = vertices.nbytes
+                bytes_texCoords = texture_coords.nbytes
+
+                verts = (GLfloat * len(vertices))(*vertices)
+                texCoords = (GLfloat * len(texture_coords))(*texture_coords)
+
+                log_vertex_addition((vertices, texture_coords), (bytes_vertices, bytes_texCoords), self._len*4, len(self.to_add))
 
                 glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-                glBufferSubData(GL_ARRAY_BUFFER, self._len, bytes_vertices, (c_float * len(i[0]))(*i[0]))
-                glVertexPointer (3, GL_FLOAT, 0, None)
+                glBufferSubData(GL_ARRAY_BUFFER, self._len, bytes_vertices, verts)
+                if not USING_RENDERDOC:
+                    glVertexPointer (3, GL_FLOAT, 0, None)
                 glFlush()
                 
                 glBindBuffer(GL_ARRAY_BUFFER, self.vbo_1)
-                glBufferSubData(GL_ARRAY_BUFFER, self._len, bytes_texCoords, (c_float * len(i[1]))(*i[1]))
-                glTexCoordPointer(2, GL_FLOAT, 0, None)
+                glBufferSubData(GL_ARRAY_BUFFER, self._len, bytes_texCoords, texCoords)
+                if not USING_RENDERDOC:
+                    glTexCoordPointer(2, GL_FLOAT, 0, None)
                 glFlush()
-
-                glVertexPointer(3, GL_FLOAT, 0, None)
-                glTexCoordPointer(3, GL_FLOAT, 0, None)
 
                 self.vertices += i[0]
                 self.texCoords += i[1]
@@ -86,12 +96,16 @@ class TerrainRenderer:
 
         glEnable(GL_TEXTURE_2D)
         glEnable(GL_BLEND)
+
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glBindBuffer (GL_ARRAY_BUFFER, self.vbo)
-        glVertexPointer (3, GL_FLOAT, 0, None)
+        if not USING_RENDERDOC:
+            glVertexPointer (3, GL_FLOAT, 0, None)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo_1)
-        glTexCoordPointer(2, GL_FLOAT, 0, None)
+        if not USING_RENDERDOC:
+            glTexCoordPointer(2, GL_FLOAT, 0, None)
 
         glDrawArrays (GL_QUADS, 0, self._len)
+
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)
