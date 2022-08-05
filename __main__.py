@@ -52,7 +52,10 @@ if __name__ == "__main__":
 
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluPerspective(70, w / h, 0.1, 1000)
+        try:
+            gluPerspective(70, w / h, 0.1, 1000)
+        except ZeroDivisionError:
+            pass
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 
