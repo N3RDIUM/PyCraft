@@ -14,7 +14,8 @@ class TerrainRenderer:
     def __init__(self, window):
         self.event = threading.Event()
         self.to_add = []
-        self._len = 0
+        self._len  = 0
+        self._len_ = 0
 
         self.parent = window
 
@@ -29,9 +30,8 @@ class TerrainRenderer:
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         if not USING_RENDERDOC:
+            glEnableClientState(GL_VERTEX_ARRAY)
             glEnableClientState(GL_TEXTURE_COORD_ARRAY)
-            glEnableClientState (GL_VERTEX_ARRAY)
-
 
     def shared_context(self, window):
         glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
@@ -61,7 +61,7 @@ class TerrainRenderer:
                 glFlush()
                 
                 glBindBuffer(GL_ARRAY_BUFFER, self.vbo_1)
-                glBufferSubData(GL_ARRAY_BUFFER, self._len, bytes_texCoords, texCoords)
+                glBufferSubData(GL_ARRAY_BUFFER, self._len_, bytes_texCoords, texCoords)
                 if not USING_RENDERDOC:
                     glTexCoordPointer(2, GL_FLOAT, 0, None)
                 glFlush()
@@ -70,6 +70,7 @@ class TerrainRenderer:
                 self.texCoords += i[1]
                 
                 self._len += bytes_vertices
+                self._len_ += bytes_texCoords
 
             glfw.poll_events()
             glfw.swap_buffers(window2)
