@@ -21,7 +21,7 @@ from constants import *
 if not glfw.init():
     raise Exception("glfw can not be initialized!")
 
-def run():
+if __name__ == "__main__":
     window = glfw.create_window(800, 500, "PyCraft", None, None)
     glfw.make_context_current(window)
     renderer = TerrainRenderer(window)
@@ -87,6 +87,3 @@ def run():
         glfw.swap_buffers(window)
 
     glfw.terminate()
-
-if __name__ == "__main__":
-    run()
