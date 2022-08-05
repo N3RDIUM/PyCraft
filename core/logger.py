@@ -25,7 +25,7 @@ def info(source, message):
     :source: the source of the message
     :message: the message to log
     """
-    logging.info(f'(info) [{source}]: {message}')
+    logging.info(f'[{source}]: {message}')
 
 
 def warn(source, message):
@@ -37,7 +37,7 @@ def warn(source, message):
     :source: the source of the message
     :message: the message to log
     """
-    logging.warning(f'(warning) [{source}]: {message}')
+    logging.warning(f'[{source}]: {message}')
 
 
 def error(source, message):
@@ -49,7 +49,7 @@ def error(source, message):
     :source: the source of the message
     :message: the message to log
     """
-    logging.error(f'(error) [{source}]: {message}')
+    logging.error(f'[{source}]: {message}')
 
 
 def critical(source, message):
@@ -61,7 +61,7 @@ def critical(source, message):
     :source: the source of the message
     :message: the message to log
     """
-    logging.critical(f'(critical) [{source}]: {message}')
+    logging.critical(f'[{source}]: {message}')
 
 def log_vertex_addition(data, bytes, vertex_length, texcoord_length, left_to_add):
     """
