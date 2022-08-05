@@ -63,11 +63,11 @@ def run():
     def add_cube(x, y, z):
         X, Y, Z = x + 1, y + 1, z + 1
         renderer.add((x, Y, Z,  X, Y, Z,  X, Y, z,  x, Y, z), renderer.texture_manager.get_texture("grass"))
-        renderer.add((x, y, z, X, y, z, X, y, Z, x, y, Z), renderer.texture_manager.get_texture("grass"))
-        renderer.add((x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z), renderer.texture_manager.get_texture("grass"))
-        renderer.add((X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z), renderer.texture_manager.get_texture("grass"))
-        renderer.add((x, y, Z,  X, y, Z,  X, Y, Z,  x, Y, Z), renderer.texture_manager.get_texture("grass"))
-        renderer.add((X, y, z,  x, y, z,  x, Y, z,  X, Y, z), renderer.texture_manager.get_texture("grass"))
+        renderer.add((x, y, z, X, y, z, X, y, Z, x, y, Z), renderer.texture_manager.get_texture("dirt"))
+        renderer.add((x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z), renderer.texture_manager.get_texture("grass_side"))
+        renderer.add((X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z), renderer.texture_manager.get_texture("grass_side"))
+        renderer.add((x, y, Z,  X, y, Z,  X, Y, Z,  x, Y, Z), renderer.texture_manager.get_texture("grass_side"))
+        renderer.add((X, y, z,  x, y, z,  x, Y, z,  X, Y, z), renderer.texture_manager.get_texture("grass_side"))
 
     add_cube(0, 0, -2)
 
