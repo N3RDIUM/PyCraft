@@ -6,6 +6,7 @@ from core.texture_manager import *
 import threading
 import numpy as np
 from core.logger import *
+from core.fileutils import *
 from constants import *
 
 glfw.init()
@@ -13,7 +14,6 @@ glfw.init()
 class TerrainRenderer:
     def __init__(self, window):
         self.event = threading.Event()
-        self.to_add = []
         self._len  = 0
         self._len_ = 0
 
@@ -22,9 +22,11 @@ class TerrainRenderer:
         self.vertices = []
         self.texCoords = []
 
-        self.create_vbo(window)
-
         self.texture_manager = TextureAtlas()
+        self.listener        = ListenerBase("cache_vbo/", window)
+        self.writer          = WriterBase("cache_vbo/")
+
+        self.create_vbo(window)
 
         glEnable(GL_TEXTURE_2D)
         glEnable(GL_BLEND)
@@ -40,11 +42,11 @@ class TerrainRenderer:
         self.event.set()
 
         while not glfw.window_should_close(window):
-            if len(self.to_add) > 0:
-                i = self.to_add.pop(0)
+            if self.listener.get_queue_length() > 0:
+                i = self.listener.get_queue_item(0)
 
-                vertices = np.array(i[0], dtype=np.float32)
-                texture_coords = np.array(i[1], dtype=np.float32)
+                vertices = np.array(i["vertices"], dtype=np.float32)
+                texture_coords = np.array(i["texCoords"], dtype=np.float32)
 
                 bytes_vertices = vertices.nbytes
                 bytes_texCoords = texture_coords.nbytes
@@ -52,7 +54,7 @@ class TerrainRenderer:
                 verts = (GLfloat * len(vertices))(*vertices)
                 texCoords = (GLfloat * len(texture_coords))(*texture_coords)
 
-                log_vertex_addition((vertices, texture_coords), (bytes_vertices, bytes_texCoords), self._len*4, len(self.to_add))
+                log_vertex_addition((vertices, texture_coords), (bytes_vertices, bytes_texCoords), self._len*4, self._len_*4, self.listener.get_queue_length())
 
                 glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
                 glBufferSubData(GL_ARRAY_BUFFER, self._len, bytes_vertices, verts)
@@ -66,8 +68,8 @@ class TerrainRenderer:
                     glTexCoordPointer(2, GL_FLOAT, 0, None)
                 glFlush()
 
-                self.vertices += i[0]
-                self.texCoords += i[1]
+                self.vertices += tuple(vertices)
+                self.texCoords += tuple(texture_coords)
                 
                 self._len += bytes_vertices
                 self._len_ += bytes_texCoords
@@ -90,7 +92,10 @@ class TerrainRenderer:
         glfw.make_context_current(window)
 
     def add(self, vertices, texCoords):
-        self.to_add.append((tuple(vertices), tuple(texCoords)))
+        self.writer.write("AUTO", {
+            "vertices": vertices,
+            "texCoords": texCoords,
+        })
 
     def render(self):
         glClear (GL_COLOR_BUFFER_BIT)

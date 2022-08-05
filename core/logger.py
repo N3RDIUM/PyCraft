@@ -63,7 +63,7 @@ def critical(source, message):
     """
     logging.critical(f'(critical) [{source}]: {message}')
 
-def log_vertex_addition(data, bytes, total_length, left_to_add):
+def log_vertex_addition(data, bytes, vertex_length, texcoord_length, left_to_add):
     """
     vertex_addition
 
@@ -72,4 +72,4 @@ def log_vertex_addition(data, bytes, total_length, left_to_add):
     :data: a tuple of the vertex data
     :bytes: the number of bytes of the data
     """
-    info('TerrainRenderer', f"Vertices: {data[1][:4]}@{bytes[0]} | TexCoords: {data[1][:4]}@{bytes[1]} | Total Length: {total_length} bytes | Scheduled: {left_to_add}")
+    info('TerrainRenderer', f"Vertices@{bytes[0]} TexCoords@{bytes[1]} | vertex data: {vertex_length} bytes | texcoord data: {texcoord_length} bytes | Scheduled: {left_to_add}")

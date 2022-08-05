@@ -1,27 +1,34 @@
 import os
 import json
-import multiprocessing
+import threading
+import sys
+import glfw
+
+def print_from_process(string):
+    print(string)
+    sys.stdout.flush()
 
 class ListenerBase:
-    def __init__(self, directory):
+    def __init__(self, directory, window):
         self.directory = directory
-        self.process = multiprocessing.Process(target=self.listen)
-        self.queue = []
+        self.window = window
+        self.process = threading.Thread(target=self.listen)
         self.process.start()
+        self.queue = []
 
     def listen(self):
-        while True:
-            dir = os.listdir(self.directory)
-            for file in dir:
-                if file.endswith(".json"):
-                    filename = file.split(".json")[0]
-                    if not filename in self.queue:
-                        self.queue.append(filename)
+        while glfw.window_should_close(self.window) == 0:
+            try:
+                dir = os.listdir(self.directory)
+                self.queue = [i.split(".")[0] for i in dir]
+            except FileNotFoundError:
+                os.mkdir(self.directory)
 
     def get_queue_item(self, id):
         item = self.queue.pop(id)
         with open(self.directory + item + ".json", "r") as f:
             data = json.load(f)
+        os.remove(self.directory + item + ".json")
         return data
 
     def get_queue_length(self):
@@ -30,18 +37,11 @@ class ListenerBase:
 class WriterBase:
     def __init__(self, directory):
         self.directory = directory
-        self.process = multiprocessing.Process(target=self.write_process)
-        self.write_queue = []
-        self.process.start()
-
-    def write_process(self):
-        while True:
-            if len(self.write_queue) > 0:
-                item = self.write_queue.pop(0)
-                with open(self.directory + item[0] + ".json", "w") as f:
-                    json.dump(item[1], f)
-            else:
-                pass
+        self.written = 0
 
     def write(self, filename, data):
-        self.write_queue.append((filename, data))
+        if filename == "AUTO":
+            filename = str(self.written + 1)
+        with open(self.directory + filename + ".json", "w") as f:
+            json.dump(data, f)
+        self.written += 1
