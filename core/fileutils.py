@@ -24,6 +24,8 @@ class ListenerBase:
             except FileNotFoundError:
                 os.mkdir(self.directory)
 
+        os.rmdir(self.directory)
+
     def get_queue_item(self, id):
         item = self.queue.pop(id)
         with open(self.directory + item + ".json", "r") as f:
