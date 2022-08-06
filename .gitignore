@@ -132,3 +132,6 @@ dmypy.json
 
 # executables
 *.exe
+
+# Atlases
+atlas.png
