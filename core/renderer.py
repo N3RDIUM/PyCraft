@@ -12,12 +12,13 @@ from constants import *
 glfw.init()
 
 class TerrainRenderer:
-    def __init__(self, window):
+    def __init__(self, window, mode=GL_QUADS):
         self.event = threading.Event()
         self._len  = 0
         self._len_ = 0
 
         self.parent = window
+        self.mode = mode
 
         self.vertices  = []
         self.texCoords = []
@@ -121,7 +122,7 @@ class TerrainRenderer:
         if not USING_RENDERDOC:
             glTexCoordPointer(2, GL_FLOAT, 0, None)
 
-        glDrawArrays (GL_QUADS, 0, self._len)
+        glDrawArrays (self.mode, 0, self._len)
 
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)
