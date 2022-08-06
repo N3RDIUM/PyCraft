@@ -64,8 +64,11 @@ if __name__ == "__main__":
         _setup_3d()
         glViewport(0, 0, *get_window_size())
 
+    handler = BlockHandler()
+
     block = GrassBlock({
         "texture_manager": renderer.texture_manager,
+        "add_handler": handler,
     })
 
     storage = TerrainMeshStorage(renderer)
