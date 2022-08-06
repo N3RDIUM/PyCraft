@@ -19,7 +19,7 @@ class TerrainRenderer:
 
         self.parent = window
 
-        self.vertices = []
+        self.vertices  = []
         self.texCoords = []
 
         self.texture_manager = TextureAtlas()
@@ -74,9 +74,10 @@ class TerrainRenderer:
                     
                     self._len += bytes_vertices
                     self._len_ += bytes_texCoords
+
                 except Exception as e:
                     pass
-
+                
             glfw.poll_events()
             glfw.swap_buffers(window2)
         glfw.terminate()
@@ -99,6 +100,9 @@ class TerrainRenderer:
             "vertices": vertices,
             "texCoords": texCoords,
         })
+
+    def remove(self, vertices, texCoords):
+        raise NotImplementedError
 
     def add_mesh(self, storage):
         self.add(storage.vertices, storage.texCoords)
