@@ -137,3 +137,7 @@ class TerrainMeshStorage:
     def add(self, posList, texCoords):
         self.vertices.extend(posList)
         self.texCoords.extend(texCoords)
+
+    def clear(self):
+        self.vertices = []
+        self.texCoords = []

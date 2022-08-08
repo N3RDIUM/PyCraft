@@ -1,3 +1,5 @@
+import os
+import importlib
 import threading
 
 from models import cube, add_position
@@ -73,17 +75,22 @@ class BlockHandler:
         for i in self.blocks.values():
             i.process_to_add()
 
-# example block
-class GrassBlock(Block):
-    def __init__(self, data):
-        data["name"] = "grass"
-        super().__init__(data)
+def get_blocks(renderer):
+    ret = {
+        "handler": BlockHandler(),
+        "blocks":{}
+    }
 
-        self.texture_coords = {
-            "top": self.texture_manager.get_texture("grass"),
-            "bottom": self.texture_manager.get_texture("dirt"),
-            "left": self.texture_manager.get_texture("grass_side"),
-            "right": self.texture_manager.get_texture("grass_side"),
-            "front": self.texture_manager.get_texture("grass_side"),
-            "back": self.texture_manager.get_texture("grass_side"),
-        }
+    data = {
+        "texture_manager": renderer.texture_manager,
+        "add_handler": ret["handler"],
+    }
+
+    block_data = os.listdir("terrain/blocks/")
+    for i in block_data:
+        if i.endswith(".py") and i != "__init__.py":
+            importlib.import_module("terrain.blocks." + i[:-3])
+            block = importlib.import_module("terrain.blocks." + i[:-3])._block(data)
+            ret["blocks"][block.name] = block
+
+    return ret

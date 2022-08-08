@@ -15,7 +15,7 @@ from OpenGL.GLU import *
 
 # internal imports
 from core.renderer import *
-from terrain.block import *
+from terrain.chunk import *
 from player import *
 from constants import *
 
@@ -64,18 +64,8 @@ if __name__ == "__main__":
         _setup_3d()
         glViewport(0, 0, *get_window_size())
 
-    handler = BlockHandler()
-
-    block = GrassBlock({
-        "texture_manager": renderer.texture_manager,
-        "add_handler": handler,
-    })
-
-    storage = TerrainMeshStorage(renderer)
-
-    block.add_instance((0, 0, -5), storage)
-
-    renderer.add_mesh(storage)
+    chunk = Chunk((0, 0), renderer)
+    chunk.load()
 
     # mainloop
     while not glfw.window_should_close(window):
