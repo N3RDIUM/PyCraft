@@ -70,6 +70,12 @@ class TextureAtlas:
 
             (x + w) / self.atlas_generator.texture_size,
             y / self.atlas_generator.texture_size,
+
+            (x + w) / self.atlas_generator.texture_size,
+            (y - h) / self.atlas_generator.texture_size,
+
+            x / self.atlas_generator.texture_size,
+            y / self.atlas_generator.texture_size,
         )
 
     def get_texture(self, name):

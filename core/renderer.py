@@ -12,7 +12,7 @@ from constants import *
 glfw.init()
 
 class TerrainRenderer:
-    def __init__(self, window, mode=GL_QUADS):
+    def __init__(self, window, mode=GL_TRIANGLES):
         self.event = threading.Event()
         self._len  = 0
         self._len_ = 0
