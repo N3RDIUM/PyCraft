@@ -1,9 +1,12 @@
 import threading
+import opensimplex
 
 from terrain.block import *
 from core.renderer import *
 
 CHUNK_SIZE = 16
+
+NOISE = opensimplex.OpenSimplex(seed=69)
 
 class Chunk:
     def __init__(self, position, parent):
@@ -34,5 +37,6 @@ class Chunk:
         self.storage.clear()
 
     def generate_filament(self, x, y):
-        for i in range(-256, 0):
+        height_noise = round(NOISE.noise2(x / 16, y / 16) * 10)
+        for i in range(-256, height_noise):
             self._blocks[(x, i, y)] = 0
