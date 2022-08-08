@@ -1,9 +1,9 @@
 from terrain.block import *
 
 class _block(Block):
-    def __init__(self, data):
+    def __init__(self, data, id):
         data["name"] = "grass"
-        super().__init__(data)
+        super().__init__(data, id)
 
         self.texture_coords = {
             "top": self.texture_manager.get_texture("grass"),

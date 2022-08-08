@@ -5,14 +5,16 @@ import threading
 from models import cube, add_position
 
 class Block:
-    def __init__(self, data):
+    def __init__(self, data, id):
         self.data = data
+        self.id   = id
 
         self.to_add_quantity = 16
 
         self.texture_manager = data["texture_manager"]
         self.name            = data["name"]
         self.add_handler     = data["add_handler"]
+        self.parent          = data["parent"]
         self.add_handler.add(self)
 
         self.instances = []
@@ -29,24 +31,41 @@ class Block:
             "index_range": (), # Not implemented yet (Index range from the renderer's VBO)
         }
 
-        vertices = cube.vertices["top"]\
-            + cube.vertices["bottom"]\
-            + cube.vertices["left"]\
-            + cube.vertices["right"]\
-            + cube.vertices["front"]\
-            + cube.vertices["back"]
-        data["vertices"] = add_position(position, vertices)
+        x, y, z = position
 
-        tex_coords = self.texture_coords["top"]\
-            + self.texture_coords["bottom"]\
-            + self.texture_coords["left"]\
-            + self.texture_coords["right"]\
-            + self.texture_coords["front"]\
-            + self.texture_coords["back"]
+        vertices = []
+        tex_coords = []
+
+        chunk = self.parent
+
+        if not chunk.block_exists((x, y + 1, z)):
+            vertices.extend(cube.vertices["top"])
+            tex_coords.extend(self.texture_coords["top"])
+
+        if not chunk.block_exists((x, y - 1, z)):
+            vertices.extend(cube.vertices["bottom"])
+            tex_coords.extend(self.texture_coords["bottom"])
+
+        if not chunk.block_exists((x - 1, y, z)):
+            vertices.extend(cube.vertices["left"])
+            tex_coords.extend(self.texture_coords["left"])
+
+        if not chunk.block_exists((x + 1, y, z)):
+            vertices.extend(cube.vertices["right"])
+            tex_coords.extend(self.texture_coords["right"])
+
+        if not chunk.block_exists((x, y, z - 1)):
+            vertices.extend(cube.vertices["front"])
+            tex_coords.extend(self.texture_coords["front"])
+
+        if not chunk.block_exists((x, y, z + 1)):
+            vertices.extend(cube.vertices["back"])
+            tex_coords.extend(self.texture_coords["back"])
+            
+        data["vertices"] = add_position(position, vertices)
         data["tex_coords"] = tex_coords
 
         storage.add(data["vertices"], data["tex_coords"])
-
         self.instances.append(data)
 
     def remove_instance(self, position, storage):
@@ -75,7 +94,9 @@ class BlockHandler:
         for i in self.blocks.values():
             i.process_to_add()
 
-def get_blocks(renderer):
+blocks = {}
+
+def get_blocks(renderer, parent):
     ret = {
         "handler": BlockHandler(),
         "blocks":{}
@@ -84,13 +105,20 @@ def get_blocks(renderer):
     data = {
         "texture_manager": renderer.texture_manager,
         "add_handler": ret["handler"],
+        "parent": parent,
     }
 
     block_data = os.listdir("terrain/blocks/")
     for i in block_data:
         if i.endswith(".py") and i != "__init__.py":
             importlib.import_module("terrain.blocks." + i[:-3])
-            block = importlib.import_module("terrain.blocks." + i[:-3])._block(data)
-            ret["blocks"][block.name] = block
+            id = len(ret["blocks"])
+            block = importlib.import_module("terrain.blocks." + i[:-3])._block(data, id)
+            ret["blocks"][block.name] = [block, id]
+            ret["handler"].add(block)
+            blocks[id] = block
 
     return ret
+
+def get_block_by_id(id):
+    return blocks[id]

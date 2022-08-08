@@ -22,7 +22,7 @@ class Player:
         self.rot = [0, 0, 0]
         self.vel = [0, 0, 0]
         self.window = parent
-        self.speed = 0.0003
+        self.speed = 0.03
         self.friction = 0.9
 
         # lock mouse pointer
