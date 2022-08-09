@@ -11,6 +11,8 @@ from constants import *
 
 glfw.init()
 
+STEP = 1024
+
 class TerrainRenderer:
     def __init__(self, window, mode=GL_TRIANGLES):
         self.event = threading.Event()
@@ -106,7 +108,10 @@ class TerrainRenderer:
         raise NotImplementedError
 
     def add_mesh(self, storage):
-        self.add(storage.vertices, storage.texCoords)
+        to_add = storage._group()
+
+        for i in to_add:
+            self.add(i[0], i[1])
 
     def render(self):
         glClear (GL_COLOR_BUFFER_BIT)
@@ -135,9 +140,28 @@ class TerrainMeshStorage:
         self.texture_manager = renderer.texture_manager
     
     def add(self, posList, texCoords):
-        self.vertices.extend(posList)
-        self.texCoords.extend(texCoords)
+        self.vertices.append(posList)
+        self.texCoords.append(texCoords)
 
     def clear(self):
         self.vertices = []
         self.texCoords = []
+
+    def _group(self):
+        # Group vertices every STEP elements
+        to_add = []
+        for i in range(0, len(self.vertices), STEP):
+            verts = self.vertices[i:i+STEP]
+            tex = self.texCoords[i:i+STEP]
+
+            _verts = []
+            _tex = []
+
+            for i in verts:
+                _verts.extend(i)
+            for i in tex:
+                _tex.extend(i)
+
+            to_add.append((_verts, _tex))
+
+        return to_add

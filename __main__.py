@@ -15,7 +15,7 @@ from OpenGL.GLU import *
 
 # internal imports
 from core.renderer import *
-from terrain.chunk import *
+from terrain.world import *
 from player import *
 from constants import *
 
@@ -26,22 +26,23 @@ if __name__ == "__main__":
     window = glfw.create_window(800, 500, "PyCraft", None, None)
     glfw.make_context_current(window)
     renderer = TerrainRenderer(window)
-    player = Player(window)
 
     renderer.texture_manager.add_from_folder("assets/textures/block/")
     renderer.texture_manager.save("atlas.png")
     renderer.texture_manager.bind()
+
+    world = World(renderer)
 
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_CULL_FACE)
     glCullFace(GL_BACK)
     if not DEV_MODE and not USING_RENDERDOC:
         glEnable(GL_FOG)
-        glFogfv(GL_FOG_COLOR, (GLfloat * int(8))(0.5, 0.69, 1.0, 10))
+        glFogfv(GL_FOG_COLOR, (GLfloat * int(32))(0.5, 0.69, 1.0, 10))
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
-        glFogf(GL_FOG_START, 30)
-        glFogf(GL_FOG_END, 100)
+        glFogf(GL_FOG_START, CHUNK_SIZE)
+        glFogf(GL_FOG_END, (world.render_distance) * CHUNK_SIZE)
 
     # get window size
     def get_window_size():
@@ -64,19 +65,14 @@ if __name__ == "__main__":
         _setup_3d()
         glViewport(0, 0, *get_window_size())
 
-    chunk = Chunk((0, 0), renderer)
-    chunk.load()
-
     # mainloop
     while not glfw.window_should_close(window):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         if not USING_RENDERDOC:
             _update_3d()
         glClearColor(0.5, 0.7, 1, 1.0)
-
-        if not USING_RENDERDOC:
-            player.update()
-            
+        
+        world.drawcall()
         renderer.render()
 
         glfw.poll_events()
