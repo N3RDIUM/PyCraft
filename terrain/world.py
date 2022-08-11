@@ -14,8 +14,7 @@ class World:
         self.blocks = self.block_data["blocks"]
 
         self.chunks = {}
-        self.to_generate = []
-        self.render_distance = 2
+        self.render_distance = 1
         self.seed = 64
         self.thread = threading.Thread(target=self.generate, daemon=True)
         self.thread.start()
@@ -24,7 +23,6 @@ class World:
 
     def generate_chunk(self, position):
         self.chunks[position] = Chunk(position, self)
-        self.to_generate.append(position)
 
     def generate(self):
         for i in range(-self.render_distance, self.render_distance):
