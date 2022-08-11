@@ -8,10 +8,11 @@ import numpy as np
 from core.logger import *
 from core.fileutils import *
 from constants import *
+import time
 
 glfw.init()
 
-STEP = 1024
+STEP = 4096
 
 class TerrainRenderer:
     def __init__(self, window, mode=GL_TRIANGLES):
@@ -26,8 +27,8 @@ class TerrainRenderer:
         self.texCoords = []
 
         self.texture_manager = TextureAtlas()
-        self.listener        = ListenerBase("cache_vbo/", window)
-        self.writer          = WriterBase("cache_vbo/")
+        self.listener        = ListenerBase("cache/vbo/")
+        self.writer          = WriterBase("cache/vbo/")
 
         self.create_vbo(window)
 
@@ -38,6 +39,9 @@ class TerrainRenderer:
             glEnableClientState(GL_VERTEX_ARRAY)
             glEnableClientState(GL_TEXTURE_COORD_ARRAY)
 
+        self.fps = 0
+        self.timings = []
+
     def shared_context(self, window):
         glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
         window2 = glfw.create_window(500,500, "Window 2", None, window)
@@ -45,9 +49,9 @@ class TerrainRenderer:
         self.event.set()
 
         while not glfw.window_should_close(window2):
-            if self.listener.get_queue_length() > 0:
+            while not self.listener.get_queue_length() == 0:
                 try:
-                    i = self.listener.get_queue_item(0)
+                    i = self.listener.get_last_item()
 
                     vertices = np.array(i["vertices"], dtype=np.float32)
                     texture_coords = np.array(i["texCoords"], dtype=np.float32)
@@ -132,12 +136,18 @@ class TerrainRenderer:
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)
 
+        self.timings.append(time.time())
+        if len(self.timings) > 10:
+            self.timings.pop(0)
+            try:
+                self.fps = 1 / (self.timings[-1] - self.timings[0])
+            except:
+                self.fps = 0
+
 class TerrainMeshStorage:
-    def __init__(self, renderer):
+    def __init__(self):
         self.vertices = []
         self.texCoords = []
-        self.renderer = renderer
-        self.texture_manager = renderer.texture_manager
     
     def add(self, posList, texCoords):
         self.vertices.append(posList)
@@ -148,7 +158,6 @@ class TerrainMeshStorage:
         self.texCoords = []
 
     def _group(self):
-        # Group vertices every STEP elements
         to_add = []
         for i in range(0, len(self.vertices), STEP):
             verts = self.vertices[i:i+STEP]

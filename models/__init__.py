@@ -1,4 +1,5 @@
 from models.cube import *
+from models.slab import *
 
 def add_position(position, vertices):
     vertices = list(vertices)

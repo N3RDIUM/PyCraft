@@ -135,3 +135,6 @@ dmypy.json
 
 # Atlases
 atlas.png
+
+# PyCraft cache
+cache/

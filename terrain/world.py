@@ -7,18 +7,6 @@ from terrain.block import *
 from player.player import *
 from constants import *
 
-class ChunkGenerationThread(threading.Thread):
-    def __init__(self, parent):
-        threading.Thread.__init__(self, daemon=True)
-        self.parent = parent
-
-    def run(self):
-        while not glfw.window_should_close(self.parent.renderer.parent):
-            for i in self.parent.to_generate:
-                self.parent.chunks[i].generate()
-            self.parent.to_generate.clear()
-            time.sleep(1)
-
 class World:
     def __init__(self, parent):
         self.renderer = parent
@@ -27,11 +15,8 @@ class World:
 
         self.chunks = {}
         self.to_generate = []
-
-        self.generation_thread = ChunkGenerationThread(self)
-        self.generation_thread.start()
-
-        self.render_distance = 3
+        self.render_distance = 2
+        self.seed = 64
         self.thread = threading.Thread(target=self.generate, daemon=True)
         self.thread.start()
 

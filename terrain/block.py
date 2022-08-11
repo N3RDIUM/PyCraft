@@ -120,5 +120,16 @@ def get_blocks(renderer, parent):
 
     return ret
 
+def get_block_types(block_data = blocks):
+    # create a jsonifiable version of the blocks
+    ret = {}
+    for blocktype in block_data.values():
+        ret[blocktype[0].name] = {
+            "name": blocktype[0].name,
+            "id": blocktype[1],
+            "texture_coords": blocktype[0].texture_coords,
+        }
+    return ret
+
 def get_block_by_id(id):
     return blocks[id]
