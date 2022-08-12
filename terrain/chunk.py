@@ -34,7 +34,7 @@ class Chunk:
         data = self.listener.wait_read(f"chunk{encode_position(self.position)}")
         if data is not None:
             data = data["blocks"]
-            self.blocks = data["blocks"]
+            self.blocks = data
 
             blocktypes = get_block_types(self.blocks)
 
