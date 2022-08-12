@@ -51,7 +51,7 @@ class TerrainRenderer:
         while not glfw.window_should_close(window2):
             while not self.listener.get_queue_length() == 0:
                 try:
-                    i = self.listener.get_last_item()
+                    i = self.listener.get_first_item()
 
                     vertices = np.array(i["vertices"], dtype=np.float32)
                     texture_coords = np.array(i["texCoords"], dtype=np.float32)

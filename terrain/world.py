@@ -29,7 +29,7 @@ class World:
         self.thread = threading.Thread(target=self.generate, daemon=True)
         self.thread.start()
 
-        self.player = Player(parent.parent)
+        self.player = Player(self)
         self.to_generate = []
         self.generator_thread = ChunkGenerationThread(self)
         self.generator_thread.start()

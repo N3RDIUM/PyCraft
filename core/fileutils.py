@@ -45,8 +45,8 @@ class ListenerBase:
             except:
                 pass
 
-    def get_last_item(self):
-        return self.get_queue_item(self.queue[-1])
+    def get_first_item(self):
+        return self.get_queue_item(self.queue[0])
 
     def get_queue_length(self):
         return len(self.queue)
