@@ -1,11 +1,21 @@
 import threading
-import glfw
-import time
+import random
 
 from terrain.chunk import *
 from terrain.block import *
 from player.player import *
 from constants import *
+
+class ChunkGenerationThread(threading.Thread):
+    def __init__(self, parent):
+        threading.Thread.__init__(self, daemon=True)
+        self.parent = parent
+
+    def run(self):
+        while not glfw.window_should_close(self.parent.renderer.parent):
+            if len(self.parent.to_generate) > 0:
+                chunk = self.parent.chunks[self.parent.to_generate.pop()]
+                chunk.generate()
 
 class World:
     def __init__(self, parent):
@@ -14,15 +24,19 @@ class World:
         self.blocks = self.block_data["blocks"]
 
         self.chunks = {}
-        self.render_distance = 1
-        self.seed = 64
+        self.render_distance = 2
+        self.seed = random.randint(0, 1000000)
         self.thread = threading.Thread(target=self.generate, daemon=True)
         self.thread.start()
 
         self.player = Player(parent.parent)
+        self.to_generate = []
+        self.generator_thread = ChunkGenerationThread(self)
+        self.generator_thread.start()
 
     def generate_chunk(self, position):
         self.chunks[position] = Chunk(position, self)
+        self.to_generate.append(position)
 
     def generate(self):
         for i in range(-self.render_distance, self.render_distance):

@@ -1,5 +1,4 @@
 import subprocess
-import time
 
 from terrain.block import *
 from core.renderer import *
@@ -21,13 +20,12 @@ class Chunk:
         self.listener = ListenerBase('cache/generated/')
         self.writer   = WriterBase('cache/requested/')
         self.vbo_requester = WriterBase('cache/vbo_request/')
-        self.thread = threading.Thread(target=self.run, daemon=True)
-        self.thread.start()
 
     def block_exists(self, position):
+        position = encode_position(position)
         return position in self._blocks
 
-    def run(self):
+    def generate(self):
         self.writer.write(f"chunk{encode_position(self.position)}", {
             "position": encode_position(self.position),
             "seed": self.parent.seed,
@@ -36,10 +34,7 @@ class Chunk:
         data = self.listener.wait_read(f"chunk{encode_position(self.position)}")
         if data is not None:
             data = data["blocks"]
-            for index, block in data.items():
-                position = tuple(decode_position(index))
-                self._blocks[position] = block
-                del position
+            self.blocks = data["blocks"]
 
             blocktypes = get_block_types(self.blocks)
 
@@ -48,3 +43,4 @@ class Chunk:
                 "position": encode_position(self.position),
                 "block_types": blocktypes
             })
+            self._generated = True        
