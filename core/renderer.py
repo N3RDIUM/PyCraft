@@ -92,9 +92,9 @@ class TerrainRenderer:
     def create_vbo(self, window):
         self.vbo, self.vbo_1 = glGenBuffers (2)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-        glBufferData(GL_ARRAY_BUFFER, 64000000, None, GL_STATIC_DRAW)
+        glBufferData(GL_ARRAY_BUFFER, 640000000, None, GL_STATIC_DRAW)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo_1)
-        glBufferData(GL_ARRAY_BUFFER, 64000000, None, GL_STATIC_DRAW)
+        glBufferData(GL_ARRAY_BUFFER, 640000000, None, GL_STATIC_DRAW)
 
         glfw.make_context_current(None)
         thread = threading.Thread(target=self.shared_context, args=[window], daemon=True)
