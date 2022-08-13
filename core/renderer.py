@@ -12,7 +12,7 @@ import time
 
 glfw.init()
 
-STEP = 256
+STEP = 4096
 
 class TerrainRenderer:
     def __init__(self, window, mode=GL_TRIANGLES):
