@@ -1,7 +1,6 @@
 import os
 import json
 import threading
-import sys
 
 class ListenerBase:
     def __init__(self, directory):
