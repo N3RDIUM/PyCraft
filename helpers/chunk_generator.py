@@ -19,7 +19,7 @@ vbo_writer = WriterBase('cache/vbo_request/')
 
 def generate_filament(x, y, NOISE, _blocks):
     height_noise = abs(round(NOISE.noise2(x / 16, y / 16) * 10))
-    height_noise_low = -(abs(32 + round(NOISE.noise2(x / 16, y / 16) * 10)))
+    height_noise_low = -(abs(128 + round(NOISE.noise2(x / 16, y / 16) * 10)))
 
     dirt_noise = abs(5 + round(NOISE.noise2(x / 16, y / 16) * 20))
 
