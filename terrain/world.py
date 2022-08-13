@@ -24,7 +24,7 @@ class World:
         self.blocks = self.block_data["blocks"]
 
         self.chunks = {}
-        self.render_distance = 2
+        self.render_distance = 5
         self.seed = random.randint(0, 1000000)
         self.thread = threading.Thread(target=self.generate, daemon=True)
         self.thread.start()

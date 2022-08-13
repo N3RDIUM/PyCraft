@@ -15,6 +15,7 @@ except FileExistsError:
 
 listener = ListenerBase('cache/requested/')
 writer   = WriterBase('cache/generated/')
+vbo_writer = WriterBase('cache/vbo_request/')
 
 def generate_filament(x, y, NOISE, _blocks):
     height_noise = abs(round(NOISE.noise2(x / 16, y / 16) * 10))
@@ -50,6 +51,11 @@ while True:
                 blocks = generate_chunk(item['position'], item['seed'])
                 writer.write(f"chunk{item['position']}", {
                     'blocks': blocks
+                })
+                vbo_writer.write(f"chunk{item['position']}", {
+                    'blocks': blocks,
+                    'position': item['position'],
+                    'block_types': item['blocktypes']
                 })
         except ValueError:
             pass
