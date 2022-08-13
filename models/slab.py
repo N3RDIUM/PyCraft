@@ -1,5 +1,5 @@
 x, y, z = 0, 0, 0
-X, Y, Z = 1, 1, 1
+X, Y, Z = 1, 0.5, 1
 
 vertices = {
     "top": (x, Y, Z,  X, Y, Z,  X, Y, z,  x, Y, z, x, Y, Z, X, Y, z,),

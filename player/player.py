@@ -21,17 +21,17 @@ class Player:
         self.pos = [0, 0, 0]
         self.rot = [0, 0, 0]
         self.vel = [0, 0, 0]
-        self.window = parent
-        self.speed = 0.0003
+        self.parent = parent
+        self.speed = 0.03
         self.friction = 0.9
 
         # lock mouse pointer
         self.lock = True
-        glfw.set_input_mode(self.window, glfw.CURSOR, glfw.CURSOR_DISABLED)
+        glfw.set_input_mode(self.parent.renderer.parent, glfw.CURSOR, glfw.CURSOR_DISABLED)
 
         # dx and dy
-        self.position_previous = glfw.get_cursor_pos(self.window)
-        self.current_position = glfw.get_cursor_pos(self.window)
+        self.position_previous = glfw.get_cursor_pos(self.parent.renderer.parent)
+        self.current_position = glfw.get_cursor_pos(self.parent.renderer.parent)
 
     def mouse_motion(self, dx, dy):
         """
@@ -64,45 +64,45 @@ class Player:
         rotY = math.radians(-self.rot[1])
         dx, dz = math.sin(rotY), math.cos(rotY)
 
-        if glfw.get_key(self.window, glfw.KEY_W) == glfw.PRESS:
+        if glfw.get_key(self.parent.renderer.parent, glfw.KEY_W) == glfw.PRESS:
             self.vel[0] += dx*sens
             self.vel[2] -= dz*sens
-        if glfw.get_key(self.window, glfw.KEY_S) == glfw.PRESS:
+        if glfw.get_key(self.parent.renderer.parent, glfw.KEY_S) == glfw.PRESS:
             self.vel[0] -= dx*sens
             self.vel[2] += dz*sens
-        if glfw.get_key(self.window, glfw.KEY_A) == glfw.PRESS:
+        if glfw.get_key(self.parent.renderer.parent, glfw.KEY_A) == glfw.PRESS:
             self.vel[0] -= dz*sens
             self.vel[2] -= dx*sens
-        if glfw.get_key(self.window, glfw.KEY_D) == glfw.PRESS:
+        if glfw.get_key(self.parent.renderer.parent, glfw.KEY_D) == glfw.PRESS:
             self.vel[0] += dz*sens
             self.vel[2] += dx*sens
-        if glfw.get_key(self.window, glfw.KEY_LEFT_CONTROL) == glfw.PRESS:
+        if glfw.get_key(self.parent.renderer.parent, glfw.KEY_LEFT_CONTROL) == glfw.PRESS:
             self.speed = 0.05
         else:
             self.speed = 0.03
 
         # ESC to release mouse
-        if glfw.get_key(self.window, glfw.KEY_ESCAPE) == glfw.PRESS:
-            glfw.set_input_mode(self.window, glfw.CURSOR, glfw.CURSOR_NORMAL)
+        if glfw.get_key(self.parent.renderer.parent, glfw.KEY_ESCAPE) == glfw.PRESS:
+            glfw.set_input_mode(self.parent.renderer.parent, glfw.CURSOR, glfw.CURSOR_NORMAL)
             self.lock = False
         # L to lock mouse
-        if glfw.get_key(self.window, glfw.KEY_L) == glfw.PRESS:
-            glfw.set_input_mode(self.window, glfw.CURSOR, glfw.CURSOR_DISABLED)
+        if glfw.get_key(self.parent.renderer.parent, glfw.KEY_L) == glfw.PRESS:
+            glfw.set_input_mode(self.parent.renderer.parent, glfw.CURSOR, glfw.CURSOR_DISABLED)
             self.lock = True
         
         # mouse rotation: get dx and dy
         if self.lock:
-            self.current_position = glfw.get_cursor_pos(self.window)
+            self.current_position = glfw.get_cursor_pos(self.parent.renderer.parent)
             dx = self.current_position[0] - self.position_previous[0]
             dy = self.current_position[1] - self.position_previous[1]
             self.mouse_motion(dx, -dy)
             self.position_previous = self.current_position
 
         # SHIFT to fly down
-        if glfw.get_key(self.window, glfw.KEY_LEFT_SHIFT) == glfw.PRESS:
+        if glfw.get_key(self.parent.renderer.parent, glfw.KEY_LEFT_SHIFT) == glfw.PRESS:
             self.vel[1] -= 0.05
         # SPACE to fly up
-        if glfw.get_key(self.window, glfw.KEY_SPACE) == glfw.PRESS:
+        if glfw.get_key(self.parent.renderer.parent, glfw.KEY_SPACE) == glfw.PRESS:
             self.vel[1] += 0.05
 
         self.pos[0] += self.vel[0]

@@ -70,6 +70,12 @@ class TextureAtlas:
 
             (x + w) / self.atlas_generator.texture_size,
             y / self.atlas_generator.texture_size,
+
+            (x + w) / self.atlas_generator.texture_size,
+            (y - h) / self.atlas_generator.texture_size,
+
+            x / self.atlas_generator.texture_size,
+            y / self.atlas_generator.texture_size,
         )
 
     def get_texture(self, name):
@@ -99,7 +105,7 @@ class TextureAtlas:
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         return texid
 
 # example usage

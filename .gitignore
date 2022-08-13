@@ -132,3 +132,9 @@ dmypy.json
 
 # executables
 *.exe
+
+# Atlases
+atlas.png
+
+# PyCraft cache
+cache/
