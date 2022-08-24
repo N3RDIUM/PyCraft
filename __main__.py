@@ -16,6 +16,12 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import os
 import psutil
+import subprocess
+import sys
+
+flaskserver_helper = subprocess.Popen([sys.executable, 'helpers/flask_server.py'])
+chunk_helper = subprocess.Popen([sys.executable, 'helpers/chunk_generator.py'])
+vbo_helper = subprocess.Popen([sys.executable, 'helpers/vbo_writer.py'])
 
 current_system_pid = os.getpid()
 system = psutil.Process(current_system_pid)
@@ -47,15 +53,13 @@ if __name__ == "__main__":
     world = World(renderer)
 
     glEnable(GL_DEPTH_TEST)
-    glEnable(GL_CULL_FACE)
-    glCullFace(GL_BACK)
     if not DEV_MODE and not USING_RENDERDOC:
         glEnable(GL_FOG)
         glFogfv(GL_FOG_COLOR, (GLfloat * int(32))(0.5, 0.69, 1.0, 10))
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
-        glFogf(GL_FOG_START, CHUNK_SIZE*2)
-        glFogf(GL_FOG_END, (world.render_distance - 1) * CHUNK_SIZE)
+        glFogf(GL_FOG_START, CHUNK_SIZE)
+        glFogf(GL_FOG_END, (world.render_distance + 1) * CHUNK_SIZE)
 
     # get window size
     def get_window_size():
@@ -93,4 +97,10 @@ if __name__ == "__main__":
 
     glfw.terminate()
 
+    # kill helpers
+    flaskserver_helper.kill()
+    chunk_helper.kill()
+    vbo_helper.kill()
+
 system.terminate()
+exit()

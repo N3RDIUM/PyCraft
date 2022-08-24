@@ -62,7 +62,7 @@ class TerrainRenderer:
                     verts = (GLfloat * len(vertices))(*vertices)
                     texCoords = (GLfloat * len(texture_coords))(*texture_coords)
 
-                    log_vertex_addition((vertices, texture_coords), (bytes_vertices, bytes_texCoords), self._len*4, self._len_*4, self.listener.get_queue_length())
+                    # log_vertex_addition((vertices, texture_coords), (bytes_vertices, bytes_texCoords), self._len*4, self._len_*4, self.listener.get_queue_length())
 
                     glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
                     glBufferSubData(GL_ARRAY_BUFFER, self._len, bytes_vertices, verts)

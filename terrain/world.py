@@ -24,7 +24,7 @@ class World:
         self.blocks = self.block_data["blocks"]
 
         self.chunks = {}
-        self.render_distance = 5
+        self.render_distance = 2
         self.seed = random.randint(0, 1000000)
         self.thread = threading.Thread(target=self.generate, daemon=True)
         self.thread.start()
@@ -57,7 +57,7 @@ class World:
 
         # INFGEN
         position = (round(self.player.pos[0] // CHUNK_SIZE), round(self.player.pos[2] // CHUNK_SIZE))
-        for i in range(-self.render_distance + position[0], self.render_distance + position[0]):
-            for j in range(-self.render_distance + position[1], self.render_distance + position[1]):
+        for i in range(-self.render_distance-1 + position[0], self.render_distance+1 + position[0]):
+            for j in range(-self.render_distance-1 + position[1], self.render_distance+1 + position[1]):
                 if (i, j) not in self.chunks:
                     self.generate_chunk((i, j))

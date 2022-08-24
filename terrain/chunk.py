@@ -1,15 +1,9 @@
-import subprocess
-import sys
-
-
 from terrain.block import *
 from core.renderer import *
 from core.fileutils import *
 from core.util import *
 from constants import *
 
-chunk_helper = subprocess.Popen([sys.executable, 'helpers/chunk_generator.py'])
-vbo_helper = subprocess.Popen([sys.executable, 'helpers/vbo_writer.py'])
 
 class Chunk:
     def __init__(self, position, parent):
@@ -45,4 +39,5 @@ class Chunk:
         #         "position": encode_position(self.position),
         #         "block_types": blocktypes
         #     })
-        self._generated = True        
+        self._generated = True
+
