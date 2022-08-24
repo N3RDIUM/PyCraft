@@ -53,6 +53,7 @@ if __name__ == "__main__":
     world = World(renderer)
 
     glEnable(GL_DEPTH_TEST)
+    glEnable(GL_CULL_FACE)
     if not DEV_MODE and not USING_RENDERDOC:
         glEnable(GL_FOG)
         glFogfv(GL_FOG_COLOR, (GLfloat * int(32))(0.5, 0.69, 1.0, 10))
