@@ -85,8 +85,6 @@ class TerrainRenderer:
                 except Exception as e:
                     pass
                 
-            glfw.poll_events()
-            glfw.swap_buffers(window2)
         glfw.terminate()
 
     def create_vbo(self, window):
