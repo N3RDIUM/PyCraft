@@ -5,6 +5,7 @@ from terrain.chunk import *
 from terrain.block import *
 from player.player import *
 from constants import *
+from core.util import *
 
 class ChunkGenerationThread(threading.Thread):
     def __init__(self, parent):
@@ -24,18 +25,19 @@ class World:
         self.blocks = self.block_data["blocks"]
 
         self.chunks = {}
-        self.render_distance = 2
+        self.render_distance = 3
         self.seed = random.randint(0, 1000000)
-        self.thread = threading.Thread(target=self.generate, daemon=True)
-        self.thread.start()
 
         self.player = Player(self)
         self.to_generate = []
         self.generator_thread = ChunkGenerationThread(self)
         self.generator_thread.start()
 
+        self.generate()
+
     def generate_chunk(self, position):
-        self.chunks[position] = Chunk(position, self)
+        vbo_id = self.renderer.create_vbo(encode_position(position))
+        self.chunks[position] = Chunk(position, self, vbo_id)
         self.to_generate.append(position)
 
     def generate(self):
@@ -57,7 +59,12 @@ class World:
 
         # INFGEN
         position = (round(self.player.pos[0] // CHUNK_SIZE), round(self.player.pos[2] // CHUNK_SIZE))
+        positions = []
         for i in range(-self.render_distance-1 + position[0], self.render_distance+1 + position[0]):
             for j in range(-self.render_distance-1 + position[1], self.render_distance+1 + position[1]):
                 if (i, j) not in self.chunks:
                     self.generate_chunk((i, j))
+                    positions.append((i, j))
+
+        for chunk in self.chunks.values():
+            chunk._update(position)

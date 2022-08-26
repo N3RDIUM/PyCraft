@@ -89,6 +89,7 @@ if __name__ == "__main__":
         if not USING_RENDERDOC:
             _update_3d()
         glClearColor(0.5, 0.7, 1, 1.0)
+        glColor4f(1, 1, 1, 0)
         
         world.drawcall()
         renderer.render()

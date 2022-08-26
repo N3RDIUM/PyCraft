@@ -1,4 +1,4 @@
 # Constants
-DEV_MODE = False
+DEV_MODE = True
 USING_RENDERDOC = False
 CHUNK_SIZE = 16

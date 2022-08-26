@@ -100,6 +100,7 @@ while True:
 
                 for data_item in data:
                     writer.write("AUTO", {
+                        "id": item["vbo_id"],
                         "vertices": data_item[0],
                         "texCoords": data_item[1],
                     })

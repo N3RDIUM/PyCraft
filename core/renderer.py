@@ -1,5 +1,6 @@
 # imports
 import glfw
+import random
 from OpenGL.GL import *
 from ctypes import *
 from core.texture_manager import *
@@ -12,35 +13,63 @@ import time
 
 glfw.init()
 
-STEP = 4096
+STEP = 1024
+VERTICES_SIZE = 3200000
+TEXCOORDS_SIZE = 3200000
 
 class TerrainRenderer:
     def __init__(self, window, mode=GL_TRIANGLES):
         self.event = threading.Event()
-        self._len  = 0
-        self._len_ = 0
-
         self.parent = window
         self.mode = mode
-
-        self.vertices  = []
-        self.texCoords = []
-
+        self.vbos = {}
         self.texture_manager = TextureAtlas()
+        
         self.listener        = ListenerBase("cache/vbo/")
         self.writer          = WriterBase("cache/vbo/")
 
-        self.create_vbo(window)
+        self.fps = 0
+        self.timings = []
+
+        self.initialise(window)
 
         glEnable(GL_TEXTURE_2D)
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         if not USING_RENDERDOC:
             glEnableClientState(GL_VERTEX_ARRAY)
             glEnableClientState(GL_TEXTURE_COORD_ARRAY)
 
-        self.fps = 0
-        self.timings = []
+    def create_vbo(self, id):
+        vbo, vbo_1 = glGenBuffers (2)
+        glBindBuffer(GL_ARRAY_BUFFER, vbo)
+        glBufferData(GL_ARRAY_BUFFER, VERTICES_SIZE, None, GL_STATIC_DRAW)
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_1)
+        glBufferData(GL_ARRAY_BUFFER, TEXCOORDS_SIZE, None, GL_STATIC_DRAW)
+
+        self.vbos[id] = {
+            "vbo_vertex": vbo,
+            "vbo_texture": vbo_1,
+            "vertices": (),
+            "texCoords": (),
+            "render": True
+        }
+
+        return id
+
+    def delete_vbo(self, id):
+        vbo = self.vbos[id]
+        try:
+            glDeleteBuffers(GL_ARRAY_BUFFER, pointer(vbo["vbo_vertex"]))
+            glDeleteBuffers(GL_ARRAY_BUFFER, pointer(vbo["vbo_texture"]))
+        except:
+            pass
+        del self.vbos[id]
+
+    def initialise(self, window):
+        glfw.make_context_current(None)
+        thread = threading.Thread(target=self.shared_context, args=[window], daemon=True)
+        thread.start()
+        self.event.wait()
+        glfw.make_context_current(window)
 
     def shared_context(self, window):
         glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
@@ -49,56 +78,45 @@ class TerrainRenderer:
         self.event.set()
 
         while not glfw.window_should_close(window2):
-            while not self.listener.get_queue_length() == 0:
-                try:
-                    i = self.listener.get_first_item()
-
-                    vertices = np.array(i["vertices"], dtype=np.float32)
-                    texture_coords = np.array(i["texCoords"], dtype=np.float32)
-
-                    bytes_vertices = vertices.nbytes
-                    bytes_texCoords = texture_coords.nbytes
-
-                    verts = (GLfloat * len(vertices))(*vertices)
-                    texCoords = (GLfloat * len(texture_coords))(*texture_coords)
-
-                    # log_vertex_addition((vertices, texture_coords), (bytes_vertices, bytes_texCoords), self._len*4, self._len_*4, self.listener.get_queue_length())
-
-                    glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-                    glBufferSubData(GL_ARRAY_BUFFER, self._len, bytes_vertices, verts)
-                    if not USING_RENDERDOC:
-                        glVertexPointer (3, GL_FLOAT, 0, None)
-                    glFlush()
-                    
-                    glBindBuffer(GL_ARRAY_BUFFER, self.vbo_1)
-                    glBufferSubData(GL_ARRAY_BUFFER, self._len_, bytes_texCoords, texCoords)
-                    if not USING_RENDERDOC:
-                        glTexCoordPointer(2, GL_FLOAT, 0, None)
-                    glFlush()
-
-                    self.vertices += tuple(vertices)
-                    self.texCoords += tuple(texture_coords)
-                    
-                    self._len += bytes_vertices
-                    self._len_ += bytes_texCoords
-
-                except Exception as e:
+            try:
+                while self.listener.get_queue_length() == 0:
                     pass
+                time.sleep(0.1)
+                data = self.listener.get_first_item()
+                id   = data["id"]
+
+                vertices = np.array(data["vertices"], dtype=np.float32)
+                texture_coords = np.array(data["texCoords"], dtype=np.float32)
+
+                bytes_vertices = vertices.nbytes
+                bytes_texCoords = texture_coords.nbytes
+
+                verts = (GLfloat * len(vertices))(*vertices)
+                texCoords = (GLfloat * len(texture_coords))(*texture_coords)
+
+                vbo_dict = self.vbos[id]
+                vbo = vbo_dict["vbo_vertex"]
+                vbo_1 = vbo_dict["vbo_texture"]
+
+                glBindBuffer(GL_ARRAY_BUFFER, vbo)
+                glBufferSubData(GL_ARRAY_BUFFER, len(vbo_dict["vertices"])*4, bytes_vertices, verts)
+                if not USING_RENDERDOC:
+                    glVertexPointer (3, GL_FLOAT, 0, None)
+                glFlush()
                 
+                glBindBuffer(GL_ARRAY_BUFFER, vbo_1)
+                glBufferSubData(GL_ARRAY_BUFFER, len(vbo_dict["texCoords"])*4, bytes_texCoords, texCoords)
+                if not USING_RENDERDOC:
+                    glTexCoordPointer(2, GL_FLOAT, 0, None)
+                glFlush()
+
+                vbo_dict["vertices"] += tuple(vertices)
+                vbo_dict["texCoords"] += tuple(texture_coords)
+
+                # log_vertex_addition((vertices, texture_coords), (bytes_vertices, bytes_texCoords), len(vbo_dict["vertices"])*4, len(vbo_dict["texCoords"])*4, self.listener.get_queue_length())
+            except:
+                pass   
         glfw.terminate()
-
-    def create_vbo(self, window):
-        self.vbo, self.vbo_1 = glGenBuffers (2)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-        glBufferData(GL_ARRAY_BUFFER, 640000000, None, GL_STATIC_DRAW)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbo_1)
-        glBufferData(GL_ARRAY_BUFFER, 640000000, None, GL_STATIC_DRAW)
-
-        glfw.make_context_current(None)
-        thread = threading.Thread(target=self.shared_context, args=[window], daemon=True)
-        thread.start()
-        self.event.wait()
-        glfw.make_context_current(window)
 
     def add(self, vertices, texCoords):
         self.writer.write("AUTO", {
@@ -117,22 +135,19 @@ class TerrainRenderer:
 
     def render(self):
         glClear (GL_COLOR_BUFFER_BIT)
+        for vbo_data in self.vbos.values():
+            if vbo_data["render"]:
+                vbo = vbo_data["vbo_vertex"]
+                vbo_1 = vbo_data["vbo_texture"]
 
-        glEnable(GL_TEXTURE_2D)
-        glEnable(GL_BLEND)
+                glBindBuffer (GL_ARRAY_BUFFER, vbo)
+                if not USING_RENDERDOC:
+                    glVertexPointer (3, GL_FLOAT, 0, None)
+                glBindBuffer(GL_ARRAY_BUFFER, vbo_1)
+                if not USING_RENDERDOC:
+                    glTexCoordPointer(2, GL_FLOAT, 0, None)
 
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glBindBuffer (GL_ARRAY_BUFFER, self.vbo)
-        if not USING_RENDERDOC:
-            glVertexPointer (3, GL_FLOAT, 0, None)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbo_1)
-        if not USING_RENDERDOC:
-            glTexCoordPointer(2, GL_FLOAT, 0, None)
-
-        glDrawArrays (self.mode, 0, self._len)
-
-        glDisable(GL_TEXTURE_2D)
-        glDisable(GL_BLEND)
+                glDrawArrays (self.mode, 0, VERTICES_SIZE)
 
         self.timings.append(time.time())
         if len(self.timings) > 10:

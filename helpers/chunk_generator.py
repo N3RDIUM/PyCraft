@@ -50,13 +50,14 @@ while True:
             if item is not None:
                 blocks = generate_chunk(item['position'], item['seed'])
                 writer.write(f"chunk{item['position']}", {
-                    'blocks': blocks[0]
+                    'blocks': blocks[0],
                 })
                 vbo_writer.write(f"chunk{item['position']}", {
                     'blocks': blocks[0],
                     'simulated_blocks': blocks[1],
                     'position': item['position'],
-                    'block_types': item['blocktypes']
+                    'block_types': item['blocktypes'],
+                    "vbo_id": item['vbo_id']
                 })
         except ValueError:
             pass
