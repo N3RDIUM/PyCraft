@@ -13,9 +13,9 @@ import time
 
 glfw.init()
 
-STEP = 1024
-VERTICES_SIZE = 3200000
-TEXCOORDS_SIZE = 3200000
+STEP = 512
+VERTICES_SIZE = 256*16*16*24*3
+TEXCOORDS_SIZE = 256*16*16*24*2
 
 class TerrainRenderer:
     def __init__(self, window, mode=GL_TRIANGLES):

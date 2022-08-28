@@ -37,7 +37,7 @@ class Chunk:
 
     def _update(self, player_chunk):
         distance = math.dist(player_chunk, (self.position[0] / CHUNK_SIZE, self.position[1] / CHUNK_SIZE))
-        if distance > self.parent.render_distance - 1:
+        if distance > self.parent.render_distance // 2:
             self.parent.renderer.vbos[self.vbo_id]["render"] = False
         else:
             self.parent.renderer.vbos[self.vbo_id]["render"] = True
