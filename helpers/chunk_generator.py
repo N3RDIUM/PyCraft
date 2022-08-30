@@ -18,11 +18,11 @@ listener = ListenerBase('cache/requested/')
 writer   = WriterBase('cache/generated/')
 vbo_writer = WriterBase('cache/vbo_request/')
 
-def generate_filament(x, y, NOISE, _blocks):
+def generate_subchunk(x, y, NOISE, _blocks):
     if NOISE.noise2(x / 160, y / 160) < 0.5:
-        blockdata = plains.generate_filament(x, y, NOISE)
+        blockdata = plains.generate_subchunk(x, y, NOISE)
     else:
-        blockdata = desert.generate_filament(x, y, NOISE)
+        blockdata = desert.generate_subchunk(x, y, NOISE)
     
     if blockdata is not None:
         for position, data in blockdata.items():
@@ -37,9 +37,9 @@ def generate_chunk(position, seed):
     for i in range(-1, CHUNK_SIZE + 1):
         for j in range(-1, CHUNK_SIZE + 1):
             if not i == -1 and not i == CHUNK_SIZE and not j == -1 and not j == CHUNK_SIZE:
-                generate_filament(i + position[0], j + position[1], noise, _blocks)
+                generate_subchunk(i + position[0], j + position[1], noise, _blocks)
             else:
-                generate_filament(i + position[0], j + position[1], noise, _simulated_blocks)
+                generate_subchunk(i + position[0], j + position[1], noise, _simulated_blocks)
 
     return [_blocks, _simulated_blocks]
 

@@ -5,7 +5,7 @@ class DesertGenerator:
     def __init__(self):
         pass
 
-    def generate_filament(self, x, y, NOISE):
+    def generate_subchunk(self, x, y, NOISE):
         blockdata = {}
 
         height_noise = abs(round(lerp(smoothstep(NOISE.noise2(x / 160, y / 160)) / 2, NOISE.noise2(x / 1600, y / 1600) * 100, NOISE.noise2(x / 16, y / 16) * 64)))
