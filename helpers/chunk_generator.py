@@ -44,20 +44,19 @@ def generate_chunk(position, seed):
     return [_blocks, _simulated_blocks]
 
 while True:
-    for i in listener.queue:
-        try:
-            item = listener.get_queue_item(i)
-            if item is not None:
-                blocks = generate_chunk(item['position'], item['seed'])
-                writer.write(f"chunk{item['position']}", {
-                    'blocks': blocks[0],
-                })
-                vbo_writer.write(f"chunk{item['position']}", {
-                    'blocks': blocks[0],
-                    'simulated_blocks': blocks[1],
-                    'position': item['position'],
-                    'block_types': item['blocktypes'],
-                    "vbo_id": item['vbo_id']
-                })
-        except ValueError:
-            pass
+    try:
+        item = listener.get_random_item()
+        if item is not None:
+            blocks = generate_chunk(item['position'], item['seed'])
+            writer.write(f"chunk{item['position']}", {
+                'blocks': blocks[0],
+            })
+            vbo_writer.write(f"chunk{item['position']}", {
+                'blocks': blocks[0],
+                'simulated_blocks': blocks[1],
+                'position': item['position'],
+                'block_types': item['blocktypes'],
+                "vbo_id": item['vbo_id']
+            })
+    except ValueError:
+        pass
