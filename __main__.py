@@ -60,7 +60,7 @@ if __name__ == "__main__":
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
         glFogf(GL_FOG_START, CHUNK_SIZE)
-        glFogf(GL_FOG_END, (world.render_distance  // 2 + 1) * CHUNK_SIZE)
+        glFogf(GL_FOG_END, (world.render_distance) * CHUNK_SIZE + 1)
 
     # get window size
     def get_window_size():
