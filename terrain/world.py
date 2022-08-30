@@ -25,7 +25,7 @@ class World:
         self.blocks = self.block_data["blocks"]
 
         self.chunks = {}
-        self.render_distance = 3
+        self.render_distance = 5
         self.seed = random.randint(0, 1000000)
 
         self.player = Player(self)

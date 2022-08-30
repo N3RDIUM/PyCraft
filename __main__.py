@@ -16,8 +16,17 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import os
 import psutil
-import subprocess
 import sys
+import subprocess
+
+try:
+    shutil.rmtree("cache/")
+    os.mkdir("cache/")
+except FileNotFoundError:
+    os.mkdir("cache/")
+except FileExistsError:
+    sys.exit("Cache directory already exists, please delete it.")
+
 
 flaskserver_helper = subprocess.Popen([sys.executable, 'helpers/flask_server.py'])
 chunk_helper = subprocess.Popen([sys.executable, 'helpers/chunk_generator.py'])
@@ -25,12 +34,6 @@ vbo_helper = subprocess.Popen([sys.executable, 'helpers/vbo_writer.py'])
 
 current_system_pid = os.getpid()
 system = psutil.Process(current_system_pid)
-
-try:
-    os.mkdir("cache/")
-except FileExistsError:
-    shutil.rmtree("cache/")
-    os.mkdir("cache/")
 
 # internal imports
 from core.renderer import *
@@ -99,10 +102,15 @@ if __name__ == "__main__":
 
     glfw.terminate()
 
-    # kill helpers
-    flaskserver_helper.kill()
-    chunk_helper.kill()
-    vbo_helper.kill()
+# cleanup
+flaskserver_helper.terminate()
+chunk_helper.terminate()
+vbo_helper.terminate()
+
+try:
+    shutil.rmtree("cache/")
+except:
+    sys.exit("Cache directory could not be deleted. Please delete it manually.")
 
 system.terminate()
 exit()
