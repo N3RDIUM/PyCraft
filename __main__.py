@@ -17,7 +17,6 @@ from OpenGL.GLU import *
 import os
 import psutil
 import sys
-import subprocess
 
 try:
     shutil.rmtree("cache/")
@@ -27,17 +26,11 @@ except FileNotFoundError:
 except FileExistsError:
     sys.exit("Cache directory already exists, please delete it.")
 
-
-flaskserver_helper = subprocess.Popen([sys.executable, 'helpers/flask_server.py'])
-chunk_helper = subprocess.Popen([sys.executable, 'helpers/chunk_generator.py'])
-vbo_helper = subprocess.Popen([sys.executable, 'helpers/vbo_writer.py'])
-
 current_system_pid = os.getpid()
 system = psutil.Process(current_system_pid)
 
 # internal imports
 from core.renderer import *
-from terrain.world import *
 from player import *
 from constants import *
 
@@ -53,8 +46,6 @@ if __name__ == "__main__":
     renderer.texture_manager.save("atlas.png")
     renderer.texture_manager.bind()
 
-    world = World(renderer)
-
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_CULL_FACE)
     if not DEV_MODE and not USING_RENDERDOC:
@@ -63,7 +54,7 @@ if __name__ == "__main__":
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
         glFogf(GL_FOG_START, CHUNK_SIZE)
-        glFogf(GL_FOG_END, (world.render_distance) * CHUNK_SIZE + 1)
+        # glFogf(GL_FOG_END, (world.render_distance) * CHUNK_SIZE + 1)
 
     # get window size
     def get_window_size():
@@ -93,19 +84,12 @@ if __name__ == "__main__":
             _update_3d()
         glClearColor(0.5, 0.7, 1, 1.0)
         glColor4f(1, 1, 1, 0)
-        
-        world.drawcall()
         renderer.render()
 
         glfw.poll_events()
         glfw.swap_buffers(window)
 
     glfw.terminate()
-
-# cleanup
-flaskserver_helper.terminate()
-chunk_helper.terminate()
-vbo_helper.terminate()
 
 try:
     shutil.rmtree("cache/")
