@@ -15,9 +15,16 @@ import shutil
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import os
-import psutil
+import subprocess
 import sys
 
+# internal imports
+from core.renderer import *
+from player import *
+from constants import *
+from terrain.chunk import *
+
+# start helpers
 try:
     shutil.rmtree("cache/")
     os.mkdir("cache/")
@@ -26,13 +33,8 @@ except FileNotFoundError:
 except FileExistsError:
     sys.exit("Cache directory already exists, please delete it.")
 
-current_system_pid = os.getpid()
-system = psutil.Process(current_system_pid)
-
-# internal imports
-from core.renderer import *
-from player import *
-from constants import *
+chunk_generator = subprocess.Popen([sys.executable, "helpers/chunk_generator.py"])
+chunk_builder   = subprocess.Popen([sys.executable, "helpers/chunk_builder.py"])
 
 if not glfw.init():
     raise Exception("glfw can not be initialized!")
@@ -45,6 +47,8 @@ if __name__ == "__main__":
     renderer.texture_manager.add_from_folder("assets/textures/block/")
     renderer.texture_manager.save("atlas.png")
     renderer.texture_manager.bind()
+
+    chunk = Chunk(renderer, position=(0, 0))
 
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_CULL_FACE)
@@ -83,7 +87,8 @@ if __name__ == "__main__":
         if not USING_RENDERDOC:
             _update_3d()
         glClearColor(0.5, 0.7, 1, 1.0)
-        glColor4f(1, 1, 1, 0)
+
+        chunk._drawcall()
         renderer.render()
 
         glfw.poll_events()
@@ -91,10 +96,11 @@ if __name__ == "__main__":
 
     glfw.terminate()
 
+# end helpers
+chunk_generator.terminate()
+chunk_builder.terminate()
+
 try:
     shutil.rmtree("cache/")
 except:
     sys.exit("Cache directory could not be deleted. Please delete it manually.")
-
-system.terminate()
-exit()

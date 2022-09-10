@@ -5,7 +5,6 @@ import threading
 class ListenerBase:
     def __init__(self, directory):
         self.directory = directory
-        self.condition = None
         try:
             os.mkdir(self.directory)
         except FileExistsError:
@@ -15,22 +14,23 @@ class ListenerBase:
         self.queue = []
 
     def listen(self):
-        if self.condition == None:
-            while True:
+        while True:
+            try:
                 dir = os.listdir(self.directory)
                 self.queue = [i.split(".")[0] for i in dir]
-        else:
-            while not self.condition():
-                dir = os.listdir(self.directory)
-                self.queue = [i.split(".")[0] for i in dir]
-
-        os.rmdir(self.directory)
+            except FileNotFoundError:
+                pass
 
     def get_queue_item(self, id):
         try:
             item = self.queue[self.queue.index(id)]
             with open(self.directory + item + ".json", "r") as f:
-                data = json.load(f)
+                while True:
+                    try:
+                        data = json.load(f)
+                        break
+                    except json.decoder.JSONDecodeError:
+                        pass
             try:
                 os.remove(self.directory + item + ".json")
             except:
