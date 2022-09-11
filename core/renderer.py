@@ -8,6 +8,7 @@ import numpy as np
 from core.logger import *
 from core.fileutils import *
 from constants import *
+import time
 
 glfw.init()
 
@@ -60,53 +61,58 @@ class TerrainRenderer:
         self.event.set()
 
         while not glfw.window_should_close(window2):
-            if self.listener.get_queue_length() > 0:
-                i = self.listener.get_first_item()
-                id = i["id"]
-                data = self.vbos[id]
-                vbo = data["vbo"]
-                vbo_1 = data["vbo_1"]
-                _vertices = data["vertices"]
-                _texCoords = data["texCoords"]
-                _len = len(_vertices)
-                _len_ = len(_texCoords)
-                
-                vertices = np.array(i["vertices"], dtype=np.float32)
-                texture_coords = np.array(i["texCoords"], dtype=np.float32)
+            try:
+                if self.listener.get_queue_length() > 0:
+                    time.sleep(0.01)
+                    i = self.listener.get_first_item()
+                    id = i["id"]
+                    data = self.vbos[id]
+                    vbo = data["vbo"]
+                    vbo_1 = data["vbo_1"]
+                    _vertices = data["vertices"]
+                    _texCoords = data["texCoords"]
+                    _len = data["_len"]
+                    _len_ = data["_len_"]
+                    
+                    vertices = np.array(i["vertices"], dtype=np.float32)
+                    texture_coords = np.array(i["texCoords"], dtype=np.float32)
 
-                bytes_vertices = vertices.nbytes
-                bytes_texCoords = texture_coords.nbytes
+                    bytes_vertices = vertices.nbytes
+                    bytes_texCoords = texture_coords.nbytes
 
-                verts = (GLfloat * len(vertices))(*vertices)
-                texCoords = (GLfloat * len(texture_coords))(*texture_coords)
+                    verts = (GLfloat * len(vertices))(*vertices)
+                    texCoords = (GLfloat * len(texture_coords))(*texture_coords)
 
-                log_vertex_addition((vertices, texture_coords), (bytes_vertices, bytes_texCoords), _len*4, _len_*4, self.listener.get_queue_length())
+                    log_vertex_addition((vertices, texture_coords), (bytes_vertices, bytes_texCoords), _len*4, _len_*4, self.listener.get_queue_length())
 
-                glBindBuffer(GL_ARRAY_BUFFER, vbo)
-                glBufferSubData(GL_ARRAY_BUFFER, _len, bytes_vertices, verts)
-                if not USING_RENDERDOC:
-                    glVertexPointer (3, GL_FLOAT, 0, None)
-                glFlush()
-                
-                glBindBuffer(GL_ARRAY_BUFFER, vbo_1)
-                glBufferSubData(GL_ARRAY_BUFFER, _len_, bytes_texCoords, texCoords)
-                if not USING_RENDERDOC:
-                    glTexCoordPointer(2, GL_FLOAT, 0, None)
-                glFlush()
+                    glBindBuffer(GL_ARRAY_BUFFER, vbo)
+                    glBufferSubData(GL_ARRAY_BUFFER, _len, bytes_vertices, verts)
+                    if not USING_RENDERDOC:
+                        glVertexPointer (3, GL_FLOAT, 0, None)
+                    glFlush()
+                    
+                    glBindBuffer(GL_ARRAY_BUFFER, vbo_1)
+                    glBufferSubData(GL_ARRAY_BUFFER, _len_, bytes_texCoords, texCoords)
+                    if not USING_RENDERDOC:
+                        glTexCoordPointer(2, GL_FLOAT, 0, None)
+                    glFlush()
 
-                _vertices += tuple(vertices)
-                _texCoords += tuple(texture_coords)
-                
-                _len += bytes_vertices
-                _len_ += bytes_texCoords
+                    _vertices += tuple(vertices)
+                    _texCoords += tuple(texture_coords)
+                    
+                    _len += bytes_vertices
+                    _len_ += bytes_texCoords
 
-                data["_len"] = _len
-                data["_len_"] = _len_
-                data["vertices"] = _vertices
-                data["texCoords"] = _texCoords
-                
-            glfw.poll_events()
-            glfw.swap_buffers(window2)
+                    data["_len"] = _len
+                    data["_len_"] = _len_
+                    data["vertices"] = _vertices
+                    data["texCoords"] = _texCoords
+                    
+                    glfw.poll_events()
+                    glfw.swap_buffers(window2)
+            except:
+                pass
+        
         glfw.terminate()
 
     def init(self, window):
@@ -151,7 +157,7 @@ class TerrainRenderer:
                     glTexCoordPointer(2, GL_FLOAT, 0, None)
                 glFlush()
 
-                glDrawArrays(self.mode, 0, data["_len"]//4)
+                glDrawArrays(self.mode, 0, data["_len"] * 4)
 
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)

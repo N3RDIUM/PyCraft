@@ -27,11 +27,8 @@ from terrain.chunk import *
 # start helpers
 try:
     shutil.rmtree("cache/")
-    os.mkdir("cache/")
 except FileNotFoundError:
-    os.mkdir("cache/")
-except FileExistsError:
-    sys.exit("Cache directory already exists, please delete it.")
+    pass
 
 chunk_generator = subprocess.Popen([sys.executable, "helpers/chunk_generator.py"])
 chunk_builder   = subprocess.Popen([sys.executable, "helpers/chunk_builder.py"])

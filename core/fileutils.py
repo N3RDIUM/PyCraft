@@ -6,7 +6,7 @@ class ListenerBase:
     def __init__(self, directory):
         self.directory = directory
         try:
-            os.mkdir(self.directory)
+            os.makedirs(self.directory)
         except FileExistsError:
             pass
         self.process = threading.Thread(target=self.listen)
