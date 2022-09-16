@@ -28,12 +28,13 @@ class ChunkBuilder(ListenerBase):
         blocktypes       = data["blocktypes"]
         vbo_id           = data["id"]
         position         = data["position"]
+        position         = (position[0], position[1])
         blocks           = data["blocks"]
         simulated_blocks = data["simulated"]
         mesh = TerrainMeshStorage()
 
-        for position, blocktype in blocks.items():
-            x, y, z = decode_position(position)
+        for _position, blocktype in blocks.items():
+            x, y, z = decode_position(_position)
             vertices = blocktypes[blocktype]["model"]
             texture  = blocktypes[blocktype]["texture"]
 
@@ -52,11 +53,12 @@ class ChunkBuilder(ListenerBase):
 
         data = mesh._group()
 
-        for data_item in data:
-            self.writer.write("AUTO", {
+        for data_item in range(len(data) - 1):
+            _data_item = data[data_item]
+            self.writer.write("vbo_" + str(vbo_id) + "_part_" + str(data_item), {
                 "id": vbo_id,
-                "vertices": data_item[0],
-                "texCoords": data_item[1],
+                "vertices": _data_item[0],
+                "texCoords": _data_item[1],
             })
 
         log("ChunkBuilder", f"Chunk {position} has been built.")
@@ -66,8 +68,13 @@ if __name__ == "__main__":
         generator = ChunkBuilder()
         while True:
             if len(generator.queue) > 0:
-                time.sleep(0.1)
-                generator.on(generator.get_first_item())
+                try:
+                    time.sleep(1)
+                    generator.on(generator.get_first_item())
+                except PermissionError:
+                    pass
+                except IndexError:
+                    pass
     except FileNotFoundError:
         pass
     exit()

@@ -12,8 +12,8 @@ import time
 
 glfw.init()
 
-VERTICES_SIZE = 3200000
-TEXCOORDS_SIZE = 3200000
+VERTICES_SIZE = 256 * 16 * 16 * 8 * 24 * 3
+TEXCOORDS_SIZE = 256 * 16 * 16 * 8 * 24 * 2
 
 class TerrainRenderer:
     def __init__(self, window, mode=GL_TRIANGLES):
@@ -60,11 +60,11 @@ class TerrainRenderer:
         glfw.make_context_current(window2)
         self.event.set()
 
-        while not glfw.window_should_close(window2):
+        while not glfw.window_should_close(window):
             try:
+                time.sleep(0.04)
                 if self.listener.get_queue_length() > 0:
-                    time.sleep(0.01)
-                    i = self.listener.get_first_item()
+                    i = self.listener.get_random_item()[0]
                     id = i["id"]
                     data = self.vbos[id]
                     vbo = data["vbo"]
@@ -107,13 +107,13 @@ class TerrainRenderer:
                     data["_len_"] = _len_
                     data["vertices"] = _vertices
                     data["texCoords"] = _texCoords
-                    
-                    glfw.poll_events()
-                    glfw.swap_buffers(window2)
             except:
                 pass
-        
+            glfw.swap_buffers(window2)
         glfw.terminate()
+        self.event.set()
+        self.listener.thread.join()
+        del self.listener
 
     def init(self, window):
         glfw.make_context_current(None)

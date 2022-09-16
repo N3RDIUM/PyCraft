@@ -1,4 +1,4 @@
-STEP = 512
+STEP = 1024
 
 class TerrainMeshStorage:
     def __init__(self):

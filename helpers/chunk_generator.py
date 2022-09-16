@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 
 import opensimplex
@@ -23,6 +24,7 @@ class ChunkGenerator(ListenerBase):
         blocktypes = data["blocktypes"]
         vbo_id     = data["id"]
         position   = data["position"]
+        position   = position[0] * CHUNK_SIZE, position[1] * CHUNK_SIZE
         seed       = data["seed"]
 
         NOISE = opensimplex.OpenSimplex(seed)
@@ -49,7 +51,13 @@ if __name__ == "__main__":
         generator = ChunkGenerator()
         while True:
             if len(generator.queue) > 0:
-                generator.on(generator.get_first_item())
+                try:
+                    time.sleep(0.5)
+                    generator.on(generator.get_first_item())
+                except PermissionError:
+                    pass
+                except IndexError:
+                    pass
     except FileNotFoundError:
         pass
     exit()

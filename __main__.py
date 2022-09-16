@@ -16,13 +16,14 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import os
 import subprocess
+import psutil
 import sys
 
 # internal imports
 from core.renderer import *
 from player import *
 from constants import *
-from terrain.chunk import *
+from terrain.world import *
 
 # start helpers
 try:
@@ -30,8 +31,14 @@ try:
 except FileNotFoundError:
     pass
 
-chunk_generator = subprocess.Popen([sys.executable, "helpers/chunk_generator.py"])
-chunk_builder   = subprocess.Popen([sys.executable, "helpers/chunk_builder.py"])
+chunk_generators = []
+chunk_builders   = []
+
+for i in range(psutil.cpu_count()):
+    chunk_generator =  subprocess.Popen([sys.executable, "helpers/chunk_generator.py"])
+    chunk_generators.append(chunk_generator)
+    chunk_builder   =  subprocess.Popen([sys.executable, "helpers/chunk_builder.py"])
+    chunk_builders.append(chunk_builder)
 
 if not glfw.init():
     raise Exception("glfw can not be initialized!")
@@ -45,7 +52,7 @@ if __name__ == "__main__":
     renderer.texture_manager.save("atlas.png")
     renderer.texture_manager.bind()
 
-    chunk = Chunk(renderer, position=(0, 0))
+    world = World(renderer)
 
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_CULL_FACE)
@@ -55,7 +62,7 @@ if __name__ == "__main__":
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
         glFogf(GL_FOG_START, CHUNK_SIZE)
-        # glFogf(GL_FOG_END, (world.render_distance) * CHUNK_SIZE + 1)
+        glFogf(GL_FOG_END, (world.render_distance) * CHUNK_SIZE + 1)
 
     # get window size
     def get_window_size():
@@ -85,7 +92,7 @@ if __name__ == "__main__":
             _update_3d()
         glClearColor(0.5, 0.7, 1, 1.0)
 
-        chunk._drawcall()
+        world.drawcall()
         renderer.render()
 
         glfw.poll_events()
@@ -101,3 +108,5 @@ try:
     shutil.rmtree("cache/")
 except:
     sys.exit("Cache directory could not be deleted. Please delete it manually.")
+
+sys.exit(0)
