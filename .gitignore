@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *atlas.png
 
 # Byte-compiled / optimized / DLL files
@@ -138,3 +139,7 @@ atlas.png
 
 # PyCraft cache
 cache/
+=======
+# pycache folders
+__pycache__
+>>>>>>> origin/REMAKE
