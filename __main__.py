@@ -15,28 +15,30 @@ import shutil
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import os
-import psutil
 import subprocess
+import psutil
 import sys
-
-flaskserver_helper = subprocess.Popen([sys.executable, 'helpers/flask_server.py'])
-chunk_helper = subprocess.Popen([sys.executable, 'helpers/chunk_generator.py'])
-vbo_helper = subprocess.Popen([sys.executable, 'helpers/vbo_writer.py'])
-
-current_system_pid = os.getpid()
-system = psutil.Process(current_system_pid)
-
-try:
-    os.mkdir("cache/")
-except FileExistsError:
-    shutil.rmtree("cache/")
-    os.mkdir("cache/")
 
 # internal imports
 from core.renderer import *
-from terrain.world import *
 from player import *
 from constants import *
+from terrain.world import *
+
+# start helpers
+try:
+    shutil.rmtree("cache/")
+except FileNotFoundError:
+    pass
+
+chunk_generators = []
+chunk_builders   = []
+
+for i in range(psutil.cpu_count()):
+    chunk_generator =  subprocess.Popen([sys.executable, "helpers/chunk_generator.py"])
+    chunk_generators.append(chunk_generator)
+    chunk_builder   =  subprocess.Popen([sys.executable, "helpers/chunk_builder.py"])
+    chunk_builders.append(chunk_builder)
 
 if not glfw.init():
     raise Exception("glfw can not be initialized!")
@@ -89,7 +91,7 @@ if __name__ == "__main__":
         if not USING_RENDERDOC:
             _update_3d()
         glClearColor(0.5, 0.7, 1, 1.0)
-        
+
         world.drawcall()
         renderer.render()
 
@@ -98,10 +100,13 @@ if __name__ == "__main__":
 
     glfw.terminate()
 
-    # kill helpers
-    flaskserver_helper.kill()
-    chunk_helper.kill()
-    vbo_helper.kill()
+# end helpers
+chunk_generator.terminate()
+chunk_builder.terminate()
 
-system.terminate()
-exit()
+try:
+    shutil.rmtree("cache/")
+except:
+    sys.exit("Cache directory could not be deleted. Please delete it manually.")
+
+sys.exit(0)

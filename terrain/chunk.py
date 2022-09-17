@@ -1,43 +1,34 @@
 from terrain.block import *
-from core.renderer import *
-from core.fileutils import *
-from core.util import *
+from core.util import encode_position
+from player.player import Player
+from core.fileutils import WriterBase
+import math
 from constants import *
 
-
 class Chunk:
-    def __init__(self, position, parent):
-        self.position = (position[0] * CHUNK_SIZE, position[1] * CHUNK_SIZE)
+    def __init__(self, renderer, position, parent=None):
+        self.renderer = renderer
+        self.texture_manager = renderer.texture_manager
+        self.position = position
         self.parent = parent
-        self.block_data = dict(self.parent.block_data)
-        self.blocks = self.block_data["blocks"]
-        self._blocks = {}
-        self._generated = False
-        self.listener = ListenerBase('cache/generated/')
-        self.writer   = WriterBase('cache/requested/')
-        self.vbo_requester = WriterBase('cache/vbo_request/')
+        self.block_handler = parent.block_handler
+        self.writer = WriterBase("cache/chunk/")
+        self.vbo_id = encode_position(self.position)
+        self.renderer.create_vbo(self.vbo_id)
 
-    def block_exists(self, position):
-        position = encode_position(position)
-        return position in self._blocks
-
-    def generate(self):
-        blocktypes = get_block_types(self.blocks)
-        self.writer.write(f"chunk{encode_position(self.position)}", {
-            "position": encode_position(self.position),
-            "seed": self.parent.seed,
-            "blocktypes": blocktypes
+        # Request chunk generation from helper
+        self.writer.write(f"{encode_position(self.position)}", {
+            "id"          : self.vbo_id,
+            "position"    : list(self.position),
+            "blocktypes"  : self.block_handler.pack_blocks_to_json(),
+            "seed"        : self.parent.seed
         })
 
-        # data = self.listener.wait_read(f"chunk{encode_position(self.position)}")
-        # if data is not None:
-        #     data = data["blocks"]
-        #     self._blocks = data
+    def _drawcall(self):
+        player_position = self.parent.player.pos
+        player_chunk = (round(player_position[0] // CHUNK_SIZE), round(player_position[2] // CHUNK_SIZE))
 
-        #     self.vbo_requester.write(f"chunk{encode_position(self.position)}", {
-        #         "blocks": data,
-        #         "position": encode_position(self.position),
-        #         "block_types": blocktypes
-        #     })
-        self._generated = True
-
+        if math.dist((player_chunk[0], player_chunk[1]), (self.position[0], self.position[1])) > self.parent.render_distance // 2:
+            self.renderer.vbos[self.vbo_id]["render"] = False
+        else:
+            self.renderer.vbos[self.vbo_id]["render"] = True

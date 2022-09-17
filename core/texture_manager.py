@@ -1,5 +1,6 @@
 from OpenGL.GL import *
 from PIL import Image
+import pygame
 
 class TextureAtlasGenerator:
     def __init__(self, texture_size=32, n_textures = 100):
@@ -93,7 +94,6 @@ class TextureAtlas:
                 self.add(image, filename)
 
     def bind(self):
-        import pygame
         texSurface = pygame.image.load(self.save_path)
         texData = pygame.image.tostring(texSurface, "RGBA", 1)
         width = texSurface.get_width()

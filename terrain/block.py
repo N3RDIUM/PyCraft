@@ -1,135 +1,60 @@
 import os
-import importlib
-import threading
-
-from models import cube, add_position
+from importlib import util as importutil
+import sys
 
 class Block:
-    def __init__(self, data, id):
-        self.data = data
-        self.id   = id
-
-        self.to_add_quantity = 16
-
-        self.texture_manager = data["texture_manager"]
-        self.name            = data["name"]
-        self.add_handler     = data["add_handler"]
-        self.parent          = data["parent"]
-        self.add_handler.add(self)
-
-        self.instances = []
-        self.to_add    = []
-
-    def add(self, position, storage):
-        self.to_add.append((position, storage))
-
-    def add_instance(self, position, storage):
-        data = {
-            "position": position,
-            "vertices": (),
-            "tex_coords": (),
-            "index_range": (), # Not implemented yet (Index range from the renderer's VBO)
-        }
-
-        x, y, z = position
-
-        vertices = []
-        tex_coords = []
-
-        chunk = self.parent
-
-        if not chunk.block_exists((x, y + 1, z)):
-            vertices.extend(cube.vertices["top"])
-            tex_coords.extend(self.texture_coords["top"])
-
-        if not chunk.block_exists((x, y - 1, z)):
-            vertices.extend(cube.vertices["bottom"])
-            tex_coords.extend(self.texture_coords["bottom"])
-
-        if not chunk.block_exists((x - 1, y, z)):
-            vertices.extend(cube.vertices["left"])
-            tex_coords.extend(self.texture_coords["left"])
-
-        if not chunk.block_exists((x + 1, y, z)):
-            vertices.extend(cube.vertices["right"])
-            tex_coords.extend(self.texture_coords["right"])
-
-        if not chunk.block_exists((x, y, z - 1)):
-            vertices.extend(cube.vertices["front"])
-            tex_coords.extend(self.texture_coords["front"])
-
-        if not chunk.block_exists((x, y, z + 1)):
-            vertices.extend(cube.vertices["back"])
-            tex_coords.extend(self.texture_coords["back"])
-            
-        data["vertices"] = add_position(position, vertices)
-        data["tex_coords"] = tex_coords
-
-        storage.add(data["vertices"], data["tex_coords"])
-        self.instances.append(data)
-
-    def remove_instance(self, position, storage):
-        raise NotImplementedError
-
-    def process_to_add(self):
-        for i in range(self.to_add_quantity):
-            if len(self.to_add) == 0:
-                return
-            position, storage = self.to_add.pop(0)
-            self.add_instance(position, storage)
+    def __init__(self, texture_manager, *args, **kwargs):
+        self.texture_manager = texture_manager
+        self.name = kwargs["name"]
+        self.id = kwargs["id"]
+        self.texture = kwargs["texture"]
+        self.model = kwargs["model"]
 
 class BlockHandler:
-    def __init__(self):
+    def __init__(self, parent):
+        self.parent = parent
         self.blocks = {}
-        self.thread = threading.Thread(target=self.run, daemon=True)
-        self.thread.start()
 
-    def add(self, block):
-        self.blocks[block.name] = block
+        self.load_blocks_from_dir("terrain/blocks", {
+            "texture_manager": self.parent.texture_manager
+        })
+        
+    def register_block(self, block):
+        self.blocks[block.id] = block
 
-    def remove(self, block):
-        del self.blocks[block.name]
+    def get_block(self, id):
+        return self.blocks[id]
 
-    def run(self):
-        for i in self.blocks.values():
-            i.process_to_add()
+    def get_block_by_name(self, name):
+        for block in self.blocks.values():
+            if block.name == name:
+                return block
 
-blocks = {}
+    def get_block_by_id(self, id):
+        return self.blocks[id]
 
-def get_blocks(renderer, parent):
-    ret = {
-        "handler": BlockHandler(),
-        "blocks":{}
-    }
+    def load_blocks_from_dir(self, path, args):
+        blocks = os.listdir(path)
 
-    data = {
-        "texture_manager": renderer.texture_manager,
-        "add_handler": ret["handler"],
-        "parent": parent,
-    }
+        for block in blocks:
+            if block.endswith(".py") and not block.startswith("__"):
+                block = block[:-3]
+                spec = importutil.spec_from_file_location(block, f"{path}/{block}.py")
+                object = importutil.module_from_spec(spec)
+                sys.modules[spec.name] = object
+                spec.loader.exec_module(object)
+                
+                block = object.Block(**args)
+                self.register_block(block)
 
-    block_data = os.listdir("terrain/blocks/")
-    for i in block_data:
-        if i.endswith(".py") and i != "__init__.py":
-            importlib.import_module("terrain.blocks." + i[:-3])
-            id = len(ret["blocks"])
-            block = importlib.import_module("terrain.blocks." + i[:-3])._block(data, id)
-            ret["blocks"][block.name] = [block, id]
-            ret["handler"].add(block)
-            blocks[id] = block
+    def pack_blocks_to_json(self):
+        blocks = {}
+        for block in self.blocks.values():
+            blocks[block.id] = {
+                "name": block.name,
+                "texture": block.texture,
+                "model": block.model,
+                "id": block.id
+            }
 
-    return ret
-
-def get_block_types(block_data = blocks):
-    # create a jsonifiable version of the blocks
-    ret = {}
-    for blocktype in block_data.values():
-        ret[blocktype[0].name] = {
-            "name": blocktype[0].name,
-            "id": blocktype[1],
-            "texture_coords": blocktype[0].texture_coords,
-        }
-    return ret
-
-def get_block_by_id(id):
-    return blocks[id]
+        return blocks

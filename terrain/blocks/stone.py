@@ -1,15 +1,14 @@
-from terrain.block import *
+from terrain.block import Block
+from models.cube import vertices
 
-class _block(Block):
-    def __init__(self, data, id):
-        data["name"] = "stone"
-        super().__init__(data, id)
-
-        self.texture_coords = {
-            "top": self.texture_manager.get_texture("stone"),
-            "bottom": self.texture_manager.get_texture("stone"),
-            "left": self.texture_manager.get_texture("stone"),
-            "right": self.texture_manager.get_texture("stone"),
-            "front": self.texture_manager.get_texture("stone"),
-            "back": self.texture_manager.get_texture("stone"),
+class Block(Block):
+    def __init__(self, *args, **kwargs):
+        self.texture = {
+            "top": kwargs["texture_manager"].get_texture("stone"),
+            "bottom": kwargs["texture_manager"].get_texture("stone"),
+            "left": kwargs["texture_manager"].get_texture("stone"),
+            "right": kwargs["texture_manager"].get_texture("stone"),
+            "front": kwargs["texture_manager"].get_texture("stone"),
+            "back": kwargs["texture_manager"].get_texture("stone"),
         }
+        super().__init__(*args, **kwargs, name="stone", id="PyCraft:Stone", model=vertices, texture=self.texture)

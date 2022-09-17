@@ -1,38 +1,44 @@
 import os
 import json
 import threading
+import random
+import time
 
 class ListenerBase:
     def __init__(self, directory):
         self.directory = directory
-        self.condition = None
         try:
-            os.mkdir(self.directory)
+            os.makedirs(self.directory)
         except FileExistsError:
             pass
-        self.process = threading.Thread(target=self.listen)
-        self.process.start()
+        self.thread = threading.Thread(target=self.listen)
+        self.thread.start()
         self.queue = []
 
     def listen(self):
-        if self.condition == None:
-            while True:
+        while True:
+            try:
                 dir = os.listdir(self.directory)
                 self.queue = [i.split(".")[0] for i in dir]
-        else:
-            while not self.condition():
-                dir = os.listdir(self.directory)
-                self.queue = [i.split(".")[0] for i in dir]
+            except FileNotFoundError:
+                pass
 
-        os.rmdir(self.directory)
-
-    def get_queue_item(self, id):
+    def get_queue_item(self, id, no_delete = False):
         try:
             item = self.queue[self.queue.index(id)]
             with open(self.directory + item + ".json", "r") as f:
-                data = json.load(f)
+                tries = 8
+                while f.readable() and tries > 0:
+                    try:
+                        data = json.load(f)
+                        break
+                    except:
+                        tries -= 1
+                        time.sleep(0.01)
+                        continue
             try:
-                os.remove(self.directory + item + ".json")
+                if not no_delete:
+                    os.remove(self.directory + item + ".json")
             except:
                 pass
             return data
@@ -40,12 +46,31 @@ class ListenerBase:
             return None
         finally:
             try:
-                self.queue.remove(id)
+                if not no_delete:
+                    self.queue.remove(id)
             except:
                 pass
 
-    def get_first_item(self):
-        return self.get_queue_item(self.queue[0])
+    def get_random_item(self, no_delete = False):
+        _ = random.choice(self.queue)
+        return self.get_queue_item(_, no_delete), _
+
+    def delete(self, id):
+        try:
+            os.remove(self.directory + id + ".json")
+            self.queue.remove(id)
+        except:
+            pass
+
+    def get_first_item(self, no_delete = False):
+        return self.get_queue_item(self.queue[0], no_delete)
+
+    def remove_first_item(self):
+        try:
+            os.remove(self.directory + self.queue[0] + ".json")
+            self.queue.remove(self.queue[0])
+        except:
+            pass
 
     def get_queue_length(self):
         return len(self.queue)
@@ -71,11 +96,17 @@ class WriterBase:
         if not filename == "CUSTOM":
             if filename == "AUTO":
                 filename = str(self.written + 1)
+                while True:
+                    if os.path.exists(self.directory + filename + ".json"):
+                        filename = str(self.written + 1)
+                        self.written += 1
+                        break
             with open(self.directory + filename + ".json", "w") as f:
-                json.dump(data, f)
+                dat = json.dumps(data)
+                f.write(dat)
             self.written += 1
         else:
-            filename = str(self.written + 1)
             with open(self.directory + filename + ".json", "w") as f:
-                f.write(data)
+                dat = json.dumps(data)
+                f.write(dat)
             self.written += 1

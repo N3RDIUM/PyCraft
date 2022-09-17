@@ -1,62 +1,63 @@
 import sys
 import os
+import time
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
-
-from core.fileutils import *
-from core.util import *
-from constants import CHUNK_SIZE
-from helpers.biomes import *
 
 import opensimplex
 
-try:
-    os.mkdir("cache/")
-except FileExistsError:
-    pass
+from constants import *
+from terrain.biomes import *
+from core.util import encode_position
+from core.fileutils import ListenerBase, WriterBase
+from core.logger import *
 
-listener = ListenerBase('cache/requested/')
-writer   = WriterBase('cache/generated/')
-vbo_writer = WriterBase('cache/vbo_request/')
+class ChunkGenerator(ListenerBase):
+    def __init__(self):
+        log("ChunkGenerator", "Initializing...")
+        super().__init__("cache/chunk/")
+        self.writer = WriterBase("cache/chunk_build/")
 
-def generate_filament(x, y, NOISE, _blocks):
-    if NOISE.noise2(x / 160, y / 160) < 0.5:
-        blockdata = plains.generate_filament(x, y, NOISE)
-    else:
-        blockdata = desert.generate_filament(x, y, NOISE)
-    
-    if blockdata is not None:
-        for position, data in blockdata.items():
-            _blocks[position] = data
+    def on(self, data):
+        _simulated_blocks = {}
+        _blocks           = {}
 
+        blocktypes = data["blocktypes"]
+        vbo_id     = data["id"]
+        position   = data["position"]
+        position   = position[0] * CHUNK_SIZE, position[1] * CHUNK_SIZE
+        seed       = data["seed"]
 
-def generate_chunk(position, seed):
-    position = decode_position(position)
-    _blocks = {}
-    _simulated_blocks = {}
-    noise = opensimplex.OpenSimplex(seed=seed)
-    for i in range(-1, CHUNK_SIZE + 1):
-        for j in range(-1, CHUNK_SIZE + 1):
-            if not i == -1 and not i == CHUNK_SIZE and not j == -1 and not j == CHUNK_SIZE:
-                generate_filament(i + position[0], j + position[1], noise, _blocks)
-            else:
-                generate_filament(i + position[0], j + position[1], noise, _simulated_blocks)
+        NOISE = opensimplex.OpenSimplex(seed)
+        generator = PlainsGenerator()
 
-    return [_blocks, _simulated_blocks]
+        for x in range(position[0] - 1, position[1] + CHUNK_SIZE + 1):
+            for z in range(position[1] - 1, position[1] + CHUNK_SIZE + 1):
+                if x == position[0] - 1 or x == position[0] + CHUNK_SIZE or z == position[1] - 1 or z == position[1] + CHUNK_SIZE:
+                    generator.generate_subchunk((x, z), NOISE, _simulated_blocks)
+                else:
+                    generator.generate_subchunk((x, z), NOISE, _blocks)
 
-while True:
-    for i in listener.queue:
-        try:
-            item = listener.get_queue_item(i)
-            if item is not None:
-                blocks = generate_chunk(item['position'], item['seed'])
-                writer.write(f"chunk{item['position']}", {
-                    'blocks': blocks[0]
-                })
-                vbo_writer.write(f"chunk{item['position']}", {
-                    'blocks': blocks[0],
-                    'simulated_blocks': blocks[1],
-                    'position': item['position'],
-                    'block_types': item['blocktypes']
-                })
-        except ValueError:
-            pass
+        self.writer.write(encode_position(position), {
+            "id"          : vbo_id,
+            "position"    : position,
+            "blocktypes"  : blocktypes,
+            "blocks"      : _blocks,
+            "simulated"   : _simulated_blocks
+        })
+        log("ChunkGenerator", f"Generated chunk {position}")
+
+if __name__ == "__main__":
+    try:
+        generator = ChunkGenerator()
+        while True:
+            if len(generator.queue) > 0:
+                try:
+                    time.sleep(0.5)
+                    generator.on(generator.get_first_item())
+                except PermissionError:
+                    pass
+                except IndexError:
+                    pass
+    except FileNotFoundError:
+        pass
+    exit()
