@@ -10,12 +10,12 @@
 
 # imports
 import glfw
-import os
 import shutil
 from OpenGL.GL import *
 from OpenGL.GLU import *
-import os
+from core.logger import *
 import subprocess
+import multiprocessing
 import psutil
 import sys
 
@@ -31,10 +31,13 @@ try:
 except FileNotFoundError:
     pass
 
+if DEV_MODE:
+    warn("PyCraaft", "DEV_MODE is enabled. Please don't use this in production.")
+
 chunk_generators = []
 chunk_builders   = []
 
-for i in range(psutil.cpu_count()):
+for i in range(psutil.cpu_count()//4):
     chunk_generator =  subprocess.Popen([sys.executable, "helpers/chunk_generator.py"])
     chunk_generators.append(chunk_generator)
     chunk_builder   =  subprocess.Popen([sys.executable, "helpers/chunk_builder.py"])
@@ -61,8 +64,8 @@ if __name__ == "__main__":
         glFogfv(GL_FOG_COLOR, (GLfloat * int(32))(0.5, 0.69, 1.0, 10))
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
-        glFogf(GL_FOG_START, CHUNK_SIZE)
-        glFogf(GL_FOG_END, (world.render_distance) * CHUNK_SIZE + 1)
+        glFogf(GL_FOG_START, CHUNK_SIZE//2)
+        glFogf(GL_FOG_END, (world.render_distance) * CHUNK_SIZE//2 + 1)
 
     # get window size
     def get_window_size():
@@ -98,15 +101,32 @@ if __name__ == "__main__":
         glfw.poll_events()
         glfw.swap_buffers(window)
 
-    glfw.terminate()
+    try:
+        glfw.terminate()
+    except:
+        error("PyCraft", "Failed to terminate glfw!")
+        sys.exit("GLFW could not be terminated!")
 
-# end helpers
-chunk_generator.terminate()
-chunk_builder.terminate()
+    # end helpers
+    try:
+        # get all active child processes
+        active = multiprocessing.active_children()
 
-try:
-    shutil.rmtree("cache/")
-except:
-    sys.exit("Cache directory could not be deleted. Please delete it manually.")
+        for process in active:
+            process.terminate()
 
-sys.exit(0)
+        try:
+            for child in active:
+                child.kill()
+        except:
+            pass
+
+    except:
+        sys.exit("Helper processes could not be terminated. Please terminate them manually.")
+
+    try:
+        shutil.rmtree("cache/")
+    except:
+        sys.exit("Cache directory could not be deleted. Please delete it manually.")
+
+    sys.exit("PyCraft has been terminated.")

@@ -23,5 +23,3 @@ class Generator:
             else:
                 if cave_noise < 2/(height_noise - i):
                     blockdata[encode_position((x, i, y))] = "PyCraft:Stone"
-        
-        return blockdata

@@ -52,6 +52,7 @@ class TerrainRenderer:
             "vertices": (),
             "texCoords": (),
             "render": True,
+            "addition_history": []
         }
 
     def shared_context(self, window):
@@ -83,6 +84,12 @@ class TerrainRenderer:
                     verts = (GLfloat * len(vertices))(*vertices)
                     texCoords = (GLfloat * len(texture_coords))(*texture_coords)
 
+                    # Check if the data is already in the VBO
+                    if verts in data["addition_history"]:
+                        continue
+                    if texCoords in data["addition_history"]:
+                        continue                    
+
                     log_vertex_addition((vertices, texture_coords), (bytes_vertices, bytes_texCoords), _len*4, _len_*4, self.listener.get_queue_length())
 
                     glBindBuffer(GL_ARRAY_BUFFER, vbo)
@@ -107,6 +114,7 @@ class TerrainRenderer:
                     data["_len_"] = _len_
                     data["vertices"] = _vertices
                     data["texCoords"] = _texCoords
+                    data["addition_history"].append((vertices, texture_coords))
             except:
                 pass
             glfw.swap_buffers(window2)

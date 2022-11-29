@@ -18,33 +18,45 @@ class ChunkGenerator(ListenerBase):
         self.writer = WriterBase("cache/chunk_build/")
 
     def on(self, data):
-        _simulated_blocks = {}
-        _blocks           = {}
+        try:
+            _simulated_blocks = {}
+            _blocks           = {}
 
-        blocktypes = data["blocktypes"]
-        vbo_id     = data["id"]
-        position   = data["position"]
-        position   = position[0] * CHUNK_SIZE, position[1] * CHUNK_SIZE
-        seed       = data["seed"]
+            blocktypes = data["blocktypes"]
+            vbo_id     = data["id"]
+            position   = data["position"]
+            position   = [position[0] * CHUNK_SIZE, position[1] * CHUNK_SIZE]
+            seed       = data["seed"]
 
-        NOISE = opensimplex.OpenSimplex(seed)
-        generator = PlainsGenerator()
+            NOISE = opensimplex.OpenSimplex(seed)
+            generator = PlainsGenerator()
 
-        for x in range(position[0] - 1, position[1] + CHUNK_SIZE + 1):
-            for z in range(position[1] - 1, position[1] + CHUNK_SIZE + 1):
-                if x == position[0] - 1 or x == position[0] + CHUNK_SIZE or z == position[1] - 1 or z == position[1] + CHUNK_SIZE:
-                    generator.generate_subchunk((x, z), NOISE, _simulated_blocks)
-                else:
-                    generator.generate_subchunk((x, z), NOISE, _blocks)
+            for x in range(-1, CHUNK_SIZE + 1):
+                for z in range(-1, CHUNK_SIZE + 1):
+                    if x == -1 or x == CHUNK_SIZE or z == -1 or z == CHUNK_SIZE:
+                        pos = [
+                            position[0] + x,
+                            position[1] + z
+                        ]
+                        generator.generate_subchunk(pos, NOISE, _simulated_blocks)
+                    else:
+                        pos = [
+                            position[0] + x,
+                            position[1] + z
+                        ]
+                        generator.generate_subchunk(pos, NOISE, _blocks)
 
-        self.writer.write(encode_position(position), {
-            "id"          : vbo_id,
-            "position"    : position,
-            "blocktypes"  : blocktypes,
-            "blocks"      : _blocks,
-            "simulated"   : _simulated_blocks
-        })
-        log("ChunkGenerator", f"Generated chunk {position}")
+
+            self.writer.write(encode_position(position), {
+                "id"          : vbo_id,
+                "position"    : position,
+                "blocktypes"  : blocktypes,
+                "blocks"      : _blocks,
+                "simulated"   : _simulated_blocks
+            })
+            log("ChunkGenerator", f"Generated chunk {position}")
+        except:
+            pass
 
 if __name__ == "__main__":
     try:
@@ -57,6 +69,8 @@ if __name__ == "__main__":
                 except PermissionError:
                     pass
                 except IndexError:
+                    pass
+                except:
                     pass
     except FileNotFoundError:
         pass
