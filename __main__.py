@@ -16,7 +16,6 @@ from OpenGL.GLU import *
 from core.logger import *
 import subprocess
 import multiprocessing
-import psutil
 import sys
 
 # internal imports
@@ -32,15 +31,21 @@ except FileNotFoundError:
     pass
 
 if DEV_MODE:
-    warn("PyCraaft", "DEV_MODE is enabled. Please don't use this in production.")
+    warn("PyCraft", "DEV_MODE is enabled. Please don't use this in production.")
+if DISABLE_CHUNK_CULLING:
+    warn("PyCraft", "DISABLE_CHUNK_CULLING is enabled. This may cause significant FPS drops.")
 
 chunk_generators = []
-chunk_builders   = []
+chunk_builders = []
 
-for i in range(psutil.cpu_count()//4):
-    chunk_generator =  subprocess.Popen([sys.executable, "helpers/chunk_generator.py"])
+for i in range(multiprocessing.cpu_count() // 2):
+    chunk_generator = subprocess.Popen(
+        [sys.executable, "helpers/chunk_generator.py"])
     chunk_generators.append(chunk_generator)
-    chunk_builder   =  subprocess.Popen([sys.executable, "helpers/chunk_builder.py"])
+
+for i in range(multiprocessing.cpu_count() // 4):
+    chunk_builder = subprocess.Popen(
+        [sys.executable, "helpers/chunk_builder.py"])
     chunk_builders.append(chunk_builder)
 
 if not glfw.init():
@@ -64,8 +69,9 @@ if __name__ == "__main__":
         glFogfv(GL_FOG_COLOR, (GLfloat * int(32))(0.5, 0.69, 1.0, 10))
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         glFogi(GL_FOG_MODE, GL_LINEAR)
-        glFogf(GL_FOG_START, CHUNK_SIZE//2)
-        glFogf(GL_FOG_END, (world.render_distance) * CHUNK_SIZE//2 + 1)
+        glFogf(GL_FOG_START, CHUNK_SIZE//4)
+        distance = world.render_distance
+        glFogf(GL_FOG_END, (world.render_distance + 2)/4 * CHUNK_SIZE + 1)
 
     # get window size
     def get_window_size():
@@ -121,8 +127,14 @@ if __name__ == "__main__":
         except:
             pass
 
+        for process in active:
+            process.join()
+
+        for process in active:
+            process.close()
     except:
-        sys.exit("Helper processes could not be terminated. Please terminate them manually.")
+        sys.exit(
+            "Helper processes could not be terminated. Please terminate them manually.")
 
     try:
         shutil.rmtree("cache/")

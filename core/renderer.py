@@ -8,7 +8,6 @@ import numpy as np
 from core.logger import *
 from core.fileutils import *
 from constants import *
-import time
 
 glfw.init()
 
@@ -55,6 +54,19 @@ class TerrainRenderer:
             "addition_history": []
         }
 
+    def delete_vbo(self, id):
+        # Remove all data from the VBO
+        self.vbos[id]["_len"] = 0
+        self.vbos[id]["_len_"] = 0
+        self.vbos[id]["vertices"] = ()
+        self.vbos[id]["texCoords"] = ()
+        self.vbos[id]["addition_history"] = []
+
+        glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo"])
+        glBufferData(GL_ARRAY_BUFFER, VERTICES_SIZE, None, GL_DYNAMIC_DRAW)
+        glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo_1"])
+        glBufferData(GL_ARRAY_BUFFER, TEXCOORDS_SIZE, None, GL_DYNAMIC_DRAW)
+
     def shared_context(self, window):
         glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
         window2 = glfw.create_window(500,500, "Window 2", None, window)
@@ -63,7 +75,6 @@ class TerrainRenderer:
 
         while not glfw.window_should_close(window):
             try:
-                time.sleep(0.04)
                 if self.listener.get_queue_length() > 0:
                     i = self.listener.get_random_item()[0]
                     id = i["id"]

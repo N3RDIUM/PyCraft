@@ -27,15 +27,8 @@ class ListenerBase:
         try:
             item = self.queue[self.queue.index(id)]
             with open(self.directory + item + ".json", "r") as f:
-                tries = 8
-                while f.readable() and tries > 0:
-                    try:
-                        data = json.load(f)
-                        break
-                    except:
-                        tries -= 1
-                        time.sleep(0.01)
-                        continue
+                if f.readable():
+                    data = json.load(f)
             try:
                 if not no_delete:
                     os.remove(self.directory + item + ".json")

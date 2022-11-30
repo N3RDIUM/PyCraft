@@ -64,12 +64,7 @@ if __name__ == "__main__":
         while True:
             if len(generator.queue) > 0:
                 try:
-                    time.sleep(0.5)
-                    generator.on(generator.get_first_item())
-                except PermissionError:
-                    pass
-                except IndexError:
-                    pass
+                    generator.on(generator.get_random_item()[0])
                 except:
                     pass
     except FileNotFoundError:

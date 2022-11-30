@@ -44,4 +44,8 @@ class World:
                     positions.append((i, j))
 
         for chunk in self.chunks.values():
-            chunk._drawcall()
+            if chunk.position in positions:
+                chunk._drawcall()
+                positions.remove(chunk.position)
+            else:
+                chunk._dispose()

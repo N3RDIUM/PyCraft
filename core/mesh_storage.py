@@ -1,32 +1,23 @@
-STEP = 1024
+import multiprocessing
+STEP = 6400 * (multiprocessing.cpu_count() // 4)
 
 class TerrainMeshStorage:
     def __init__(self):
         self.vertices = []
         self.texCoords = []
-    
+        self.groups = []
+
     def add(self, posList, texCoords):
-        self.vertices.append(posList)
-        self.texCoords.append(texCoords)
+        self.vertices.extend(posList)
+        self.texCoords.extend(texCoords)
+
+        if len(self.vertices) >= STEP:
+            self.groups.append((self.vertices, self.texCoords))
+            self.clear()
 
     def clear(self):
         self.vertices = []
         self.texCoords = []
 
     def _group(self):
-        to_add = []
-        for i in range(0, len(self.vertices), STEP):
-            verts = self.vertices[i:i+STEP]
-            tex = self.texCoords[i:i+STEP]
-
-            _verts = []
-            _tex = []
-
-            for i in verts:
-                _verts.extend(i)
-            for i in tex:
-                _tex.extend(i)
-
-            to_add.append((_verts, _tex))
-
-        return to_add
+        return self.groups + [(self.vertices, self.texCoords)]

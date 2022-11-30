@@ -2,7 +2,6 @@ import sys
 import os
 import time
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
-
 from core.util import decode_position, encode_position
 from core.fileutils import ListenerBase, WriterBase
 from core.logger import *
@@ -73,12 +72,7 @@ if __name__ == "__main__":
         while True:
             if len(generator.queue) > 0:
                 try:
-                    time.sleep(1)
-                    generator.on(generator.get_first_item())
-                except PermissionError:
-                    pass
-                except IndexError:
-                    pass
+                    generator.on(generator.get_random_item()[0])
                 except:
                     pass
     except FileNotFoundError:
