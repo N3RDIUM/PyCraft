@@ -13,6 +13,7 @@ class ChunkBuilder(ListenerBase):
         log("ChunkBuilder", "Initializing...")
         super().__init__("cache/chunk_build/")
         self.writer = WriterBase("cache/vbo/")
+        self.flask_writer = WriterBase("cache/flask/")
 
     @staticmethod
     def block_exists(dict1, dict2, position):
@@ -63,6 +64,16 @@ class ChunkBuilder(ListenerBase):
                 })
 
             log("ChunkBuilder", f"Chunk {position} has been built.")
+
+            self.flask_writer.write(encode_position(position), {
+                "id": vbo_id,
+                "position": list(position),
+                "blocktypes": blocktypes,
+                "seed": data["seed"],
+                "blocks": blocks,
+                "simulated": simulated_blocks,
+            })
+            log("ChunkBuilder", f"Chunk {position} has been transferred to the Flask ferver frocess.")        
         except:
             pass
 

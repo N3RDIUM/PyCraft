@@ -1,5 +1,5 @@
 import random
-import math
+from core.logger import *
 from terrain.chunk import *
 from terrain.block import *
 from player.player import *
@@ -41,11 +41,15 @@ class World:
             for j in range(-self.render_distance + position[1], self.render_distance + position[1]):
                 if (i, j) not in self.chunks:
                     self.generate_chunk((i, j))
-                    positions.append((i, j))
+                positions.append((i, j))
 
+        to_delete = []
         for chunk in self.chunks.values():
             if chunk.position in positions:
                 chunk._drawcall()
-                positions.remove(chunk.position)
             else:
                 chunk._dispose()
+                to_delete.append(chunk.position)
+        
+        for position in to_delete:
+            del self.chunks[position]

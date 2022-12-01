@@ -8,8 +8,8 @@ class Generator:
     def generate_subchunk(self, position, NOISE, blockdata):
         x, y = position
 
-        height_noise = abs(round(lerp(smoothstep(NOISE.noise2(x / 160, y / 160)) / 2, NOISE.noise2(x / 1600, y / 1600) * 100, NOISE.noise2(x / 16, y / 16) * 64)))
-        height_noise_low = -(abs(256 // 3 * 2 + round(NOISE.noise2(x / 16, y / 16) * 10)))
+        height_noise = round(lerp(smoothstep(NOISE.noise2(x / 160, y / 160)) / 2, NOISE.noise2(x / 1600, y / 1600) * 100, NOISE.noise2(x / 16, y / 16) * 64))
+        height_noise_low = -256
 
         dirt_noise = abs(5 + round(NOISE.noise2(x / 16, y / 16) * 20))
 

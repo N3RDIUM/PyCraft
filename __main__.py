@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_CULL_FACE)
-    if not DEV_MODE and not USING_RENDERDOC:
+    if not DEV_MODE and not USING_GRAPHICS_DEBUGGER:
         glEnable(GL_FOG)
         glFogfv(GL_FOG_COLOR, (GLfloat * int(32))(0.5, 0.69, 1.0, 10))
         glHint(GL_FOG_HINT, GL_DONT_CARE)
@@ -97,7 +97,7 @@ if __name__ == "__main__":
     # mainloop
     while not glfw.window_should_close(window):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        if not USING_RENDERDOC:
+        if not USING_GRAPHICS_DEBUGGER:
             _update_3d()
         glClearColor(0.5, 0.7, 1, 1.0)
 

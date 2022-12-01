@@ -33,7 +33,7 @@ class TerrainRenderer:
         glEnable(GL_TEXTURE_2D)
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        if not USING_RENDERDOC:
+        if not USING_GRAPHICS_DEBUGGER:
             glEnableClientState(GL_VERTEX_ARRAY)
             glEnableClientState(GL_TEXTURE_COORD_ARRAY)
     
@@ -66,6 +66,11 @@ class TerrainRenderer:
         glBufferData(GL_ARRAY_BUFFER, VERTICES_SIZE, None, GL_DYNAMIC_DRAW)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo_1"])
         glBufferData(GL_ARRAY_BUFFER, TEXCOORDS_SIZE, None, GL_DYNAMIC_DRAW)
+
+        glDeleteBuffers(2, [self.vbos[id]["vbo"], self.vbos[id]["vbo_1"]])
+
+        del self.vbos[id]
+        info("TerrainRenderer", "Deleted VBO: " + id)
 
     def shared_context(self, window):
         glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
@@ -105,13 +110,13 @@ class TerrainRenderer:
 
                     glBindBuffer(GL_ARRAY_BUFFER, vbo)
                     glBufferSubData(GL_ARRAY_BUFFER, _len, bytes_vertices, verts)
-                    if not USING_RENDERDOC:
+                    if not USING_GRAPHICS_DEBUGGER:
                         glVertexPointer (3, GL_FLOAT, 0, None)
                     glFlush()
                     
                     glBindBuffer(GL_ARRAY_BUFFER, vbo_1)
                     glBufferSubData(GL_ARRAY_BUFFER, _len_, bytes_texCoords, texCoords)
-                    if not USING_RENDERDOC:
+                    if not USING_GRAPHICS_DEBUGGER:
                         glTexCoordPointer(2, GL_FLOAT, 0, None)
                     glFlush()
 
@@ -167,16 +172,16 @@ class TerrainRenderer:
         for data in self.vbos.values():
             if data["render"]:
                 glBindBuffer(GL_ARRAY_BUFFER, data["vbo"])
-                if not USING_RENDERDOC:
+                if not USING_GRAPHICS_DEBUGGER:
                     glVertexPointer (3, GL_FLOAT, 0, None)
                 glFlush()
                 
                 glBindBuffer(GL_ARRAY_BUFFER, data["vbo_1"])
-                if not USING_RENDERDOC:
+                if not USING_GRAPHICS_DEBUGGER:
                     glTexCoordPointer(2, GL_FLOAT, 0, None)
                 glFlush()
 
-                glDrawArrays(self.mode, 0, data["_len"] * 4)
+                glDrawArrays(self.mode, 0, data["_len"]//4)
 
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)

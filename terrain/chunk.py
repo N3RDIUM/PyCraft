@@ -24,34 +24,25 @@ class Chunk:
             "blocktypes"  : self.block_handler.pack_blocks_to_json(),
             "seed"        : self.parent.seed
         })
-
-        # self.thread = threading.Thread(target=self._listen_for_data)
-        # self.thread.start()
-        # self.in_cache = False
+        self.in_cache = False
 
     def _drawcall(self):
-        player_position = self.parent.player.pos
-        player_chunk = (player_position[0] // CHUNK_SIZE, player_position[2] // CHUNK_SIZE)
+        if not self.in_cache:
+            player_position = self.parent.player.pos
+            player_chunk = (player_position[0] // CHUNK_SIZE, player_position[2] // CHUNK_SIZE)
 
-        distance = self.parent.render_distance // 4
-        if distance <= 2:
-            distance = 2
+            distance = self.parent.render_distance // 4
+            if distance <= 2:
+                distance = 2
+            if distance >= 8:
+                distance = 4
 
-        if math.dist((player_chunk[0], player_chunk[1]), (self.position[0], self.position[1])) > distance and not DISABLE_CHUNK_CULLING:
-            self.renderer.vbos[self.vbo_id]["render"] = False
-        # if math.dist((player_chunk[0], player_chunk[1]), (self.position[0], self.position[1])) > self.parent.render_distance+1:
-        #     self.renderer.delete_vbo(self.vbo_id)
-        #     self.in_cache = True
-        else:
-            self.renderer.vbos[self.vbo_id]["render"] = True
-            # if self.in_cache:
-            #     self.writer.write(f"{encode_position(self.position)}", {
-            #         "id"          : self.vbo_id,
-            #         "position"    : list(self.position),
-            #         "blocktypes"  : self.block_handler.pack_blocks_to_json(),
-            #         "seed"        : self.parent.seed
-            #     })
-            #     self.in_cache = False
+            if math.dist((player_chunk[0], player_chunk[1]), (self.position[0], self.position[1])) > distance and not DISABLE_CHUNK_CULLING:
+                self.renderer.vbos[self.vbo_id]["render"] = False
+            else:
+                self.renderer.vbos[self.vbo_id]["render"] = True
     
     def _dispose(self):
-        pass
+        self.renderer.vbos[self.vbo_id]["render"] = False
+        self.renderer.delete_vbo(self.vbo_id)
+        self.in_cache = True
