@@ -1,5 +1,5 @@
 import multiprocessing
-STEP = 6400 * (multiprocessing.cpu_count() // 4)
+STEP = 4096 * (multiprocessing.cpu_count() // 4)
 
 class TerrainMeshStorage:
     def __init__(self):
@@ -20,4 +20,6 @@ class TerrainMeshStorage:
         self.texCoords = []
 
     def _group(self):
-        return self.groups + [(self.vertices, self.texCoords)]
+        self.groups.append((self.vertices, self.texCoords))
+        self.clear()
+        return self.groups

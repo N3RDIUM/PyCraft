@@ -81,7 +81,7 @@ class TerrainRenderer:
         while not glfw.window_should_close(window):
             try:
                 if self.listener.get_queue_length() > 0:
-                    i = self.listener.get_random_item()[0]
+                    i = self.listener.get_last_item()
                     id = i["id"]
                     data = self.vbos[id]
                     vbo = data["vbo"]
@@ -181,7 +181,7 @@ class TerrainRenderer:
                     glTexCoordPointer(2, GL_FLOAT, 0, None)
                 glFlush()
 
-                glDrawArrays(self.mode, 0, data["_len"]//4)
+                glDrawArrays(self.mode, 0, data["_len"]//8*5)
 
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)

@@ -1,12 +1,12 @@
 import sys
 import os
-import time
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 from core.util import decode_position, encode_position
 from core.fileutils import ListenerBase, WriterBase
 from core.logger import *
 from core.mesh_storage import TerrainMeshStorage
 from models import add_position
+from json import JSONDecodeError
 
 class ChunkBuilder(ListenerBase):
     def __init__(self):
@@ -67,15 +67,11 @@ class ChunkBuilder(ListenerBase):
 
             self.flask_writer.write(encode_position(position), {
                 "id": vbo_id,
-                "position": list(position),
-                "blocktypes": blocktypes,
-                "seed": data["seed"],
                 "blocks": blocks,
-                "simulated": simulated_blocks,
             })
             log("ChunkBuilder", f"Chunk {position} has been transferred to the Flask ferver frocess.")        
-        except:
-            pass
+        except Exception as e:
+            warn("ChunkBuilder", f"Error while building chunk: {e}")
 
 if __name__ == "__main__":
     try:
@@ -83,9 +79,11 @@ if __name__ == "__main__":
         while True:
             if len(generator.queue) > 0:
                 try:
-                    generator.on(generator.get_random_item()[0])
-                except:
-                    pass
+                    generator.on(generator.get_last_item())
+                except JSONDecodeError:
+                    warn("ChunkBuilder", "Invalid JSON data received, skipping...") 
+                except Exception as e:
+                    warn("ChunkBuilder", f"Error while building chunk: {e}")           
     except FileNotFoundError:
         pass
     exit()

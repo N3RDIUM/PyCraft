@@ -1,15 +1,13 @@
 import sys
 import os
-import time
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
-
 import opensimplex
-
 from constants import *
 from terrain.biomes import *
 from core.util import encode_position
 from core.fileutils import ListenerBase, WriterBase
 from core.logger import *
+from json import JSONDecodeError
 
 class ChunkGenerator(ListenerBase):
     def __init__(self):
@@ -55,8 +53,8 @@ class ChunkGenerator(ListenerBase):
                 "simulated"   : _simulated_blocks
             })
             log("ChunkGenerator", f"Generated chunk {position}")
-        except:
-            pass
+        except Exception as e:
+            log("ChunkGenerator", f"Error while generating chunk: {e}")
 
 if __name__ == "__main__":
     try:
@@ -64,9 +62,11 @@ if __name__ == "__main__":
         while True:
             if len(generator.queue) > 0:
                 try:
-                    generator.on(generator.get_random_item()[0])
-                except:
-                    pass
+                    generator.on(generator.get_last_item())
+                except JSONDecodeError:
+                    warn("ChunkGenerator", "Invalid JSON data received, skipping...")
+                except Exception as e:
+                    log("ChunkGenerator", f"Error while generating chunk: {e}")
     except FileNotFoundError:
         pass
     exit()

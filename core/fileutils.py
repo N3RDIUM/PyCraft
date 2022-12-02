@@ -17,6 +17,7 @@ class ListenerBase:
 
     def listen(self):
         while True:
+            time.sleep(0.1)
             try:
                 dir = os.listdir(self.directory)
                 self.queue = [i.split(".")[0] for i in dir]
@@ -57,6 +58,9 @@ class ListenerBase:
 
     def get_first_item(self, no_delete = False):
         return self.get_queue_item(self.queue[0], no_delete)
+
+    def get_last_item(self, no_delete = False):
+        return self.get_queue_item(self.queue[-1], no_delete)
 
     def remove_first_item(self):
         try:
