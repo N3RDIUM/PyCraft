@@ -6,6 +6,6 @@ function openPage(name){
         window.location.href = "contributors.html";
     }
     else if(name=="ghub"){
-        window.location.href = "https://github.com/1upCommunity/PyCraft";
+        window.location.href = "https://github.com/SubNerd/PyCraft";
     }
 }
