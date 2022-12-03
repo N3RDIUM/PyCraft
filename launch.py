@@ -9,7 +9,17 @@ except pkg_resources.DistributionNotFound:
     print("pip is not installed. Please install pip.")
     sys.exit(1)
 
-required  = {'glfw', 'pygame', 'opensimplex', 'psutil', 'pyopengl', 'pyopengl-accelerate', 'numpy', 'pillow', 'perlin-noise'} 
+required  = {
+    "glfw",
+    "numpy",
+    "pyopengl",
+    "pyopengl-accelerate",
+    "noise",
+    "ctypes",
+    "pillow",
+    "pygame",
+    "importlib",
+} 
 installed = {pkg.key for pkg in pkg_resources.working_set}
 missing   = required - installed
 
