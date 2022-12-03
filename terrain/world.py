@@ -53,3 +53,9 @@ class World:
         
         for position in to_delete:
             del self.chunks[position]
+            # delete request file
+            filename = encode_position(position)
+            if os.path.exists(f"cache/chunk_build/{filename}.json"):
+                os.remove(f"cache/chunk_build/{filename}.json")
+            if os.path.exists(f"cache/chunk/{filename}.json"):
+                os.remove(f"cache/chunk/{filename}.json")

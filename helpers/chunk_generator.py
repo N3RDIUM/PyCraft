@@ -52,7 +52,7 @@ class ChunkGenerator(ListenerBase):
                 "blocks"      : _blocks,
                 "simulated"   : _simulated_blocks
             })
-            log("ChunkGenerator", f"Generated chunk {position}")
+            log("ChunkGenerator", f"Generated chunk {position} with {len(_blocks)} blocks.")
         except Exception as e:
             log("ChunkGenerator", f"Error while generating chunk: {e}")
 
