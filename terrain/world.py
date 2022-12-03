@@ -5,6 +5,7 @@ from terrain.block import *
 from player.player import *
 from constants import *
 from core.util import *
+import requests
 
 class World:
     def __init__(self, renderer):
@@ -29,7 +30,16 @@ class World:
                 self.generate_chunk((i, j))
 
     def block_exists(self, position):
-        return NotImplementedError
+        position = encode_position(position)
+        try:
+            r = requests.get(f"http://localhost:5079/api/v1/block_exists?position={position}")
+            data = r.json()
+            if data["exists"]:
+                return True, data["block"]
+            else:
+                return False, None
+        except requests.exceptions.ConnectionError:
+            return False, None
 
     def drawcall(self):
         self.player.update()

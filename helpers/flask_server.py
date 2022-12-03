@@ -65,4 +65,4 @@ def api_block_exists():
         })
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port="5079")
