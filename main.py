@@ -38,12 +38,12 @@ if DISABLE_CHUNK_CULLING:
 chunk_generators = []
 chunk_builders = []
 
-for i in range(multiprocessing.cpu_count() // 2):
+for i in range(CHUNK_GENERATORS):
     chunk_generator = subprocess.Popen(
         [sys.executable, "helpers/chunk_generator.py"])
     chunk_generators.append(chunk_generator)
 
-for i in range(multiprocessing.cpu_count() // 4):
+for i in range(CHUNK_BUILDERS):
     chunk_builder = subprocess.Popen(
         [sys.executable, "helpers/chunk_builder.py"])
     chunk_builders.append(chunk_builder)

@@ -25,6 +25,7 @@ class TerrainRenderer:
         self.texture_manager = TextureAtlas()
         self.listener        = ListenerBase("cache/vbo/")
         self.writer          = WriterBase("cache/vbo/")
+        self.delete_queue    = []
 
         self.init(window)
 
@@ -53,6 +54,9 @@ class TerrainRenderer:
             "render": True,
             "addition_history": []
         }
+
+    def _delete_vbo(self, id):
+        self.delete_queue.append(id)
 
     def delete_vbo(self, id):
         # Remove all data from the VBO
@@ -131,6 +135,10 @@ class TerrainRenderer:
                     data["vertices"] = _vertices
                     data["texCoords"] = _texCoords
                     data["addition_history"].append((vertices, texture_coords))
+
+                if len(self.delete_queue) > 0:
+                    id = self.delete_queue.pop()
+                    self.delete_vbo(id)
             except:
                 pass
             glfw.swap_buffers(window2)

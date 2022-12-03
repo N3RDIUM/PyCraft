@@ -1,7 +1,6 @@
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
-import opensimplex
 from constants import *
 from terrain.biomes import *
 from core.util import encode_position
@@ -26,7 +25,7 @@ class ChunkGenerator(ListenerBase):
             position   = [position[0] * CHUNK_SIZE, position[1] * CHUNK_SIZE]
             seed       = data["seed"]
 
-            NOISE = opensimplex.OpenSimplex(seed)
+            SEED = seed
             generator = PlainsGenerator()
 
             for x in range(-1, CHUNK_SIZE + 1):
@@ -36,13 +35,13 @@ class ChunkGenerator(ListenerBase):
                             position[0] + x,
                             position[1] + z
                         ]
-                        generator.generate_subchunk(pos, NOISE, _simulated_blocks)
+                        generator.generate_subchunk(pos, SEED, _simulated_blocks)
                     else:
                         pos = [
                             position[0] + x,
                             position[1] + z
                         ]
-                        generator.generate_subchunk(pos, NOISE, _blocks)
+                        generator.generate_subchunk(pos, SEED, _blocks)
 
 
             self.writer.write(encode_position(position), {

@@ -1,26 +1,28 @@
 from packages.perlin import *
 from core.util import *
+from noise import snoise3, snoise4
+
 
 class Generator:
     def __init__(self):
         pass
 
-    def generate_subchunk(self, position, NOISE, blockdata):
+    def generate_subchunk(self, position, SEED, blockdata):
         x, y = position
 
         height_noise = round(lerp(
-            smoothstep(NOISE.noise2(x / 160, y / 160)) / 2, 
-            NOISE.noise2(x / 1600, y / 1600) * 100, 
-            NOISE.noise2(x / 16, y / 16) * 64
-        ))
+            smoothstep(snoise3(x / 160, y / 160, SEED)) / 2,
+            snoise3(x / 1600, y / 1600, SEED) * 100,
+            snoise3(x / 16, y / 16, SEED) * 64)
+        )
         height_noise_low = -256
 
-        dirt_noise = abs(5 + round(NOISE.noise2(x / 16, y / 16) * 20))
+        dirt_noise = abs(5 + round(snoise3(x / 16, y / 16, SEED) * 20))
 
         blockdata[encode_position((x, height_noise - 1, y))] = "PyCraft:Grass"
 
         for i in range(height_noise_low, height_noise - 1):
-            cave_noise = abs(round(NOISE.noise3(x / 16, i/16, y / 16)))
+            cave_noise = abs(round(snoise4(x / 16, i/16, y / 16, SEED)))
             if i < height_noise and i > height_noise - dirt_noise:
                 if cave_noise < 1/(height_noise - i):
                     blockdata[encode_position((x, i, y))] = "PyCraft:Dirt"
