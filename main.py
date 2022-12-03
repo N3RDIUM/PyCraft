@@ -48,6 +48,9 @@ for i in range(CHUNK_BUILDERS):
         [sys.executable, "helpers/chunk_builder.py"])
     chunk_builders.append(chunk_builder)
 
+flask_process = subprocess.Popen(
+        [sys.executable, "helpers/flask_server.py"])
+
 if not glfw.init():
     raise Exception("glfw can not be initialized!")
 

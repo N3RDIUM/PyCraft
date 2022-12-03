@@ -15,10 +15,10 @@ required  = {
     "pyopengl",
     "pyopengl-accelerate",
     "noise",
-    "ctypes",
     "pillow",
     "pygame",
     "importlib",
+    "flask"
 } 
 installed = {pkg.key for pkg in pkg_resources.working_set}
 missing   = required - installed
@@ -30,4 +30,4 @@ if missing:
 subprocess.Popen(['git', 'pull']).wait()
 
 # run the game
-subprocess.Popen(['python', '__main__.py']).wait()
+subprocess.Popen(['python', 'main.py']).wait()
