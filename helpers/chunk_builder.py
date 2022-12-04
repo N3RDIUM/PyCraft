@@ -86,4 +86,4 @@ if __name__ == "__main__":
                     warn("ChunkBuilder", f"Error while building chunk: {e}")           
     except FileNotFoundError:
         pass
-    exit()
+    sys.exit()
