@@ -22,8 +22,7 @@
 ##### To run PyCraft, run the following code:
     git clone https://github.com/SubNerd/PyCraft.git
     cd PyCraft
-    dep_installer
-    python __main__.py
+    python launch.py
 ##### (assuming that you already have git and python installed)
 
 ## Known issues
