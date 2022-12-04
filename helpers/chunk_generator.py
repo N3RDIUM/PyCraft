@@ -68,4 +68,4 @@ if __name__ == "__main__":
                     log("ChunkGenerator", f"Error while generating chunk: {e}")
     except FileNotFoundError:
         pass
-    exit()
+    sys.exit()
