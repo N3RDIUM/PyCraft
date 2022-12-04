@@ -37,7 +37,7 @@ class TerrainRenderer:
         if not USING_GRAPHICS_DEBUGGER:
             glEnableClientState(GL_VERTEX_ARRAY)
             glEnableClientState(GL_TEXTURE_COORD_ARRAY)
-    
+
     def create_vbo(self, id):
         self.vbo, self.vbo_1 = glGenBuffers (2)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
@@ -94,7 +94,7 @@ class TerrainRenderer:
                     _texCoords = data["texCoords"]
                     _len = data["_len"]
                     _len_ = data["_len_"]
-                    
+
                     vertices = np.array(i["vertices"], dtype=np.float32)
                     texture_coords = np.array(i["texCoords"], dtype=np.float32)
 
@@ -117,7 +117,7 @@ class TerrainRenderer:
                     if not USING_GRAPHICS_DEBUGGER:
                         glVertexPointer (3, GL_FLOAT, 0, None)
                     glFlush()
-                    
+
                     glBindBuffer(GL_ARRAY_BUFFER, vbo_1)
                     glBufferSubData(GL_ARRAY_BUFFER, _len_, bytes_texCoords, texCoords)
                     if not USING_GRAPHICS_DEBUGGER:
@@ -126,7 +126,7 @@ class TerrainRenderer:
 
                     _vertices += tuple(vertices)
                     _texCoords += tuple(texture_coords)
-                    
+
                     _len += bytes_vertices
                     _len_ += bytes_texCoords
 
@@ -176,14 +176,14 @@ class TerrainRenderer:
         glEnable(GL_BLEND)
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        
+
         for data in self.vbos.values():
             if data["render"]:
                 glBindBuffer(GL_ARRAY_BUFFER, data["vbo"])
                 if not USING_GRAPHICS_DEBUGGER:
                     glVertexPointer (3, GL_FLOAT, 0, None)
                 glFlush()
-                
+
                 glBindBuffer(GL_ARRAY_BUFFER, data["vbo_1"])
                 if not USING_GRAPHICS_DEBUGGER:
                     glTexCoordPointer(2, GL_FLOAT, 0, None)

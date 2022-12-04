@@ -41,7 +41,7 @@ class Chunk:
                 self.renderer.vbos[self.vbo_id]["render"] = False
             else:
                 self.renderer.vbos[self.vbo_id]["render"] = True
-    
+
     def _dispose(self):
         self.renderer.vbos[self.vbo_id]["render"] = False
         self.renderer.delete_vbo(self.vbo_id)
