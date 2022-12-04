@@ -26,4 +26,4 @@
 ##### (assuming that you already have git and python installed)
 
 ## Known issues
-- The game really hangs while loading chunks.
+- Please let us know id you find any.
