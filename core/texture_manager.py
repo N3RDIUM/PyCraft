@@ -12,7 +12,7 @@ class TextureAtlasGenerator:
         self.current_x = 0
         self.current_y = 0
         self.used = []
-    
+
     def add(self, image):
         # Add image to texture atlas.
         if image.size[0] > self.texture_size or image.size[1] > self.texture_size:
@@ -22,7 +22,7 @@ class TextureAtlasGenerator:
             self.current_x = 0
             self.current_y += image.size[1]
             self.current_side += 1
-        
+
         if self.current_y + image.size[1] > self.texture_size:
             raise Exception("Texture atlas is full.")
 

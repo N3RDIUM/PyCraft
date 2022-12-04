@@ -23,4 +23,3 @@ def jsonify_vbo_data(vertices, texCoords):
             json += ","
     json += "]}"
     return json
-    

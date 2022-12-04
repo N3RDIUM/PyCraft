@@ -18,7 +18,7 @@ class BlockHandler:
         self.load_blocks_from_dir("terrain/blocks", {
             "texture_manager": self.parent.texture_manager
         })
-        
+
     def register_block(self, block):
         self.blocks[block.id] = block
 
@@ -43,7 +43,7 @@ class BlockHandler:
                 object = importutil.module_from_spec(spec)
                 sys.modules[spec.name] = object
                 spec.loader.exec_module(object)
-                
+
                 block = object.Block(**args)
                 self.register_block(block)
 
