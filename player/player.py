@@ -89,7 +89,7 @@ class Player:
         if glfw.get_key(self.parent.parent, glfw.KEY_L) == glfw.PRESS:
             glfw.set_input_mode(self.parent.parent, glfw.CURSOR, glfw.CURSOR_DISABLED)
             self.lock = True
-        
+
         # mouse rotation: get dx and dy
         if self.lock:
             self.current_position = glfw.get_cursor_pos(self.parent.parent)
