@@ -60,7 +60,7 @@ class World:
             if math.dist(chunk.position, position) > self.render_distance * 2:
                 chunk._dispose()
                 to_delete.append(chunk.position)   
-        
+
         for position in to_delete:
             del self.chunks[position]
             # delete request file
