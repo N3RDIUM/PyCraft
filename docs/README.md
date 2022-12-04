@@ -26,4 +26,4 @@
 ##### (assuming that you already have git and python installed)
 
 ## Known issues
-- Please let us know id you find any.
+- Please let us know if you find any.
