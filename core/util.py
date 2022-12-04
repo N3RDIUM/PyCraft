@@ -23,3 +23,11 @@ def jsonify_vbo_data(vertices, texCoords):
             json += ","
     json += "]}"
     return json
+
+def remove_subset(_set, subset):
+    for i in range(len(_set)):  # Renamed set to lst, since it is a list, and to avoid shadowing set constructor
+        if _set[i:i+len(subset)] == subset:  # Renamed subset to sublst to match
+            del _set[i:i+len(subset)]  # We found a place where the sublst begins, slice it out
+            break
+
+    

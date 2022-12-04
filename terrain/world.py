@@ -10,15 +10,14 @@ import requests
 class World:
     def __init__(self, renderer):
         self.renderer = renderer
-        self.player = Player(renderer)
+        self.player = Player(renderer, self)
         self.texture_manager = renderer.texture_manager
         self.block_handler = BlockHandler(self)
 
         self.chunks = {}
-        self.render_distance = 4
+        self.render_distance = 1
         self.seed = random.randint(0, 1000000)
 
-        self.player = Player(renderer)
         self.generate()
 
     def generate_chunk(self, position):
@@ -40,6 +39,15 @@ class World:
                 return False, None
         except requests.exceptions.ConnectionError:
             return False, None
+
+    def remove_block(self, position):
+        position = encode_position(position)
+        try:
+            r = requests.get(f"http://localhost:5079/api/v1/remove_block?position={position}")
+            data = r.json()
+            return data
+        except requests.exceptions.ConnectionError:
+            return None
 
     def drawcall(self):
         self.player.update()

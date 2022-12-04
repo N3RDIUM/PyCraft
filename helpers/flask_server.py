@@ -46,7 +46,9 @@ def api_block_exists():
                 if block in data["blocks"]:
                     return jsonify({
                         "exists": True,
-                        "block": data["blocks"][block]
+                        "block": data["blocks"][block],
+                        "position": block,
+                        "vbo_data": data["vbo_data"][block]
                     })
                 else:
                     return jsonify({
@@ -61,6 +63,47 @@ def api_block_exists():
         return jsonify({
             "error": "No position provided."
         })
+    
+@app.route('/api/v1/remove_block', methods=['GET'])
+def api_remove_block():
+    if 'position' in request.args:
+        block = request.args['position']
+        chunk = decode_position(block)
+        chunk = [chunk[0] // CHUNK_SIZE, chunk[2] // CHUNK_SIZE]
+        chunk = [chunk[0] * CHUNK_SIZE, chunk[1] * CHUNK_SIZE]
+        try:
+            with open(f"cache/flask/{encode_position(chunk)}.json", "r") as f:
+                data = json.load(f)
+                if block in data["blocks"]:
+                    del data["blocks"][block]
+                    vbo_data = data["vbo_data"][block]
+                    del data["vbo_data"][block]
+                    with open(f"cache/flask/{encode_position(chunk)}.json", "w") as f:
+                        json.dump(data, f)
+                    with open(f"cache/vbo_remove/{encode_position(chunk)}.json", "w") as f:
+                        json.dump({
+                            "id": encode_position(chunk),
+                            "vbo_data": vbo_data
+                        }, f)
+                    return jsonify({
+                        "success": True,
+                        "position": block,
+                        "vbo_data": vbo_data,
+                        "chunk": chunk,
+                    })
+                else:
+                    return jsonify({
+                        "success": False
+                    })
+        except FileNotFoundError:
+            return jsonify({
+                "error": "Chunk not found.",
+                "chunk": chunk
+            })
+    else:
+        return jsonify({
+            "error": "No position provided."
+        })
 
 if __name__ == "__main__":
-    app.run(port="5079")
+    app.run(port="2077")

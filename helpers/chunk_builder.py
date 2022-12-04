@@ -33,6 +33,7 @@ class ChunkBuilder(ListenerBase):
             position         = (position[0], position[1])
             blocks           = data["blocks"]
             simulated_blocks = data["simulated"]
+            block_vbo_data   = {}
             mesh = TerrainMeshStorage()
 
             for _position, blocktype in blocks.items():
@@ -40,18 +41,35 @@ class ChunkBuilder(ListenerBase):
                 vertices = blocktypes[blocktype]["model"]
                 texture  = blocktypes[blocktype]["texture"]
 
+                block_vbo_data[_position] = {
+                    "vertices": [],
+                    "texCoords": [],
+                }
+
                 if not self.block_exists(blocks, simulated_blocks, (x, y + 1, z)):
                     mesh.add(add_position((x, y, z), vertices["top"]), texture["top"])
+                    block_vbo_data[_position]["vertices"].extend(add_position((x, y, z), vertices["top"]))
+                    block_vbo_data[_position]["texCoords"].extend(texture["top"])
                 if not self.block_exists(blocks, simulated_blocks, (x, y - 1, z)):
                     mesh.add(add_position((x, y, z), vertices["bottom"]), texture["bottom"])
+                    block_vbo_data[_position]["vertices"].extend(add_position((x, y, z), vertices["bottom"]))
+                    block_vbo_data[_position]["texCoords"].extend(texture["bottom"])
                 if not self.block_exists(blocks, simulated_blocks, (x + 1, y, z)):
                     mesh.add(add_position((x, y, z), vertices["right"]), texture["right"])
+                    block_vbo_data[_position]["vertices"].extend(add_position((x, y, z), vertices["right"]))
+                    block_vbo_data[_position]["texCoords"].extend(texture["right"])
                 if not self.block_exists(blocks, simulated_blocks, (x - 1, y, z)):
                     mesh.add(add_position((x, y, z), vertices["left"]), texture["left"])
+                    block_vbo_data[_position]["vertices"].extend(add_position((x, y, z), vertices["left"]))
+                    block_vbo_data[_position]["texCoords"].extend(texture["left"])
                 if not self.block_exists(blocks, simulated_blocks, (x, y, z - 1)):
                     mesh.add(add_position((x, y, z), vertices["front"]), texture["front"])
+                    block_vbo_data[_position]["vertices"].extend(add_position((x, y, z), vertices["front"]))
+                    block_vbo_data[_position]["texCoords"].extend(texture["front"])
                 if not self.block_exists(blocks, simulated_blocks, (x, y, z + 1)):
                     mesh.add(add_position((x, y, z), vertices["back"]), texture["back"])
+                    block_vbo_data[_position]["vertices"].extend(add_position((x, y, z), vertices["back"]))
+                    block_vbo_data[_position]["texCoords"].extend(texture["back"])
 
             data = mesh._group()
 
@@ -68,6 +86,8 @@ class ChunkBuilder(ListenerBase):
             self.flask_writer.write(encode_position(position), {
                 "id": vbo_id,
                 "blocks": blocks,
+                "simulated": simulated_blocks,
+                "vbo_data": block_vbo_data,
             })
             log("ChunkBuilder", f"Chunk {position} has been transferred to the Flask ferver frocess.")        
         except Exception as e:

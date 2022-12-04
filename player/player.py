@@ -1,6 +1,8 @@
 # imports
 from OpenGL.GL import *
 import math
+import time
+import threading
 import glfw
 
 # player class
@@ -10,7 +12,7 @@ class Player:
 
     * the first person controller
     """
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, world=None):
         """
         Player.__init__
 
@@ -24,6 +26,7 @@ class Player:
         self.parent = parent
         self.speed = 0.03
         self.friction = 0.9
+        self.world = world
 
         # lock mouse pointer
         self.lock = True
@@ -32,6 +35,8 @@ class Player:
         # dx and dy
         self.position_previous = glfw.get_cursor_pos(self.parent.parent)
         self.current_position = glfw.get_cursor_pos(self.parent.parent)
+
+        threading.Thread(target=self.remove_thread).start()
 
     def mouse_motion(self, dx, dy):
         """
@@ -119,3 +124,7 @@ class Player:
         glRotatef(-self.rot[0], 1, 0, 0)
         glRotatef(-self.rot[1], 0, 1, 0)
         glTranslatef(-self.pos[0], -self.pos[1], -self.pos[2])
+
+    def remove_thread(self):
+        time.sleep(1)
+        self.world.remove_block((self.pos[0], self.pos[1], self.pos[2]))
