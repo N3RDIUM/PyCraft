@@ -1,6 +1,5 @@
 from terrain.block import *
 from core.util import encode_position
-import threading
 from core.fileutils import WriterBase
 import math
 from constants import *
