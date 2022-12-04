@@ -25,9 +25,24 @@ def jsonify_vbo_data(vertices, texCoords):
     return json
 
 def remove_subset(_set, subset):
-    for i in range(len(_set)):  # Renamed set to lst, since it is a list, and to avoid shadowing set constructor
-        if _set[i:i+len(subset)] == subset:  # Renamed subset to sublst to match
-            del _set[i:i+len(subset)]  # We found a place where the sublst begins, slice it out
-            break
+    for i in range(len(_set)): 
+        if _set[i:i+len(subset)] == subset: 
+            del _set[i:i+len(subset)] 
+            return _set
 
-    
+def get_subset(_set, subset):
+    for i in range(len(_set)): 
+        if _set[i:i+len(subset)] == subset: 
+            return _set[i:i+len(subset)]
+
+def matches(_set, subset):
+    for i in range(len(_set)):
+        if _set[i] != subset[i]:
+            return False
+    return True
+
+def get_indexrange(_set, subset):
+    for i in range(len(_set)): 
+        if matches(_set[i:i+len(subset)], subset): 
+            return i, i+len(subset)
+    return [0, 0]

@@ -8,6 +8,7 @@ import numpy as np
 from core.logger import *
 from core.fileutils import *
 from constants import *
+from core.util import *
 
 glfw.init()
 
@@ -139,6 +140,40 @@ class TerrainRenderer:
                     data["texCoords"] = _texCoords
                     data["addition_history"].append((vertices, texture_coords))
 
+                if self.listener2.get_queue_length() > 0:
+                    try:
+                        data = self.listener2.get_last_item()
+                        id = data["id"]
+
+                        vbo_data = data["vbo_data"]
+                        vertices = vbo_data["vertices"]
+                        texCoords = vbo_data["texCoords"]
+
+                        _vertices = self.vbos[id]["vertices"]
+                        _texCoords = self.vbos[id]["texCoords"]
+
+                        # Get index of the data in the VBO
+                        indexrange_vertices = get_indexrange(_vertices, vertices)
+                        indexrange_texCoords = [indexrange_vertices[0]//3*2, indexrange_vertices[1]//3*2]
+
+                        # Remove the data from the VBO
+                        _vertices = _vertices[:indexrange_vertices[0]] + _vertices[indexrange_vertices[1]:]
+                        _texCoords = _texCoords[:indexrange_texCoords[0]] + _texCoords[indexrange_texCoords[1]:]
+
+                        # Update the VBO
+                        self.vbos[id]["vertices"] = _vertices
+                        self.vbos[id]["texCoords"] = _texCoords
+
+                        # Update the VBO on the GPU
+                        glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo"])
+                        glBufferSubData(GL_ARRAY_BUFFER, 0, len(_vertices)*4, (GLfloat * len(_vertices))(*_vertices))
+                        glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo_1"])
+                        glBufferSubData(GL_ARRAY_BUFFER, 0, len(_texCoords)*4, (GLfloat * len(_texCoords))(*_texCoords))
+
+                        print("Removed data from VBO: " + id)
+                    except Exception as e:
+                        print(e)
+
                 if len(self.delete_queue) > 0:
                     id = self.delete_queue.pop()
                     self.delete_vbo(id)
@@ -172,151 +207,12 @@ class TerrainRenderer:
             "id": id
         })
 
-    def shared_context(self, window):
-        glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
-        window2 = glfw.create_window(500, 500, "Window 2", None, window)
-        glfw.make_context_current(window2)
-        self.event.set()
-
-        while not glfw.window_should_close(window):
-            if self.listener.get_queue_length() > 0:
-                i = self.listener.get_last_item()
-                id = i["id"]
-                data = self.vbos[id]
-                vbo = data["vbo"]
-                vbo_1 = data["vbo_1"]
-                _vertices = data["vertices"]
-                _texCoords = data["texCoords"]
-                _len = data["_len"]
-                _len_ = data["_len_"]
-
-                vertices = np.array(i["vertices"], dtype=np.float32)
-                texture_coords = np.array(i["texCoords"], dtype=np.float32)
-
-                bytes_vertices = vertices.nbytes
-                bytes_texCoords = texture_coords.nbytes
-
-                verts = (GLfloat * len(vertices))(*vertices)
-                texCoords = (GLfloat * len(texture_coords)
-                                )(*texture_coords)
-
-                # Check if the data is already in the VBO
-                if verts in data["addition_history"]:
-                    continue
-                if texCoords in data["addition_history"]:
-                    continue
-
-                log_vertex_addition((vertices, texture_coords), (
-                    bytes_vertices, bytes_texCoords), _len*4, _len_*4, self.listener.get_queue_length())
-
-                glBindBuffer(GL_ARRAY_BUFFER, vbo)
-                glBufferSubData(GL_ARRAY_BUFFER, _len,
-                                bytes_vertices, verts)
-                if not USING_GRAPHICS_DEBUGGER:
-                    glVertexPointer(3, GL_FLOAT, 0, None)
-                glFlush()
-
-                glBindBuffer(GL_ARRAY_BUFFER, vbo_1)
-                glBufferSubData(GL_ARRAY_BUFFER, _len_,
-                                bytes_texCoords, texCoords)
-                if not USING_GRAPHICS_DEBUGGER:
-                    glTexCoordPointer(2, GL_FLOAT, 0, None)
-                glFlush()
-
-                _vertices += tuple(vertices)
-                _texCoords += tuple(texture_coords)
-
-                _len += bytes_vertices
-                _len_ += bytes_texCoords
-
-                data["_len"] = _len
-                data["_len_"] = _len_
-                data["vertices"] = _vertices
-                data["texCoords"] = _texCoords
-                data["addition_history"].append((vertices, texture_coords))
-                
-            if len(self.delete_queue) > 0:
-                id = self.delete_queue.pop()
-                self.delete_vbo(id)
-            glfw.swap_buffers(window2)
-        glfw.terminate()
-        self.event.set()
-        self.listener.thread.join()
-        del self.listener
-
-    def shared_context2(self, window):
-        glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
-        window2 = glfw.create_window(500, 500, "Window 2", None, window)
-        glfw.make_context_current(window2)
-        self.event.set()
-
-        while not glfw.window_should_close(window):
-            if self.listener2.get_queue_length() > 0:
-                try:
-                    data = self.listener2.get_last_item()
-                    print(data)
-                    id = data["id"]
-
-                    vbo_data = data["vbo_data"]
-                    vertices = vbo_data["vertices"]
-                    texCoords = vbo_data["texCoords"]
-
-                    _vertices = self.vbos[id]["vertices"]
-                    _texCoords = self.vbos[id]["texCoords"]
-
-                    # Get index of the data in the VBO
-                    indexrange_vertices = [0, 0]
-                    for i in range(len(_vertices)):  # Renamed set to lst, since it is a list, and to avoid shadowing set constructor
-                        if _vertices[i:i+len(vertices)] == vertices:  # Renamed subset to sublst to match
-                            indexrange_vertices[0] = i
-                            indexrange_vertices[1] = i+len(vertices)
-                            break
-
-                    print(indexrange_vertices)
-                    
-                    indexrange_texCoords = [0, 0]
-                    for i in range(len(_texCoords)):
-                        if _texCoords[i:i+len(texCoords)] == texCoords:
-                            indexrange_texCoords[0] = i
-                            indexrange_texCoords[1] = i+len(texCoords)
-                            break
-
-                    print(indexrange_texCoords)
-
-                    # Remove the data from the VBO
-                    _vertices = _vertices[:indexrange_vertices[0]] + _vertices[indexrange_vertices[1]:]
-                    _texCoords = _texCoords[:indexrange_texCoords[0]] + _texCoords[indexrange_texCoords[1]:]
-
-                    # Update the VBO
-                    self.vbos[id]["vertices"] = _vertices
-                    self.vbos[id]["texCoords"] = _texCoords
-
-                    # Update the VBO on the GPU
-                    glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo"])
-                    glBufferSubData(GL_ARRAY_BUFFER, indexrange_vertices[0]*4,
-                        len(vertices)*4, None)
-                    glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo_1"])
-                    glBufferSubData(GL_ARRAY_BUFFER, indexrange_texCoords[0]*4,
-                        len(texCoords)*4, None)
-                    
-                    print("Removed", vertices, texCoords, "from", id)
-
-                    # Remove the data from the addition history
-                    for i in range(len(self.vbos[id]["addition_history"])):
-                        if self.vbos[id]["addition_history"][i][0] == vertices:
-                            del self.vbos[id]["addition_history"][i]
-                            break
-                except Exception as e:
-                    print(e)
 
     def init(self, window):
         glfw.make_context_current(None)
         thread = threading.Thread(
             target=self.shared_context, args=[window], daemon=True)
-        thread2 = threading.Thread(
-            target=self.shared_context2, args=[window], daemon=True)
         thread.start()
-        thread2.start()
         self.event.wait()
         glfw.make_context_current(window)
 
