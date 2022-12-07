@@ -107,10 +107,3 @@ class TextureAtlas:
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         return texid
-
-# example usage
-if __name__ == "__main__":
-    atlas = TextureAtlas()
-    atlas.add_from_folder("assets/textures/block/")
-    atlas.save("atlas.png")
-    print(atlas.texture_coords)

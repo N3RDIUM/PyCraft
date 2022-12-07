@@ -35,8 +35,9 @@ class Player:
         # dx and dy
         self.position_previous = glfw.get_cursor_pos(self.parent.parent)
         self.current_position = glfw.get_cursor_pos(self.parent.parent)
-
-        threading.Thread(target=self.remove_thread).start()
+        
+        self.mouse_values = [0, 0]
+        self.mouse_values_previous = [0, 0]
 
     def mouse_motion(self, dx, dy):
         """
@@ -125,6 +126,28 @@ class Player:
         glRotatef(-self.rot[1], 0, 1, 0)
         glTranslatef(-self.pos[0], -self.pos[1], -self.pos[2])
 
-    def remove_thread(self):
-        time.sleep(1)
-        self.world.remove_block((self.pos[0], self.pos[1], self.pos[2]))
+    # def handle_block(self):
+    #     def _break():
+    #         block = self.world.get_block_from_view(self.pos.copy(), self.rot.copy(), 2)
+    #         print(block)
+
+    #     while True:
+    #         if glfw.get_mouse_button(self.parent.parent, glfw.MOUSE_BUTTON_LEFT) == glfw.PRESS:
+    #             self.mouse_values[0] = True
+    #         else:
+    #             self.mouse_values[0] = False
+
+    #         if glfw.get_mouse_button(self.parent.parent, glfw.MOUSE_BUTTON_RIGHT) == glfw.PRESS:
+    #             self.mouse_values[1] = True
+    #         else:
+    #             self.mouse_values[1] = False
+            
+    #         # If the mouse button is pressed and the previous mouse button is not pressed
+    #         if self.mouse_values[0] and not self.mouse_values_previous[0]:
+    #             threading.Thread(target=_break).start()
+    #         if self.mouse_values[1] and not self.mouse_values_previous[1]:
+    #             block = self.world.get_block_from_view(self.pos.copy(), self.rot.copy(), 2)
+    #             if block is not None:
+    #                 self.world.add_block(block[0], block[1])
+
+    #         self.mouse_values_previous = self.mouse_values.copy()

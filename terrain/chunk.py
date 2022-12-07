@@ -1,5 +1,5 @@
 from terrain.block import *
-from core.util import encode_position
+from core.util import encode_vector
 from core.fileutils import WriterBase
 import math
 from constants import *
@@ -12,12 +12,12 @@ class Chunk:
         self.parent = parent
         self.block_handler = parent.block_handler
         self.writer = WriterBase("cache/chunk/")
-        self.vbo_id = encode_position(self.position)
+        self.vbo_id = encode_vector(self.position)
         self.renderer.create_vbo(self.vbo_id)
         self.blocks = {}
 
         # Request chunk generation from helper
-        self.writer.write(f"{encode_position(self.position)}", {
+        self.writer.write(f"{encode_vector(self.position)}", {
             "id"          : self.vbo_id,
             "position"    : list(self.position),
             "blocktypes"  : self.block_handler.pack_blocks_to_json(),

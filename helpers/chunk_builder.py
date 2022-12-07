@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
-from core.util import decode_position, encode_position
+from core.util import decode_position, encode_vector
 from core.fileutils import ListenerBase, WriterBase
 from core.logger import *
 from core.mesh_storage import TerrainMeshStorage
@@ -17,7 +17,7 @@ class ChunkBuilder(ListenerBase):
 
     @staticmethod
     def block_exists(dict1, dict2, position):
-        position = encode_position(position)
+        position = encode_vector(position)
         if position in dict1:
             return True
         elif position in dict2:
@@ -83,7 +83,7 @@ class ChunkBuilder(ListenerBase):
 
             log("ChunkBuilder", f"Chunk {position} has been built.")
 
-            self.flask_writer.write(encode_position(position), {
+            self.flask_writer.write(encode_vector(position), {
                 "id": vbo_id,
                 "blocks": blocks,
                 "simulated": simulated_blocks,

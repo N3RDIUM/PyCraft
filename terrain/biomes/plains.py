@@ -19,13 +19,13 @@ class Generator:
 
         dirt_noise = abs(5 + round(snoise3(x / 16, y / 16, SEED) * 20))
 
-        blockdata[encode_position((x, height_noise - 1, y))] = "PyCraft:Grass"
+        blockdata[encode_vector((x, height_noise - 1, y))] = "PyCraft:Grass"
 
         for i in range(height_noise_low, height_noise - 1):
             cave_noise = abs(round(snoise4(x / 16, i/16, y / 16, SEED)))
             if i < height_noise and i > height_noise - dirt_noise:
                 if cave_noise < 1/(height_noise - i):
-                    blockdata[encode_position((x, i, y))] = "PyCraft:Dirt"
+                    blockdata[encode_vector((x, i, y))] = "PyCraft:Dirt"
             else:
                 if cave_noise < 2/(height_noise - i):
-                    blockdata[encode_position((x, i, y))] = "PyCraft:Stone"
+                    blockdata[encode_vector((x, i, y))] = "PyCraft:Stone"

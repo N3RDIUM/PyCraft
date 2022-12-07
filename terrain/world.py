@@ -29,7 +29,7 @@ class World:
                 self.generate_chunk((i, j))
 
     def block_exists(self, position):
-        position = encode_position(position)
+        position = encode_vector(position)
         try:
             r = requests.get(f"http://localhost:5079/api/v1/block_exists?position={position}")
             data = r.json()
@@ -41,7 +41,7 @@ class World:
             return False, None
 
     def remove_block(self, position):
-        position = encode_position(position)
+        position = encode_vector(position)
         try:
             r = requests.get(f"http://localhost:5079/api/v1/remove_block?position={position}")
             data = r.json()
@@ -72,7 +72,7 @@ class World:
         for position in to_delete:
             del self.chunks[position]
             # delete request file
-            filename = encode_position(position)
+            filename = encode_vector(position)
             if os.path.exists(f"cache/chunk_build/{filename}.json"):
                 os.remove(f"cache/chunk_build/{filename}.json")
             if os.path.exists(f"cache/chunk/{filename}.json"):

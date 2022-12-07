@@ -1,4 +1,4 @@
-def encode_position(position):
+def encode_vector(position):
     ret = ""
     for i in range(0, len(position)):
         ret += str(position[i]) + "x"

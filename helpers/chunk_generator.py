@@ -3,7 +3,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 from constants import *
 from terrain.biomes import *
-from core.util import encode_position
+from core.util import encode_vector
 from core.fileutils import ListenerBase, WriterBase
 from core.logger import *
 from json import JSONDecodeError
@@ -44,7 +44,7 @@ class ChunkGenerator(ListenerBase):
                         generator.generate_subchunk(pos, SEED, _blocks)
 
 
-            self.writer.write(encode_position(position), {
+            self.writer.write(encode_vector(position), {
                 "id"          : vbo_id,
                 "position"    : position,
                 "blocktypes"  : blocktypes,
