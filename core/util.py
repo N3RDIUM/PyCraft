@@ -10,6 +10,12 @@ def decode_vector(position):
         position[i] = int(position[i])
     return position
 
+def decode_vector_float(position):
+    position = position.split("x")
+    for i in range(0, len(position)):
+        position[i] = float(position[i])
+    return position
+
 def jsonify_vbo_data(vertices, texCoords):
     json = "{\"vertices\":["
     for i in range(0, len(vertices)):
