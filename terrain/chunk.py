@@ -11,13 +11,12 @@ class Chunk:
         self.position = position
         self.parent = parent
         self.block_handler = parent.block_handler
-        self.writer = WriterBase("cache/chunk/")
         self.vbo_id = encode_vector(self.position)
         self.renderer.create_vbo(self.vbo_id)
         self.blocks = {}
 
         # Request chunk generation from helper
-        self.writer.write(f"{encode_vector(self.position)}", {
+        self.parent.writer.write(f"{self.parent.writer.written}-{encode_vector(self.position)}", {
             "id"          : self.vbo_id,
             "position"    : list(self.position),
             "blocktypes"  : self.block_handler.pack_blocks_to_json(),

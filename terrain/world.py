@@ -17,6 +17,7 @@ class World:
         self.block_handler = BlockHandler(self)
 
         self.chunks = {}
+        self.writer = WriterBase("cache/chunk/")
         self.render_distance = 12
         self.seed = random.randint(0, 1000000)
 
