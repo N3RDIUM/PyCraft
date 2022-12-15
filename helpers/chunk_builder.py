@@ -75,7 +75,7 @@ class ChunkBuilder(ListenerBase):
 
             for data_item in range(len(data)):
                 _data_item = data[data_item]
-                self.writer.write("vbo_" + str(vbo_id) + "_part_" + str(data_item), {
+                self.writer.write(f"{self.writer.written}-vbo_" + str(vbo_id) + "_part_" + str(data_item), {
                     "id": vbo_id,
                     "vertices": _data_item[0],
                     "texCoords": _data_item[1],
