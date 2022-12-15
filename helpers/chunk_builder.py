@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
-from core.util import decode_position, encode_vector
+from core.util import decode_vector, encode_vector
 from core.fileutils import ListenerBase, WriterBase
 from core.logger import *
 from core.mesh_storage import TerrainMeshStorage
@@ -37,7 +37,7 @@ class ChunkBuilder(ListenerBase):
             mesh = TerrainMeshStorage()
 
             for _position, blocktype in blocks.items():
-                x, y, z = decode_position(_position)
+                x, y, z = decode_vector(_position)
                 vertices = blocktypes[blocktype]["model"]
                 texture  = blocktypes[blocktype]["texture"]
 

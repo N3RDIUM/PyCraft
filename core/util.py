@@ -4,7 +4,7 @@ def encode_vector(position):
         ret += str(position[i]) + "x"
     return ret[:-1]
 
-def decode_position(position):
+def decode_vector(position):
     position = position.split("x")
     for i in range(0, len(position)):
         position[i] = int(position[i])
