@@ -3,7 +3,7 @@ from core.logger import *
 from terrain.chunk import *
 from terrain.block import *
 from player.player import *
-from constants import *
+from settings import *
 from core.util import *
 import requests
 
@@ -15,7 +15,7 @@ class World:
         self.block_handler = BlockHandler(self)
 
         self.chunks = {}
-        self.render_distance = 12
+        self.render_distance = 2
         self.seed = random.randint(0, 1000000)
 
         self.generate()

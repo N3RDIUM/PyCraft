@@ -7,7 +7,7 @@ import threading
 import numpy as np
 from core.logger import *
 from core.fileutils import *
-from constants import *
+from settings import *
 from core.util import *
 
 glfw.init()
@@ -165,23 +165,26 @@ class TerrainRenderer:
                     self.delete_vbo(id)
 
                 if len(self.delete_queue_vbo) > 0:
-                    id = self.delete_queue_vbo.pop()
-                    # Remove all data from the VBO
-                    self.vbos[id]["_len"] = 0
-                    self.vbos[id]["_len_"] = 0
-                    self.vbos[id]["vertices"] = ()
-                    self.vbos[id]["texCoords"] = ()
-                    self.vbos[id]["addition_history"] = []
+                    try:
+                        id = self.delete_queue_vbo.pop()
+                        # Remove all data from the VBO
+                        self.vbos[id]["_len"] = 0
+                        self.vbos[id]["_len_"] = 0
+                        self.vbos[id]["vertices"] = ()
+                        self.vbos[id]["texCoords"] = ()
+                        self.vbos[id]["addition_history"] = []
 
-                    glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo"])
-                    glBufferData(GL_ARRAY_BUFFER, VERTICES_SIZE, None, GL_DYNAMIC_DRAW)
-                    glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo_1"])
-                    glBufferData(GL_ARRAY_BUFFER, TEXCOORDS_SIZE, None, GL_DYNAMIC_DRAW)
+                        glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo"])
+                        glBufferData(GL_ARRAY_BUFFER, VERTICES_SIZE, None, GL_DYNAMIC_DRAW)
+                        glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo_1"])
+                        glBufferData(GL_ARRAY_BUFFER, TEXCOORDS_SIZE, None, GL_DYNAMIC_DRAW)
 
-                    glDeleteBuffers(2, [self.vbos[id]["vbo"], self.vbos[id]["vbo_1"]])
+                        glDeleteBuffers(2, [self.vbos[id]["vbo"], self.vbos[id]["vbo_1"]])
 
-                    del self.vbos[id]
-                    info("TerrainRenderer", "Deleted VBO: " + id)
+                        del self.vbos[id]
+                        info("TerrainRenderer", "Deleted VBO: " + id)
+                    except:
+                        pass
             except:
                 pass
             glfw.swap_buffers(window2)
@@ -235,19 +238,22 @@ class TerrainRenderer:
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        for data in self.vbos.values():
-            if data["render"]:
-                glBindBuffer(GL_ARRAY_BUFFER, data["vbo"])
-                if not USING_GRAPHICS_DEBUGGER:
-                    glVertexPointer(3, GL_FLOAT, 0, None)
-                glFlush()
+        try:
+            for data in self.vbos.values():
+                if data["render"]:
+                    glBindBuffer(GL_ARRAY_BUFFER, data["vbo"])
+                    if not USING_GRAPHICS_DEBUGGER:
+                        glVertexPointer(3, GL_FLOAT, 0, None)
+                    glFlush()
 
-                glBindBuffer(GL_ARRAY_BUFFER, data["vbo_1"])
-                if not USING_GRAPHICS_DEBUGGER:
-                    glTexCoordPointer(2, GL_FLOAT, 0, None)
-                glFlush()
+                    glBindBuffer(GL_ARRAY_BUFFER, data["vbo_1"])
+                    if not USING_GRAPHICS_DEBUGGER:
+                        glTexCoordPointer(2, GL_FLOAT, 0, None)
+                    glFlush()
 
-                glDrawArrays(self.mode, 0, data["_len"]//8*5)
+                    glDrawArrays(self.mode, 0, data["_len"]//8*5)
+        except RuntimeError:
+            pass
 
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)

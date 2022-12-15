@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
-from constants import *
+from settings import *
 from terrain.biomes import *
 from core.util import encode_vector
 from core.fileutils import ListenerBase, WriterBase

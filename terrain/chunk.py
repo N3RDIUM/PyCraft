@@ -2,7 +2,7 @@ from terrain.block import *
 from core.util import encode_vector
 from core.fileutils import WriterBase
 import math
-from constants import *
+from settings import *
 
 class Chunk:
     def __init__(self, renderer, position, parent=None):

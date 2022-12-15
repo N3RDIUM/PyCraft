@@ -5,7 +5,7 @@ import flask
 from flask import request, jsonify
 from core.logger import *
 from core.util import encode_vector, decode_vector, decode_vector_float
-from constants import *
+from settings import *
 from core.fileutils import ListenerBase, WriterBase
 import json
 import math

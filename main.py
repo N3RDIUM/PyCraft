@@ -21,7 +21,7 @@ import sys
 # internal imports
 from core.renderer import *
 from player import *
-from constants import *
+from settings import *
 from terrain.world import *
 
 # start helpers
