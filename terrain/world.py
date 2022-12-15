@@ -5,6 +5,8 @@ from terrain.block import *
 from player.player import *
 from settings import *
 from core.util import *
+from packages.perlin import *
+from noise import snoise3
 import requests
 
 class World:
@@ -17,6 +19,16 @@ class World:
         self.chunks = {}
         self.render_distance = 12
         self.seed = random.randint(0, 1000000)
+
+        self.player.pos = [
+            0,
+            round(lerp(
+                smoothstep(snoise3(0, 0, self.seed)) / 2,
+                snoise3(0, 0, self.seed) * 100,
+                snoise3(0, 0, self.seed) * 64)
+            ),
+            0
+        ]
 
         self.generate()
 
