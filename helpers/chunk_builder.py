@@ -73,7 +73,7 @@ class ChunkBuilder(ListenerBase):
 
             data = mesh._group()
 
-            for data_item in range(len(data) - 1):
+            for data_item in range(len(data)):
                 _data_item = data[data_item]
                 self.writer.write("vbo_" + str(vbo_id) + "_part_" + str(data_item), {
                     "id": vbo_id,

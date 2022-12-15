@@ -30,6 +30,7 @@ class TerrainRenderer:
         self.writer = WriterBase("cache/vbo/")
         self.writer2 = WriterBase("cache/vbo_remove/")
         self.delete_queue = []
+        self.delete_queue_vbo = []
 
         self.init(window)
 
@@ -63,22 +64,7 @@ class TerrainRenderer:
         self.delete_queue.append(id)
 
     def delete_vbo(self, id):
-        # Remove all data from the VBO
-        self.vbos[id]["_len"] = 0
-        self.vbos[id]["_len_"] = 0
-        self.vbos[id]["vertices"] = ()
-        self.vbos[id]["texCoords"] = ()
-        self.vbos[id]["addition_history"] = []
-
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo"])
-        glBufferData(GL_ARRAY_BUFFER, VERTICES_SIZE, None, GL_DYNAMIC_DRAW)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo_1"])
-        glBufferData(GL_ARRAY_BUFFER, TEXCOORDS_SIZE, None, GL_DYNAMIC_DRAW)
-
-        glDeleteBuffers(2, [self.vbos[id]["vbo"], self.vbos[id]["vbo_1"]])
-
-        del self.vbos[id]
-        info("TerrainRenderer", "Deleted VBO: " + id)
+        self.delete_queue_vbo.append(id)
 
     def shared_context(self, window):
         glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
@@ -177,6 +163,25 @@ class TerrainRenderer:
                 if len(self.delete_queue) > 0:
                     id = self.delete_queue.pop()
                     self.delete_vbo(id)
+
+                if len(self.delete_queue_vbo) > 0:
+                    id = self.delete_queue_vbo.pop()
+                    # Remove all data from the VBO
+                    self.vbos[id]["_len"] = 0
+                    self.vbos[id]["_len_"] = 0
+                    self.vbos[id]["vertices"] = ()
+                    self.vbos[id]["texCoords"] = ()
+                    self.vbos[id]["addition_history"] = []
+
+                    glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo"])
+                    glBufferData(GL_ARRAY_BUFFER, VERTICES_SIZE, None, GL_DYNAMIC_DRAW)
+                    glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo_1"])
+                    glBufferData(GL_ARRAY_BUFFER, TEXCOORDS_SIZE, None, GL_DYNAMIC_DRAW)
+
+                    glDeleteBuffers(2, [self.vbos[id]["vbo"], self.vbos[id]["vbo_1"]])
+
+                    del self.vbos[id]
+                    info("TerrainRenderer", "Deleted VBO: " + id)
             except:
                 pass
             glfw.swap_buffers(window2)

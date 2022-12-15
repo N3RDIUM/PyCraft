@@ -15,7 +15,7 @@ class World:
         self.block_handler = BlockHandler(self)
 
         self.chunks = {}
-        self.render_distance = 1
+        self.render_distance = 12
         self.seed = random.randint(0, 1000000)
 
         self.generate()
