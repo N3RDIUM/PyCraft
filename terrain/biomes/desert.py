@@ -29,7 +29,7 @@ class Generator:
             cave_noise = abs(round(snoise4(x / 16, i/16, y / 16, SEED)))
             if i < height_noise and i > height_noise - dirt_noise:
                 if cave_noise < 1/(height_noise - i):
-                    blockdata[encode_vector((x, i, y))] = "PyCraft:Dirt"
+                    blockdata[encode_vector((x, i, y))] = "PyCraft:Sand"
             else:
                 if cave_noise < 2/(height_noise - i):
                     blockdata[encode_vector((x, i, y))] = "PyCraft:Stone"

@@ -17,7 +17,7 @@ class Generator:
         height_noise = round(lerp(
             smoothstep(snoise3(x / 160, y / 160, SEED)) / 2,
             snoise3(x / 1600, y / 1600, SEED) * 100,
-            snoise3(x / 16000, y / 16000, SEED) * 64)
+            snoise3(x / 16000, y / 16000, SEED) * 8)
         )
         height_noise_low = -192
 
