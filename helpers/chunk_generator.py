@@ -7,6 +7,7 @@ from core.util import encode_vector
 from core.fileutils import ListenerBase, WriterBase
 from core.logger import *
 from json import JSONDecodeError
+from terrain.weather import *
 
 class ChunkGenerator(ListenerBase):
     def __init__(self):
@@ -26,10 +27,11 @@ class ChunkGenerator(ListenerBase):
             seed       = data["seed"]
 
             SEED = seed
-            generator = PlainsGenerator()
 
             for x in range(-1, CHUNK_SIZE + 1):
                 for z in range(-1, CHUNK_SIZE + 1):
+                    weather = get_weather_at((position[0] + x, position[1] + z), SEED)
+                    generator = compute_biome(weather, generators)
                     if x == -1 or x == CHUNK_SIZE or z == -1 or z == CHUNK_SIZE:
                         pos = [
                             position[0] + x,

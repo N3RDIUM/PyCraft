@@ -8,7 +8,7 @@ class Generator:
         self.weather_desc = [
             "temperate",
             "wet",
-            "calm",
+            "windy",
         ]
 
     def generate_subchunk(self, position, SEED, blockdata):

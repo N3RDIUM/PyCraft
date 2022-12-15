@@ -6,9 +6,9 @@ from noise import snoise3, snoise4
 class Generator:
     def __init__(self):
         self.weather_desc = [
-            "temperate",
-            "wet",
-            "calm",
+            "hot",
+            "dry",
+            "windy",
         ]
 
     def generate_subchunk(self, position, SEED, blockdata):
@@ -23,7 +23,7 @@ class Generator:
 
         dirt_noise = abs(5 + round(snoise3(x / 16, y / 16, SEED) * 20))
 
-        blockdata[encode_vector((x, height_noise - 1, y))] = "PyCraft:Grass"
+        blockdata[encode_vector((x, height_noise - 1, y))] = "PyCraft:Sand"
 
         for i in range(height_noise_low, height_noise - 1):
             cave_noise = abs(round(snoise4(x / 16, i/16, y / 16, SEED)))
