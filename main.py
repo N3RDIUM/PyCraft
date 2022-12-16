@@ -114,10 +114,12 @@ if __name__ == "__main__":
             fps += value
         fps /= len(_fps)
 
-        text(10, 10, "FPS            : " + str(int(fps)))
-        text(10, 32, "Position       : " + str([int(world.player.pos[0]), int(world.player.pos[1]), int(world.player.pos[2])]))
-        text(10, 54, "Chunks         : " + str(len(world.chunks)))
+        text(10, 10, "FPS: " + str(int(fps)))
+        text(10, 32, "Position: " + str([int(world.player.pos[0]), int(world.player.pos[1]), int(world.player.pos[2])]))
+        text(10, 54, "Chunks: " + str(len(world.chunks)))
         text(10, 76, "Render Distance: " + str(world.render_distance))
+        text(10, 98, "Renderer to_add: " + str(renderer.listener.get_queue_length()))
+        text(10, 120, "Renderer to_remove: " + str(renderer.listener2.get_queue_length()))
 
         glfw.poll_events()
         glfw.swap_buffers(window)
