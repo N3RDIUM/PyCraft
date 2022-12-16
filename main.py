@@ -23,6 +23,7 @@ from core.renderer import *
 from player import *
 from settings import *
 from terrain.world import *
+from core.text import text
 
 # start helpers
 try:
@@ -106,10 +107,20 @@ if __name__ == "__main__":
 
         world.drawcall()
         renderer.render()
+        
+        _fps = world.fpss
+        fps = 0
+        for value in _fps:
+            fps += value
+        fps /= len(_fps)
+
+        text(10, 10, "FPS            : " + str(int(fps)))
+        text(10, 32, "Position       : " + str([int(world.player.pos[0]), int(world.player.pos[1]), int(world.player.pos[2])]))
+        text(10, 54, "Chunks         : " + str(len(world.chunks)))
+        text(10, 76, "Render Distance: " + str(world.render_distance))
 
         glfw.poll_events()
         glfw.swap_buffers(window)
-
     try:
         glfw.terminate()
     except:

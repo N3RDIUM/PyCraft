@@ -1,5 +1,5 @@
 import multiprocessing
-STEP = 4096 * (multiprocessing.cpu_count() // 4)
+STEP = 16000 * (multiprocessing.cpu_count() // 4)
 
 class TerrainMeshStorage:
     def __init__(self):

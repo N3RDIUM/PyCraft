@@ -8,6 +8,8 @@ from core.util import *
 from packages.perlin import *
 from noise import snoise3
 import requests
+import threading
+import time
 
 class World:
     def __init__(self, renderer):
@@ -20,6 +22,10 @@ class World:
         self.writer = WriterBase("cache/chunk/")
         self.render_distance = 12
         self.seed = random.randint(0, 1000000)
+        self.to_delete = []
+        self.last_update = time.time()
+        self.fps = 0
+        self.fpss = []
 
         self.player.pos = [
             0,
@@ -31,6 +37,8 @@ class World:
             0
         ]
 
+        self.thread = threading.Thread(target=self._thread)
+        self.thread.start()
         self.generate()
 
     def generate_chunk(self, position):
@@ -74,19 +82,30 @@ class World:
                     self.generate_chunk((i, j))
                 positions.append((i, j))
 
-        to_delete = []
+        self.to_delete = []
         for chunk in self.chunks.values():
             if chunk.position in positions:
                 chunk._drawcall()
             if math.dist(chunk.position, position) > self.render_distance * 2:
                 chunk._dispose()
-                to_delete.append(chunk.position)   
+                self.to_delete.append(chunk.position) 
 
-        for position in to_delete:
-            del self.chunks[position]
-            # delete request file
-            filename = encode_vector(position)
-            if os.path.exists(f"cache/chunk_build/{filename}.json"):
-                os.remove(f"cache/chunk_build/{filename}.json")
-            if os.path.exists(f"cache/chunk/{filename}.json"):
-                os.remove(f"cache/chunk/{filename}.json")
+        self.fps = 1 / (time.time() - self.last_update)
+        self.fpss.append(self.fps)
+        if len(self.fpss) > 100:
+            self.fpss.pop(0)
+        self.last_update = time.time()
+
+    def _thread(self):
+        while True:
+            time.sleep(0.1)
+            if len(self.to_delete) == 0:
+                continue
+            for position in self.to_delete:
+                del self.chunks[position]
+                # delete request file
+                filename = encode_vector(position)
+                if os.path.exists(f"cache/chunk_build/{filename}.json"):
+                    os.remove(f"cache/chunk_build/{filename}.json")
+                if os.path.exists(f"cache/chunk/{filename}.json"):
+                    os.remove(f"cache/chunk/{filename}.json")
