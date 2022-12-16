@@ -28,6 +28,7 @@ class TerrainRenderer:
         self.delete_queue = []
         self.delete_queue_vbo = []
         self.create_queue = []
+        self.vbos_being_rendered = 0
 
         self.init(window)
 
@@ -36,6 +37,14 @@ class TerrainRenderer:
         glEnable(GL_TEXTURE_2D)
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glEnable(GL_DEPTH_TEST)
+        glDepthFunc(GL_LESS)
+        glDepthMask(GL_TRUE)
+        glDepthRange(0.0, 1.0)
+        glClearDepth(1.0)
+        glEnable(GL_CULL_FACE)
+        glCullFace(GL_BACK)
+        glFrontFace(GL_CCW)
         if not USING_GRAPHICS_DEBUGGER:
             glEnableClientState(GL_VERTEX_ARRAY)
             glEnableClientState(GL_TEXTURE_COORD_ARRAY)
@@ -73,7 +82,7 @@ class TerrainRenderer:
         self.event.set()
 
         while not glfw.window_should_close(window):
-            time.sleep(1/60)
+            time.sleep(1/128)
             try:
                 if self.listener.get_queue_length() > 0:
                     i = self.listener.get_last_item()
@@ -243,6 +252,7 @@ class TerrainRenderer:
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
+        self.vbos_being_rendered = 0
         try:
             for data in self.vbos.values():
                 if data["render"]:
@@ -257,6 +267,7 @@ class TerrainRenderer:
                     glFlush()
 
                     glDrawArrays(self.mode, 0, data["_len"]//8)
+                    self.vbos_being_rendered += 1
         except RuntimeError:
             pass
 

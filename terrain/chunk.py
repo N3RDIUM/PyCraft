@@ -29,16 +29,30 @@ class Chunk:
             player_position = self.parent.player.pos
             player_chunk = (player_position[0] // CHUNK_SIZE, player_position[2] // CHUNK_SIZE)
 
-            distance = self.parent.render_distance // 4
-            if distance <= 2:
-                distance = 2
-            if distance >= 8:
-                distance = 4
+            distance = 2
+
             try:
-                if math.dist((player_chunk[0], player_chunk[1]), (self.position[0], self.position[1])) > distance and not DISABLE_CHUNK_CULLING:
+                # Get if the chunk is in the player's FOV
+                fov = 360 - FOV
+                rot = self.parent.player.rot
+                chunk_pos = (self.position[0] * CHUNK_SIZE, self.position[1] * CHUNK_SIZE)
+                chunk_pos = (chunk_pos[0] - player_position[0], chunk_pos[1] - player_position[2])
+                
+                # Get the angle between the player and the chunk
+                angle = math.atan2(chunk_pos[1], chunk_pos[0])
+                angle = math.degrees(angle)
+                angle = (angle + rot[1]) % 360
+
+                # If the chunk is in the player's FOV, render it
+                if angle < fov / 2 and angle > -fov / 2:
                     self.renderer.vbos[self.vbo_id]["render"] = False
                 else:
                     self.renderer.vbos[self.vbo_id]["render"] = True
+
+                # If the chunk is within the render distance, render it
+                if abs(self.position[0] - player_chunk[0]) <= distance and abs(self.position[1] - player_chunk[1]) <= distance:
+                    self.renderer.vbos[self.vbo_id]["render"] = True
+
             except KeyError:
                 pass
 

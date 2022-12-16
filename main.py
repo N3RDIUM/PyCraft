@@ -69,7 +69,7 @@ if __name__ == "__main__":
         glFogi(GL_FOG_MODE, GL_LINEAR)
         glFogf(GL_FOG_START, CHUNK_SIZE//4)
         distance = world.render_distance
-        glFogf(GL_FOG_END, (world.render_distance + 2)/4 * CHUNK_SIZE + 1)
+        glFogf(GL_FOG_END, (world.render_distance) * CHUNK_SIZE)
 
     # get window size
     def get_window_size():
@@ -116,7 +116,7 @@ if __name__ == "__main__":
         text(10, 54, "Chunks: " + str(len(world.chunks)))
         text(10, 76, "Render Distance: " + str(world.render_distance))
         text(10, 98, "Renderer to_add: " + str(renderer.listener.get_queue_length()))
-        text(10, 120, "Renderer to_remove: " + str(renderer.listener2.get_queue_length()))
+        text(10, 120, "VBOd renderings: " + str(renderer.vbos_being_rendered))
 
         glfw.poll_events()
         glfw.swap_buffers(window)

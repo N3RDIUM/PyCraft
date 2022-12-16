@@ -75,6 +75,9 @@ class World:
             return None
 
     def drawcall(self):
+        for chunk in self.chunks.values():
+            chunk._drawcall()
+            
         self.fps = 1 / (time.time() - self.last_update)
         self.fpss.append(self.fps)
         if len(self.fpss) > FPS_SAMPLES:
@@ -111,8 +114,6 @@ class World:
 
             self.to_delete = []
             for chunk in self.chunks.values():
-                if chunk.position in positions:
-                    chunk._drawcall()
-                else:
+                if not chunk.position in positions:
                     chunk._dispose()
                     self.to_delete.append(chunk.position)             
