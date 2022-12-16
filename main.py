@@ -7,7 +7,6 @@
 # |_|         ||    |______| |_| \_\/_/      \|_|         |__|  *
 #################################################################
 
-
 # imports
 import glfw
 import shutil
@@ -43,11 +42,6 @@ for i in range(CHUNK_GENERATORS):
     chunk_generator = subprocess.Popen(
         [sys.executable, "helpers/chunk_generator.py"])
     chunk_generators.append(chunk_generator)
-
-for i in range(CHUNK_BUILDERS):
-    chunk_builder = subprocess.Popen(
-        [sys.executable, "helpers/chunk_builder.py"])
-    chunk_builders.append(chunk_builder)
 
 flask_process = subprocess.Popen(
         [sys.executable, "helpers/flask_server.py"])
@@ -99,6 +93,7 @@ if __name__ == "__main__":
         glViewport(0, 0, *get_window_size())
 
     # mainloop
+    drops = 0
     while not glfw.window_should_close(window):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         if not USING_GRAPHICS_DEBUGGER:
@@ -113,8 +108,10 @@ if __name__ == "__main__":
         for value in _fps:
             fps += value
         fps /= len(_fps)
+        if world.fps < MIN_FPS:
+            drops += 1
 
-        text(10, 10, "FPS: " + str(int(fps)))
+        text(10, 10, f"{int(fps)}fps {int(1/world.fps*1000)}ms (abs: {int(world.fps)}) ({drops} drops)")
         text(10, 32, "Position: " + str([int(world.player.pos[0]), int(world.player.pos[1]), int(world.player.pos[2])]))
         text(10, 54, "Chunks: " + str(len(world.chunks)))
         text(10, 76, "Render Distance: " + str(world.render_distance))

@@ -16,12 +16,12 @@ class Chunk:
         self.blocks = {}
 
         # Request chunk generation from helper
-        self.parent.writer.write(f"{self.parent.writer.written}-{encode_vector(self.position)}", {
+        self.parent._schedule(lambda: self.parent.writer.write(f"{self.parent.writer.written}-{encode_vector(self.position)}", {
             "id"          : self.vbo_id,
             "position"    : list(self.position),
             "blocktypes"  : self.block_handler.pack_blocks_to_json(),
             "seed"        : self.parent.seed
-        })
+        }))
         self.in_cache = False
 
     def _drawcall(self):
@@ -34,11 +34,13 @@ class Chunk:
                 distance = 2
             if distance >= 8:
                 distance = 4
-
-            if math.dist((player_chunk[0], player_chunk[1]), (self.position[0], self.position[1])) > distance and not DISABLE_CHUNK_CULLING:
-                self.renderer.vbos[self.vbo_id]["render"] = False
-            else:
-                self.renderer.vbos[self.vbo_id]["render"] = True
+            try:
+                if math.dist((player_chunk[0], player_chunk[1]), (self.position[0], self.position[1])) > distance and not DISABLE_CHUNK_CULLING:
+                    self.renderer.vbos[self.vbo_id]["render"] = False
+                else:
+                    self.renderer.vbos[self.vbo_id]["render"] = True
+            except KeyError:
+                pass
 
     def _dispose(self):
         try:

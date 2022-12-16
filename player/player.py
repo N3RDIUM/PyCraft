@@ -57,7 +57,7 @@ class Player:
         self.rot[0] = self.rot[0]
         self.rot[1] = self.rot[1]
 
-    def update(self):
+    def update(self, dt):
         """
         update
 
@@ -66,7 +66,7 @@ class Player:
         :dt: the delta time
         :keys: the keys pressed
         """
-        sens = self.speed
+        sens = self.speed * dt / 0.03
         rotY = math.radians(-self.rot[1])
         dx, dz = math.sin(rotY), math.cos(rotY)
 

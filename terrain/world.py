@@ -26,6 +26,7 @@ class World:
         self.last_update = time.time()
         self.fps = 0
         self.fpss = []
+        self.scheduled = []
 
         self.player.pos = [
             0,
@@ -40,6 +41,9 @@ class World:
         self.thread = threading.Thread(target=self._thread)
         self.thread.start()
         self.generate()
+
+    def _schedule(self, func):
+        self.scheduled.append(func)
 
     def generate_chunk(self, position):
         self.chunks[position] = Chunk(self.renderer, position, self)
@@ -71,36 +75,18 @@ class World:
             return None
 
     def drawcall(self):
-        self.player.update()
-
-        # INFGEN
-        position = (round(self.player.pos[0] // CHUNK_SIZE), round(self.player.pos[2] // CHUNK_SIZE))
-        positions = []
-        for i in range(-self.render_distance + position[0], self.render_distance + position[0]):
-            for j in range(-self.render_distance + position[1], self.render_distance + position[1]):
-                if (i, j) not in self.chunks:
-                    self.generate_chunk((i, j))
-                positions.append((i, j))
-
-        self.to_delete = []
-        for chunk in self.chunks.values():
-            if chunk.position in positions:
-                chunk._drawcall()
-            if math.dist(chunk.position, position) > self.render_distance + 2:
-                chunk._dispose()
-                self.to_delete.append(chunk.position) 
-
         self.fps = 1 / (time.time() - self.last_update)
         self.fpss.append(self.fps)
-        if len(self.fpss) > 100:
+        if len(self.fpss) > FPS_SAMPLES:
             self.fpss.pop(0)
+        self.player.update(dt = time.time() - self.last_update)
         self.last_update = time.time()
 
     def _thread(self):
         while True:
-            time.sleep(0.1)
-            if len(self.to_delete) == 0:
+            if len(self.to_delete) == 0 and len(self.scheduled) == 0:
                 continue
+
             for position in self.to_delete:
                 del self.chunks[position]
                 # delete request file
@@ -109,3 +95,24 @@ class World:
                     os.remove(f"cache/chunk_build/{filename}.json")
                 if os.path.exists(f"cache/chunk/{filename}.json"):
                     os.remove(f"cache/chunk/{filename}.json")
+            self.to_delete = []
+
+            for func in self.scheduled:
+                func()
+
+            # INFGEN
+            position = (round(self.player.pos[0] // CHUNK_SIZE), round(self.player.pos[2] // CHUNK_SIZE))
+            positions = []
+            for i in range(-self.render_distance + position[0], self.render_distance + position[0]):
+                for j in range(-self.render_distance + position[1], self.render_distance + position[1]):
+                    if (i, j) not in self.chunks:
+                        self.generate_chunk((i, j))
+                    positions.append((i, j))
+
+            self.to_delete = []
+            for chunk in self.chunks.values():
+                if chunk.position in positions:
+                    chunk._drawcall()
+                else:
+                    chunk._dispose()
+                    self.to_delete.append(chunk.position)             

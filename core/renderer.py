@@ -12,10 +12,6 @@ from core.util import *
 
 glfw.init()
 
-VERTICES_SIZE = 256 * 16 * 16 * 8 * 24 * 3
-TEXCOORDS_SIZE = 256 * 16 * 16 * 8 * 24 * 2
-
-
 class TerrainRenderer:
     def __init__(self, window, mode=GL_TRIANGLES):
         self.event = threading.Event()
@@ -31,6 +27,7 @@ class TerrainRenderer:
         self.writer2 = WriterBase("cache/vbo_remove/")
         self.delete_queue = []
         self.delete_queue_vbo = []
+        self.create_queue = []
 
         self.init(window)
 
@@ -44,6 +41,9 @@ class TerrainRenderer:
             glEnableClientState(GL_TEXTURE_COORD_ARRAY)
 
     def create_vbo(self, id):
+        self.create_queue.append(id)
+
+    def _create_vbo(self, id):
         self.vbo, self.vbo_1 = glGenBuffers(2)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         glBufferData(GL_ARRAY_BUFFER, VERTICES_SIZE, None, GL_DYNAMIC_DRAW)
@@ -73,6 +73,7 @@ class TerrainRenderer:
         self.event.set()
 
         while not glfw.window_should_close(window):
+            time.sleep(1/60)
             try:
                 if self.listener.get_queue_length() > 0:
                     i = self.listener.get_last_item()
@@ -185,8 +186,12 @@ class TerrainRenderer:
                         info("TerrainRenderer", "Deleted VBO: " + id)
                     except:
                         pass
-            except:
-                pass
+
+                for i in range(len(self.create_queue)):
+                    id = self.create_queue.pop()
+                    self._create_vbo(id)
+            except Exception as e:
+                error("TerrainRenderer", f"Error in thread: {e}")
             glfw.swap_buffers(window2)
         glfw.terminate()
         self.event.set()
@@ -251,7 +256,7 @@ class TerrainRenderer:
                         glTexCoordPointer(2, GL_FLOAT, 0, None)
                     glFlush()
 
-                    glDrawArrays(self.mode, 0, data["_len"]//8*5)
+                    glDrawArrays(self.mode, 0, data["_len"]//8)
         except RuntimeError:
             pass
 
