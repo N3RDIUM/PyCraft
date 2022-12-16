@@ -86,7 +86,7 @@ class World:
         for chunk in self.chunks.values():
             if chunk.position in positions:
                 chunk._drawcall()
-            if math.dist(chunk.position, position) > self.render_distance * 2:
+            if math.dist(chunk.position, position) > self.render_distance + 2:
                 chunk._dispose()
                 self.to_delete.append(chunk.position) 
 
