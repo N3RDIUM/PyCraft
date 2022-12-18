@@ -1,5 +1,5 @@
 import psutil
-STEP = psutil.cpu_count(logical=False) * 4096
+STEP = psutil.cpu_count(logical=False) * 1024 * 4
 
 class TerrainMeshStorage:
     def __init__(self):

@@ -22,7 +22,7 @@ from core.renderer import *
 from player import *
 from settings import *
 from terrain.world import *
-from core.text import text
+from core.text import text, display_debug
 
 # start helpers
 try:
@@ -57,6 +57,7 @@ if __name__ == "__main__":
     renderer.texture_manager.add_from_folder("assets/textures/block/")
     renderer.texture_manager.save("atlas.png")
     renderer.texture_manager.bind()
+    renderer.init(window)
 
     world = World(renderer)
 
@@ -102,7 +103,7 @@ if __name__ == "__main__":
 
         world.drawcall()
         renderer.render()
-        
+
         _fps = world.fpss
         fps = 0
         for value in _fps:
@@ -111,12 +112,8 @@ if __name__ == "__main__":
         if world.fps < MIN_FPS:
             drops += 1
 
-        text(10, 10, f"{int(fps)}fps {int(1/world.fps*1000)}ms (abs: {int(world.fps)}) ({drops} drops)")
-        text(10, 32, "Position: " + str([int(world.player.pos[0]), int(world.player.pos[1]), int(world.player.pos[2])]))
-        text(10, 54, "Chunks: " + str(len(world.chunks)))
-        text(10, 76, "Render Distance: " + str(world.render_distance))
-        text(10, 98, "Renderer to_add: " + str(renderer.listener.get_queue_length()))
-        text(10, 120, "VBOd renderings: " + str(renderer.vbos_being_rendered))
+        text((10, 10), f"{int(fps)}fps {int(1/world.fps*1000)}ms (abs: {int(world.fps)}) ({drops} drops)")
+        display_debug((10, 32), renderer.debug_text)
 
         glfw.poll_events()
         glfw.swap_buffers(window)
@@ -146,8 +143,7 @@ if __name__ == "__main__":
         for process in active:
             process.close()
     except:
-        sys.exit(
-            "Helper processes could not be terminated. Please terminate them manually.")
+        sys.exit("Helper processes could not be terminated. Please terminate them manually.")
 
     try:
         shutil.rmtree("cache/")

@@ -1,8 +1,8 @@
 from terrain.block import *
 from core.util import encode_vector
-from core.fileutils import WriterBase
 import math
 from settings import *
+import threading
 
 class Chunk:
     def __init__(self, renderer, position, parent=None):
@@ -24,16 +24,13 @@ class Chunk:
         }))
         self.in_cache = False
 
-    def _drawcall(self):
+    def _loop(self):
         if not self.in_cache:
             player_position = self.parent.player.pos
             player_chunk = (player_position[0] // CHUNK_SIZE, player_position[2] // CHUNK_SIZE)
 
-            distance = 2
-
             try:
                 # Get if the chunk is in the player's FOV
-                fov = 360 - FOV
                 rot = self.parent.player.rot
                 chunk_pos = (self.position[0] * CHUNK_SIZE, self.position[1] * CHUNK_SIZE)
                 chunk_pos = (chunk_pos[0] - player_position[0], chunk_pos[1] - player_position[2])
@@ -44,13 +41,12 @@ class Chunk:
                 angle = (angle + rot[1]) % 360
 
                 # If the chunk is in the player's FOV, render it
-                if angle < fov / 2 and angle > -fov / 2:
-                    self.renderer.vbos[self.vbo_id]["render"] = False
+                if angle < FOV / 2 and angle > -FOV / 2:
+                    if not math.dist(chunk_pos, player_chunk) < self.parent.render_distance // 4:
+                        self.renderer.vbos[self.vbo_id]["render"] = False
+                    else:
+                        self.renderer.vbos[self.vbo_id]["render"] = True
                 else:
-                    self.renderer.vbos[self.vbo_id]["render"] = True
-
-                # If the chunk is within the render distance, render it
-                if abs(self.position[0] - player_chunk[0]) <= distance and abs(self.position[1] - player_chunk[1]) <= distance:
                     self.renderer.vbos[self.vbo_id]["render"] = True
 
             except KeyError:

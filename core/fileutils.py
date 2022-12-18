@@ -3,6 +3,8 @@ import json
 import threading
 import random
 import time
+import base64
+from settings import *
 
 class ListenerBase:
     def __init__(self, directory):
@@ -29,7 +31,8 @@ class ListenerBase:
             item = self.queue[self.queue.index(id)]
             with open(self.directory + item + ".json", "r") as f:
                 if f.readable():
-                    data = json.load(f)
+                    data = base64.b64decode(f.read())
+                    data = json.loads(data)
             try:
                 if not no_delete:
                     os.remove(self.directory + item + ".json")
@@ -98,12 +101,14 @@ class WriterBase:
                         filename = str(self.written + 1)
                         self.written += 1
                         break
-            with open(self.directory + filename + ".json", "w") as f:
-                dat = json.dumps(data)
-                f.write(dat)
+            with open(self.directory + filename + ".json", "wb") as f:
+                data = json.dumps(data)
+                data = base64.b64encode(data.encode("utf-8"))
+                f.write(data)
             self.written += 1
         else:
-            with open(self.directory + filename + ".json", "w") as f:
-                dat = json.dumps(data)
-                f.write(dat)
+            with open(self.directory + filename + ".json", "wb") as f:
+                data = json.dumps(data)
+                data = base64.b64encode(data.encode("utf-8"))
+                f.write(data)
             self.written += 1

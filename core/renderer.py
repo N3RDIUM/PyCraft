@@ -19,6 +19,7 @@ class TerrainRenderer:
         self.parent = window
         self.mode = mode
         self.vbos = {}
+        self.debug_text = []
 
         self.texture_manager = TextureAtlas()
         self.listener = ListenerBase("cache/vbo/")
@@ -29,10 +30,6 @@ class TerrainRenderer:
         self.delete_queue_vbo = []
         self.create_queue = []
         self.vbos_being_rendered = 0
-
-        self.init(window)
-
-        self.create_vbo("DEFAULT")
 
         glEnable(GL_TEXTURE_2D)
         glEnable(GL_BLEND)
@@ -49,15 +46,21 @@ class TerrainRenderer:
             glEnableClientState(GL_VERTEX_ARRAY)
             glEnableClientState(GL_TEXTURE_COORD_ARRAY)
 
+    def debug(self, text):
+        timestamp = time.strftime("%H:%M:%S", time.localtime())
+        self.debug_text.append(f"[{timestamp}] {text}")
+
     def create_vbo(self, id):
         self.create_queue.append(id)
 
     def _create_vbo(self, id):
         self.vbo, self.vbo_1 = glGenBuffers(2)
+        self.debug("[TerrainRenderer] Creating VBO...")
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         glBufferData(GL_ARRAY_BUFFER, VERTICES_SIZE, None, GL_DYNAMIC_DRAW)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo_1)
         glBufferData(GL_ARRAY_BUFFER, TEXCOORDS_SIZE, None, GL_DYNAMIC_DRAW)
+        self.debug("[TerrainRenderer] Setting default VBO data...")
         self.vbos[id] = {
             "vbo": self.vbo,
             "vbo_1": self.vbo_1,
@@ -69,9 +72,6 @@ class TerrainRenderer:
             "addition_history": []
         }
 
-    def _delete_vbo(self, id):
-        self.delete_queue.append(id)
-
     def delete_vbo(self, id):
         self.delete_queue_vbo.append(id)
 
@@ -82,10 +82,12 @@ class TerrainRenderer:
         self.event.set()
 
         while not glfw.window_should_close(window):
-            time.sleep(1/128)
+            time.sleep(1/60)
             try:
                 if self.listener.get_queue_length() > 0:
+                    self.debug("[TerrainRenderer] Reading file...")
                     i = self.listener.get_last_item()
+                    self.debug("[TerrainRenderer] Processing file...")
                     id = i["id"]
                     data = self.vbos[id]
                     vbo = data["vbo"]
@@ -111,7 +113,8 @@ class TerrainRenderer:
                         continue                    
 
                     log_vertex_addition((vertices, texture_coords), (bytes_vertices, bytes_texCoords), _len*4, _len_*4, self.listener.get_queue_length())
-
+                    
+                    self.debug("[TerrainRenderer] Adding data to VBO...")
                     glBindBuffer(GL_ARRAY_BUFFER, vbo)
                     glBufferSubData(GL_ARRAY_BUFFER, _len, bytes_vertices, verts)
                     if not USING_GRAPHICS_DEBUGGER:
@@ -124,6 +127,7 @@ class TerrainRenderer:
                         glTexCoordPointer(2, GL_FLOAT, 0, None)
                     glFlush()
 
+                    self.debug("[TerrainRenderer] Updating VBO data...")
                     _vertices += tuple(vertices)
                     _texCoords += tuple(texture_coords)
 
@@ -138,7 +142,9 @@ class TerrainRenderer:
 
                 if self.listener2.get_queue_length() > 0:
                     try:
+                        self.debug("[TerrainRenderer] Reading file...")
                         data = self.listener2.get_last_item()
+                        self.debug("[TerrainRenderer] Processing file...")
                         id = data["id"]
 
                         vbo_data = data["vbo_data"]
@@ -147,10 +153,12 @@ class TerrainRenderer:
 
                         _vertices = self.vbos[id]["vertices"]
                         _texCoords = self.vbos[id]["texCoords"]
+                        self.debug("[TerrainRenderer] Processing index ranges...")
 
                         # Get index of the data in the VBO
                         indexrange_vertices = get_indexrange(_vertices, vertices)
                         indexrange_texCoords = [indexrange_vertices[0]//3*2, indexrange_vertices[1]//3*2]
+                        self.debug("[TerrainRenderer] Removing data from VBO...")
 
                         # Remove the data from the VBO
                         _vertices = _vertices[:indexrange_vertices[0]] + _vertices[indexrange_vertices[1]:]
@@ -170,10 +178,6 @@ class TerrainRenderer:
                     except Exception as e:
                         print(e)
 
-                if len(self.delete_queue) > 0:
-                    id = self.delete_queue.pop()
-                    self.delete_vbo(id)
-
                 if len(self.delete_queue_vbo) > 0:
                     try:
                         id = self.delete_queue_vbo.pop()
@@ -183,11 +187,13 @@ class TerrainRenderer:
                         self.vbos[id]["vertices"] = ()
                         self.vbos[id]["texCoords"] = ()
                         self.vbos[id]["addition_history"] = []
+                        self.debug("[TerrainRenderer] Deleting VBO data...")
 
                         glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo"])
                         glBufferData(GL_ARRAY_BUFFER, VERTICES_SIZE, None, GL_DYNAMIC_DRAW)
                         glBindBuffer(GL_ARRAY_BUFFER, self.vbos[id]["vbo_1"])
                         glBufferData(GL_ARRAY_BUFFER, TEXCOORDS_SIZE, None, GL_DYNAMIC_DRAW)
+                        self.debug("[TerrainRenderer] Deleting VBO...")
 
                         glDeleteBuffers(2, [self.vbos[id]["vbo"], self.vbos[id]["vbo_1"]])
 
@@ -198,7 +204,9 @@ class TerrainRenderer:
 
                 for i in range(len(self.create_queue)):
                     id = self.create_queue.pop()
+                    self.debug("[TerrainRenderer] Creating VBO...")
                     self._create_vbo(id)
+                    
             except Exception as e:
                 error("TerrainRenderer", f"Error in thread: {e}")
             glfw.swap_buffers(window2)
@@ -209,10 +217,11 @@ class TerrainRenderer:
 
     def init(self, window):
         glfw.make_context_current(None)
-        thread = threading.Thread(target=self.shared_context, args=[window], daemon=True)
-        thread.start()
+        self.thread = threading.Thread(target=self.shared_context, args=[window], daemon=True)
+        self.thread.start()
         self.event.wait()
         glfw.make_context_current(window)
+        self.create_vbo("DEFAULT")
 
     def add(self, vertices, texCoords):
         self.writer.write("AUTO", {
@@ -251,7 +260,7 @@ class TerrainRenderer:
         glEnable(GL_BLEND)
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-
+        
         self.vbos_being_rendered = 0
         try:
             for data in self.vbos.values():

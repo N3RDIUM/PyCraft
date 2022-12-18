@@ -10,6 +10,7 @@ from noise import snoise3
 import requests
 import threading
 import time
+from core.fileutils import WriterBase
 
 class World:
     def __init__(self, renderer):
@@ -20,7 +21,7 @@ class World:
 
         self.chunks = {}
         self.writer = WriterBase("cache/chunk/")
-        self.render_distance = 12
+        self.render_distance = 8
         self.seed = random.randint(0, 1000000)
         self.to_delete = []
         self.last_update = time.time()
@@ -38,14 +39,17 @@ class World:
             0
         ]
 
+        self.renderer.debug("[World] Generating world...")
         self.thread = threading.Thread(target=self._thread)
         self.thread.start()
         self.generate()
 
     def _schedule(self, func):
+        self.renderer.debug("[World] Scheduling function...")
         self.scheduled.append(func)
 
     def generate_chunk(self, position):
+        self.renderer.debug("[World] Generating chunk...")
         self.chunks[position] = Chunk(self.renderer, position, self)
 
     def generate(self):
@@ -53,31 +57,7 @@ class World:
             for j in range(-self.render_distance, self.render_distance):
                 self.generate_chunk((i, j))
 
-    def block_exists(self, position):
-        position = encode_vector(position)
-        try:
-            r = requests.get(f"http://localhost:5079/api/v1/block_exists?position={position}")
-            data = r.json()
-            if data["exists"]:
-                return True, data["block"]
-            else:
-                return False, None
-        except requests.exceptions.ConnectionError:
-            return False, None
-
-    def remove_block(self, position):
-        position = encode_vector(position)
-        try:
-            r = requests.get(f"http://localhost:5079/api/v1/remove_block?position={position}")
-            data = r.json()
-            return data
-        except requests.exceptions.ConnectionError:
-            return None
-
     def drawcall(self):
-        for chunk in self.chunks.values():
-            chunk._drawcall()
-            
         self.fps = 1 / (time.time() - self.last_update)
         self.fpss.append(self.fps)
         if len(self.fpss) > FPS_SAMPLES:
@@ -91,6 +71,7 @@ class World:
                 continue
 
             for position in self.to_delete:
+                self.renderer.debug("[World] Deleting chunk...")
                 del self.chunks[position]
                 # delete request file
                 filename = encode_vector(position)
@@ -116,4 +97,6 @@ class World:
             for chunk in self.chunks.values():
                 if not chunk.position in positions:
                     chunk._dispose()
-                    self.to_delete.append(chunk.position)             
+                    self.to_delete.append(chunk.position)       
+                else:
+                    chunk._loop()    
