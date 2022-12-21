@@ -60,7 +60,7 @@ class Window:
             logger.fatal("Window", "GLFW failed to initialize!")
             raise GLFWInitError("GLFW failed to initialize!")
         self.window = glfw.create_window(kwargs.get("width", 800), kwargs.get(
-            "height", 500), kwargs.get("title", "Window"), None, None)  # Create the GLFW window.
+            "height", 500), kwargs.get("title", "PyCraft"), None, None)  # Create the GLFW window.
         # Make the window the current context.
         logger.info("[Window] Setting up window...")
         glfw.make_context_current(self.window)

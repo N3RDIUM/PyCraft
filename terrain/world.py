@@ -1,6 +1,6 @@
 # imports
 from misc import Sky
-from core import logger
+from core import logger, Player
 
 class World:
     """
@@ -18,12 +18,14 @@ class World:
         self.window = window
         self.renderer = renderer
 
-        # Initialize the sky
+        # Initialize
         self.sky = Sky()
+        self.player = Player(window=window, world=self)
 
     def drawcall(self):
         """
         Draw the world.
         """
         self.sky.drawcall() # Draw the sky
+        self.player.drawcall() # Update the player
         # self.renderer.drawcall()
