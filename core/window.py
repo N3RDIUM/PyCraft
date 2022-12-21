@@ -156,6 +156,7 @@ class Window:
         while not glfw.window_should_close(self.window):  # Main loop.
             # OpenGL stuff.
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            self._update_3d()
 
             for obj in self._scheduled_main:  # Loop through the scheduled objects.
                 obj.drawcall()  # Draw the object.
