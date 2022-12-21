@@ -1,8 +1,10 @@
 # imports
-from core import Window
+from core import Window, logger
 
-# initialize window
+# Initialize
+logger.info("[PyCraft] Initializing...")
 window = Window()
 
 if __name__ == "__main__":
-    window.mainloop()
+    logger.info("[PyCraft] Starting mainloop...")
+    window.mainloop()  # Start the mainloop

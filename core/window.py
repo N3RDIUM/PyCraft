@@ -2,8 +2,12 @@
 import threading
 
 import glfw
-from OpenGL.GL import glClear, GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, glMatrixMode, GL_PROJECTION, glLoadIdentity, GL_MODELVIEW, glViewport
+from OpenGL.GL import (GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_MODELVIEW,
+                       GL_PROJECTION, glClear, glLoadIdentity, glMatrixMode,
+                       glViewport)
 from OpenGL.GLU import gluPerspective
+
+from .logger import logging as logger
 
 ##################################################
 # Errors                                         #
@@ -51,11 +55,14 @@ class Window:
 
         :param kwargs: Keyword arguments.
         """
+        logger.info("[Window] Initializing window...")
         if not glfw.init():
+            logger.fatal("Window", "GLFW failed to initialize!")
             raise GLFWInitError("GLFW failed to initialize!")
         self.window = glfw.create_window(kwargs.get("width", 800), kwargs.get(
-            "height", 600), kwargs.get("title", "Window"), None, None)  # Create the GLFW window.
+            "height", 500), kwargs.get("title", "Window"), None, None)  # Create the GLFW window.
         # Make the window the current context.
+        logger.info("[Window] Setting up window...")
         glfw.make_context_current(self.window)
 
         self._scheduled_sc = []  # Scheduled shared context objects.
@@ -63,11 +70,13 @@ class Window:
         self.event = threading.Event()  # Event for the shared context.
 
         # Start the shared context.
+        logger.info("[Window] Starting shared context...")
         glfw.make_context_current(None)  # Make the shared context current.
         threading.Thread(target=self.shared_context).start()
         self.event.wait()  # Wait for the shared context to start.
         # Make the main context current.
         glfw.make_context_current(self.window)
+        logger.info("[Window] Window + shared context initialized!")
 
     def _setup_3d(self):
         """
@@ -132,6 +141,7 @@ class Window:
         glfw.make_context_current(window2)
         self.event.set()  # Let the main thread continue.
 
+        logger.info("[Window/Shared Context] Starting shared context loop...")
         while not glfw.window_should_close(self.window):  # Side loop.
             for obj in self._scheduled_sc:  # Loop through the scheduled objects.
                 obj.update()  # Update the object.
