@@ -41,7 +41,7 @@ class Player:
             "position": [0, 0, 0],
             "rotation": [0, 0, 0],
             "velocity": [0, 0, 0],
-            "friction": 0.98,
+            "friction": 0.9,
             "gravity": 9.81,
             "speed": 0.1,
             "zoom": False,
@@ -98,14 +98,14 @@ class Player:
                 self.state["rotation"][0] = 90
             elif self.state["rotation"][0] < -90:  # clamp pitch
                 self.state["rotation"][0] = -90
-            self.mouse_delta = current_position  # update mouse delta
+            self.state["mouse_delta"] = current_position  # update mouse delta
 
         # SHIFT to fly down
         if glfw.get_key(self.window.window, glfw.KEY_LEFT_SHIFT) == glfw.PRESS:
-            self.vel[1] -= 0.05
+            self.state["velocity"][1] -= 0.05
         # SPACE to fly up
         if glfw.get_key(self.window.window, glfw.KEY_SPACE) == glfw.PRESS:
-            self.vel[1] += 0.05
+            self.state["velocity"][1] += 0.05
 
         self.state["position"][0] += self.state["velocity"][0]
         self.state["position"][1] += self.state["velocity"][1]
