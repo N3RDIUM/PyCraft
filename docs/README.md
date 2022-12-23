@@ -1,4 +1,4 @@
-<a href = "https://SubNerd.github.io/PyCraft"><img src="../assets/PyCraftLogo.png" width="100%" height="100%"></a>
+<a href = "https://SubNerd.github.io/PyCraft"><img src=".._old/assets/PyCraftLogo.png" width="100%" height="100%"></a>
 
 #### 🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧
 #### This game is undergoing a major remake and will be 'unplayable' for some time.
