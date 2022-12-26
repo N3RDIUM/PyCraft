@@ -1,73 +1,88 @@
 # imports
-import ctypes
-
-import pyglet
-from OpenGL.GL import (GL_NEAREST, GL_RGBA, GL_TEXTURE_2D_ARRAY,
-                       GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER,
-                       GL_UNSIGNED_BYTE, GLuint, glBindTexture,
-                       glGenerateMipmap, glGenTextures, glTexImage3D,
+import numpy as np
+from OpenGL.GL import (GL_BGR, GL_CLAMP_TO_EDGE, GL_LINEAR, GL_RGBA, GL_RGBA8,
+                       GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER,
+                       GL_TEXTURE_MIN_FILTER, GL_TEXTURE_WRAP_R,
+                       GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, GL_UNSIGNED_BYTE,
+                       glBindTexture, glGenTextures, glTexImage3D,
                        glTexParameteri, glTexSubImage3D)
-
-########################################################################
-# Implementation from https://github.com/obiwac/python-minecraft-clone #
-########################################################################
+from PIL import Image
 
 
 class TextureManager:
     """
     TextureManager
 
-    A texture manager for PyCraft.
+    A class to manage the textures used in the game
     """
 
-    def __init__(self, texture_width=32, texture_height=32, max_textures=1024):
-        self.texture_width = texture_width
-        self.texture_height = texture_height
+    def __init__(self, width, height, depth):
+        # Create a new texture object and bind it
+        self.tex = glGenTextures(1)
+        glBindTexture(GL_TEXTURE_3D, self.tex)
 
-        self.max_textures = max_textures
+        # Set the texture parameters
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE)
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
-        self.textures = []
-        self.texture_indexes = {}
+        # Create the initial data for the texture
+        self.data = np.zeros((width, height, depth, 4), dtype=np.uint8)
 
-        self.texture_array = GLuint(0)
-        glGenTextures(1, self.texture_array)
-        glBindTexture(GL_TEXTURE_2D_ARRAY, self.texture_array)
+        # Use glTexImage3D to upload the data to the texture
+        glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, width, height,
+                     depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, self.data)
 
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        # Set the current depth to 0
+        self.current_depth = 0
+        self.texture_coords = {}
 
-        glTexImage3D(
-            GL_TEXTURE_2D_ARRAY, 0, GL_RGBA,
-            self.texture_width, self.texture_height, self.max_textures,
-            0, GL_RGBA, GL_UNSIGNED_BYTE, None)
+    def add_slice(self, filepath):
+        """
+        Add a slice to the texture
 
-    def generate_mipmaps(self):
-        glGenerateMipmap(GL_TEXTURE_2D_ARRAY)
+        :param filepath: The path to the image file to add
 
-    def add_texture(self, texture):
-        if not texture in self.textures:
-            self.textures.append(texture)
+        :return: The texture coordinates for the added slice
+        """
+        # Load the image data from the file using PIL
+        image = Image.open(filepath)
+        image_data = np.array(image)
 
-            texture_image = pyglet.image.load(
-                f"textures/{texture}.png").get_image_data()
-            glBindTexture(GL_TEXTURE_2D_ARRAY, self.texture_array)
+        # Convert the image data to the correct format and shape
+        image_data = image_data[:, :, :3]  # Drop the alpha channel if present
+        image_data = np.ascontiguousarray(
+            image_data[:, :, ::-1])  # Convert from RGB to BGR
+        # Add a singleton dimension for the z axis
+        image_data = np.expand_dims(image_data, axis=2)
 
-            glTexSubImage3D(
-                GL_TEXTURE_2D_ARRAY, 0,
-                0, 0, self.textures.index(texture),
-                self.texture_width, self.texture_height, 1,
-                GL_RGBA, GL_UNSIGNED_BYTE,
-                texture_image.get_data("RGBA", texture_image.width * 4))
+        # Update the texture using glTexSubImage3D
+        glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, self.current_depth,
+                        image.size[0], image.size[1], 1, GL_BGR, GL_UNSIGNED_BYTE, image_data)
 
-            self.texture_indexes[texture] = self.textures.index(texture)
+        # Increment the current depth
+        self.current_depth += 1
 
-    def get_texture_index(self, texture):
-        return self.texture_indexes[texture]
+        # Return the texture coordinates for the added slice
+        x1, y1, x2, y2 = 0, 0, 1, 1
+        z = self.current_depth / self.data.shape[2]
+        self.texture_coords[filepath] = (x1, y1, z, x2, y2, z)
+        return self.texture_coords[filepath]
 
-    def generate_texture_coords(self, texture):
-        return [
-            0, self.get_texture_index(texture), 0,
-            1, self.get_texture_index(texture), 0,
-            1, self.get_texture_index(texture), 1,
-            0, self.get_texture_index(texture), 1
-        ]
+    def get_texture_coords(self, filepath):
+        """
+        Get the texture coordinates for a slice
+
+        :param filepath: The path to the image file to get the texture coordinates for
+
+        :return: The texture coordinates for the slice
+        """
+        return self.texture_coords[filepath]
+
+    def bind(self):
+        """
+        Bind the texture
+        """
+        glBindTexture(GL_TEXTURE_3D, self.tex)
