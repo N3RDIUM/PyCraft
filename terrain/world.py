@@ -1,8 +1,11 @@
 # imports
-from misc import Sky
-from core import logger, Player
+from random import randint
 
 from OpenGL.GL import *  # Import OpenGL
+
+from core import Player, Renderer, logger
+from misc import Sky
+
 
 class World:
     """
@@ -11,66 +14,35 @@ class World:
     The world class for PyCraft.
     """
 
-    def __init__(self, window=None, renderer=None):
+    def __init__(self, window=None):
         """
         Initialize the world.
         """
         logger.info("[World] Initializing world...")
-        # Window and sky properties
+
+        # Window properties
         self.window = window
-        self.renderer = renderer
 
         # Initialize
         self.sky = Sky()
         self.player = Player(window=window, world=self)
+        self.renderer = Renderer(window=window)
+
+    def _(self):
+        # Add random data to the renderer
+        for i in range(100):
+            self.renderer.modify("default", [randint(0, 10), randint(0, 10), randint(0, 10)], [0.0, 0.0, 0.0], i*3)
 
     def drawcall(self):
         """
         Draw the world.
         """
-        self.sky.drawcall() # Draw the sky
-        self.player.drawcall() # Update the player
-        # self.renderer.drawcall()
         glEnable(GL_DEPTH_TEST)  # Enable depth testing
         glEnable(GL_CULL_FACE)  # Enable culling
-        
-        glBegin(GL_QUADS)  # Begin drawing quads
+
+        self.sky.drawcall()  # Draw the sky
+        self.player.drawcall()  # Update the player
         glColor3f(0.0, 1.0, 0.0)  # Set the color to green
+        self.renderer.drawcall() # Draw the renderer
         
-        # Draw the front face
-        glVertex3f(-1.0, -1.0, 1.0)
-        glVertex3f(1.0, -1.0, 1.0)
-        glVertex3f(1.0, 1.0, 1.0)
-        glVertex3f(-1.0, 1.0, 1.0)
-
-        # Draw the back face
-        glVertex3f(-1.0, -1.0, -1.0)
-        glVertex3f(-1.0, 1.0, -1.0)
-        glVertex3f(1.0, 1.0, -1.0)
-        glVertex3f(1.0, -1.0, -1.0)
-    
-        # Draw the top face
-        glVertex3f(-1.0, 1.0, -1.0)
-        glVertex3f(-1.0, 1.0, 1.0)
-        glVertex3f(1.0, 1.0, 1.0)
-        glVertex3f(1.0, 1.0, -1.0)
-
-        # Draw the bottom face
-        glVertex3f(-1.0, -1.0, -1.0)
-        glVertex3f(1.0, -1.0, -1.0)
-        glVertex3f(1.0, -1.0, 1.0)
-        glVertex3f(-1.0, -1.0, 1.0)
-
-        # Draw the right face
-        glVertex3f(1.0, -1.0, -1.0)
-        glVertex3f(1.0, 1.0, -1.0)
-        glVertex3f(1.0, 1.0, 1.0)
-        glVertex3f(1.0, -1.0, 1.0)
-        
-        # Draw the left face
-        glVertex3f(-1.0, -1.0, -1.0)
-        glVertex3f(-1.0, -1.0, 1.0)
-        glVertex3f(-1.0, 1.0, 1.0)
-        glVertex3f(-1.0, 1.0, -1.0)
-        
-        glEnd()  # End drawing quads
+        self._() # Add random data to the renderer
