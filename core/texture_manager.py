@@ -38,6 +38,7 @@ class TextureManager:
         # Set the current depth to 0
         self.current_depth = 0
         self.texture_coords = {}
+        self._texture_coords = []
 
     def add_slice(self, filepath):
         """
@@ -68,7 +69,12 @@ class TextureManager:
         # Return the texture coordinates for the added slice
         x1, y1, x2, y2 = 0, 0, 1, 1
         z = self.current_depth / self.data.shape[2]
-        self.texture_coords[filepath] = (x1, y1, z, x2, y2, z)
+        self.texture_coords[filepath] = (
+            x1, y1, z, x2, y1, z, x2, y2, z, x1, y2, z)
+        self._texture_coords.append({
+            "filepath": filepath,
+            "coords": (x1, y1, z, x2, y1, z, x2, y2, z, x1, y2, z)
+        })
         return self.texture_coords[filepath]
 
     def get_texture_coords(self, filepath):
@@ -86,3 +92,12 @@ class TextureManager:
         Bind the texture
         """
         glBindTexture(GL_TEXTURE_3D, self.tex)
+        
+    def get_texcoords_from_index(self, index):
+        return self._texture_coords[index]["coords"]
+    
+    def get_texture_index(self, filepath):
+        for i, texture in enumerate(self._texture_coords):
+            if texture["filepath"] == filepath:
+                return i
+        return -1
