@@ -1,6 +1,6 @@
 # imports
 from os import listdir
-from os.path import exists, isfile, join
+from os.path import exists, isfile, join, basename
 
 import numpy as np
 from OpenGL.GL import (GL_BGR, GL_CLAMP_TO_EDGE, GL_LINEAR, GL_RGBA, GL_RGBA8,
@@ -60,29 +60,20 @@ class TextureManager:
         image = Image.open(filepath)
         image_data = np.array(image)
 
-        # Convert the image data to the correct format and shape
-        image_data = image_data[:, :, :3]  # Drop the alpha channel if present
-        image_data = np.ascontiguousarray(
-            image_data[:, :, ::-1])  # Convert from RGB to BGR
-        # Add a singleton dimension for the z axis
-        image_data = np.expand_dims(image_data, axis=2)
-
-        # Update the texture using glTexSubImage3D
-        glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, self.current_depth,
-                        image.size[0], image.size[1], 1, GL_BGR, GL_UNSIGNED_BYTE, image_data)
-
-        # Increment the current depth
-        self.current_depth += 1
-
-        # Return the texture coordinates for the added slice
+        # Upload the image data to the texture
+        glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, self.current_depth, self.width,
+                        self.height, 1, GL_RGBA, GL_UNSIGNED_BYTE, image_data)
+        
         x1, y1, x2, y2 = 0, 0, 1, 1
-        z = self.current_depth / self.data.shape[2]
+        z = self.current_depth / self.depth
+        filepath = basename(filepath)
         self.texture_coords[filepath] = (
             x1, y1, z, x2, y1, z, x2, y2, z, x1, y2, z)
         self._texture_coords.append({
             "filepath": filepath,
             "coords": (x1, y1, z, x2, y1, z, x2, y2, z, x1, y2, z)
         })
+        self.current_depth += 1
         return self.texture_coords[filepath]
 
     def get_texture_coords(self, filepath):

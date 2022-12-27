@@ -32,11 +32,10 @@ class World:
         # Load the textures
         self.texture_manager.add_from_folder("assets/textures/block")
 
-    def _(self):
         # Add random data to the renderer
         for i in range(100):
             self.renderer.modify("default", [randint(0, 10), randint(
-                0, 10), randint(0, 10)], [0.0, 0.0, 0.0], i*3)
+                0, 10), randint(0, 10)], self.texture_manager.get_texture_coords("dirt.png"), i*3)
 
     def drawcall(self):
         """
@@ -47,7 +46,4 @@ class World:
 
         self.sky.drawcall()  # Draw the sky
         self.player.drawcall()  # Update the player
-        glColor3f(0.0, 1.0, 0.0)  # Set the color to green
         self.renderer.drawcall()  # Draw the renderer
-
-        self._()  # Add random data to the renderer
