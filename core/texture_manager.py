@@ -20,7 +20,7 @@ class TextureManager:
     A class to manage the textures used in the game
     """
 
-    def __init__(self, width, height, depth):
+    def __init__(self, n_textures):
         # Create a new texture object and bind it
         self.tex = glGenTextures(1)
         glBindTexture(GL_TEXTURE_3D, self.tex)
@@ -31,13 +31,17 @@ class TextureManager:
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE)
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        
+        self.width = 32
+        self.height = 32
+        self.depth = n_textures
 
         # Create the initial data for the texture
-        self.data = np.zeros((width, height, depth, 4), dtype=np.uint8)
+        self.data = np.zeros((self.width, self.height, self.depth, 4), dtype=np.uint8)
 
         # Use glTexImage3D to upload the data to the texture
-        glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, width, height,
-                     depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, self.data)
+        glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, self.width, self.height,
+                     self.depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, self.data)
 
         # Set the current depth to 0
         self.current_depth = 0
@@ -116,5 +120,5 @@ class TextureManager:
         files = [join(folder, f) for f in listdir(folder) if isfile(join(folder, f))]
 
         # Add each file to the texture
-        for file in tqdm(files, desc=f"Loading textures from {folder}:"):
+        for file in tqdm(files, desc=f"Loading textures from {folder}"):
             self.add_slice(file)

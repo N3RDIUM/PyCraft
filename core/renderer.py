@@ -17,7 +17,7 @@ class Renderer:
     The renderer class for PyCraft: with buffer threading support.
     """
 
-    def __init__(self, window):
+    def __init__(self, window, texture_manager):
         """
         Initializes the renderer.
         """
@@ -25,6 +25,9 @@ class Renderer:
         self.window = window
         self.window.schedule_mainloop(self)
 
+        # Texture stuff
+        self.texture_manager = texture_manager
+        
         # buffer stuff
         self.buffers = {}
         self.create_buffer("default")

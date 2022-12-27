@@ -4,3 +4,4 @@ from .window import Window
 from .pcdt import pcdt_decompress, pcdt_compress, open_pcdt, save_pcdt
 from .text import text, display_debug
 from .renderer import Renderer
+from .texture_manager import TextureManager
