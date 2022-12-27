@@ -1,4 +1,7 @@
 # imports
+from os import listdir
+from os.path import exists, isfile, join
+
 import numpy as np
 from OpenGL.GL import (GL_BGR, GL_CLAMP_TO_EDGE, GL_LINEAR, GL_RGBA, GL_RGBA8,
                        GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER,
@@ -7,6 +10,7 @@ from OpenGL.GL import (GL_BGR, GL_CLAMP_TO_EDGE, GL_LINEAR, GL_RGBA, GL_RGBA8,
                        glBindTexture, glGenTextures, glTexImage3D,
                        glTexParameteri, glTexSubImage3D)
 from PIL import Image
+from tqdm import tqdm
 
 
 class TextureManager:
@@ -92,12 +96,25 @@ class TextureManager:
         Bind the texture
         """
         glBindTexture(GL_TEXTURE_3D, self.tex)
-        
+
     def get_texcoords_from_index(self, index):
         return self._texture_coords[index]["coords"]
-    
+
     def get_texture_index(self, filepath):
         for i, texture in enumerate(self._texture_coords):
             if texture["filepath"] == filepath:
                 return i
         return -1
+    
+    def add_from_folder(self, folder):
+        """
+        Add all the slices in a folder to the texture
+
+        :param folder: The folder to add the slices from
+        """
+        # Get all the files in the folder
+        files = [join(folder, f) for f in listdir(folder) if isfile(join(folder, f))]
+
+        # Add each file to the texture
+        for file in tqdm(files, desc=f"Loading textures from {folder}:"):
+            self.add_slice(file)
