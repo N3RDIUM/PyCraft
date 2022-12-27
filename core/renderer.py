@@ -36,6 +36,7 @@ class Renderer:
         self.sync = GLsync
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_TEXTURE_COORD_ARRAY)
+        glEnable(GL_TEXTURE_3D)
 
     def create_buffer(self, id):
         """
@@ -74,18 +75,11 @@ class Renderer:
         """
         Renders the buffers.
         """
-        # Texture stuff
-        glEnable(GL_TEXTURE_3D)
-        self.texture_manager.bind()
-
         for id in self.buffers.keys():
             buffer = self.buffers[id]
             if buffer["enabled"]: # If the buffer is enabled
                 glBindBuffer(GL_ARRAY_BUFFER, buffer["vertices_buffer"].buf)
-                glVertexPointer(3, GL_FLOAT, 8 * 4, None)
+                glVertexPointer(3, GL_FLOAT, 0, None)
                 glBindBuffer(GL_ARRAY_BUFFER, buffer["texture_buffer"].buf)
-                glTexCoordPointer(2, GL_FLOAT, 8 * 4, None)
+                glTexCoordPointer(2, GL_FLOAT, 0, None)
                 glDrawArrays(GL_TRIANGLES, 0, len(buffer["vertices"]))
-
-        # Texture stuff
-        glDisable(GL_TEXTURE_3D)
