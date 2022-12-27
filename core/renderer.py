@@ -75,7 +75,7 @@ class Renderer:
         Renders the buffers.
         """
         # Texture stuff
-        glEnable(GL_TEXTURE_2D)
+        glEnable(GL_TEXTURE_3D)
         self.texture_manager.bind()
 
         for id in self.buffers.keys():
@@ -88,4 +88,4 @@ class Renderer:
                 glDrawArrays(GL_TRIANGLES, 0, len(buffer["vertices"]))
 
         # Texture stuff
-        glDisable(GL_TEXTURE_2D)
+        glDisable(GL_TEXTURE_3D)
