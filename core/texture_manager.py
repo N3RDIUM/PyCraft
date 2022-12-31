@@ -83,7 +83,6 @@ class TextureManager:
         self.current_depth += 1 / self.depth
 
         # Return the texture coordinates for the added slice
-        # using GL_TRIANGLES
         x, y, X, Y = 0, 0, 1, 1
         z = self.current_depth
         filepath = basename(filepath)
