@@ -1,14 +1,15 @@
 # imports
 from os import listdir
-from os.path import exists, isfile, join, basename
+from os.path import basename, exists, isfile, join
 
 import numpy as np
-from OpenGL.GL import (glEnable, GL_BGR, GL_CLAMP_TO_EDGE, GL_LINEAR, GL_RGBA, GL_RGBA8,
-                       GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER,
+from OpenGL.GL import (GL_BGR, GL_NEAREST, GL_REPEAT, GL_RGBA, GL_RGBA8,
+                       GL_TEXTURE0, GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER,
                        GL_TEXTURE_MIN_FILTER, GL_TEXTURE_WRAP_R,
                        GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, GL_UNSIGNED_BYTE,
-                       glBindTexture, glGenTextures, glTexImage3D,
-                       glTexParameteri, glTexSubImage3D, glGenerateMipmap, glActiveTexture, GL_TEXTURE0)
+                       glActiveTexture, glBindTexture, glEnable,
+                       glGenerateMipmap, glGenTextures, glTexImage3D,
+                       glTexParameteri, glTexSubImage3D)
 from PIL import Image
 from tqdm import tqdm
 
@@ -69,37 +70,36 @@ class TextureManager:
         image_data = np.expand_dims(image_data, axis=2)
 
         # Update the texture using glTexSubImage3D
-        glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, self.current_depth,
+        glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, self.current_depth / self.data.shape[2],
                         self.width, self.height, 1, GL_BGR, GL_UNSIGNED_BYTE, image_data)
 
         # Set the texture parameters
-        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 
-        # Increment the current depth
-        self.current_depth += 1 / self.depth
-
-        # Return the texture coordinates for the added slice
-        x, y, X, Y = 0, 0, 1, 1
-        z = self.current_depth
+        # Return the texture coordinates for the slice
+        z = (1 + 2*self.current_depth) / (2*self.data.shape[2])
         filepath = basename(filepath)
-        coords = (
-            x, y, z,
-            X, y, z,
-            x, Y, z,
-
-            X, y, z,
-            X, Y, z,
-            x, Y, z
+        coords = (  # Texture coordinates for a GL_TRIANGLES
+            0, 0, z,
+            1, 0, z,
+            0, 1, z,
+            1, 0, z,
+            1, 1, z,
+            0, 1, z
         )
         self.texture_coords[filepath] = coords
         self._texture_coords.append({
             "filepath": filepath,
             "coords": coords
         })
+        
+        # Increment the current depth
+        self.current_depth += 1
+        
         return self.texture_coords[filepath]
 
     def get_texture_coords(self, filepath):

@@ -23,8 +23,7 @@ class Renderer:
         """
         # Window stuff
         self.window = window
-        self.window.schedule_mainloop(self)
-
+        
         # Texture stuff
         self.texture_manager = texture_manager
         
@@ -79,7 +78,7 @@ class Renderer:
             buffer = self.buffers[id]
             if buffer["enabled"]: # If the buffer is enabled
                 glBindBuffer(GL_ARRAY_BUFFER, buffer["vertices_buffer"].buf)
-                glVertexPointer(3, GL_FLOAT, 0, None)
+                glVertexPointer(3, GL_FLOAT, 3 * 4, None)
                 glBindBuffer(GL_ARRAY_BUFFER, buffer["texture_buffer"].buf)
-                glTexCoordPointer(2, GL_FLOAT, 0, None)
+                glTexCoordPointer(2, GL_FLOAT, 3 * 4, None)
                 glDrawArrays(GL_TRIANGLES, 0, len(buffer["vertices"]))

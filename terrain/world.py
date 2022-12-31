@@ -26,35 +26,56 @@ class World:
         # Initialize
         self.sky = Sky()
         self.player = Player(window=window, world=self)
-        self.texture_manager = TextureManager(7)
+        self.texture_manager = TextureManager(1024)
         self.renderer = Renderer(
             window=window, texture_manager=self.texture_manager)
 
         # Load the textures
         self.texture_manager.add_from_folder("assets/textures/block")
-        
-        # Texture stuff
         self.texture_manager.bind()
-        
+
         # OpenGL stuff
         glEnable(GL_DEPTH_TEST)  # Enable depth testing
         glEnable(GL_CULL_FACE)  # Enable culling
 
-        # vertices for cube in GL_TRIANGLES
         self.renderer.modify("default", (
-            0, 0, 1, 1, 0, 1, 0, 1, 1,
-            1, 0, 1, 1, 1, 1, 0, 1, 1,
-            0, 0, 0, 0, 1, 0, 1, 0, 0,
-            1, 0, 0, 0, 1, 0, 1, 1, 0,
-            1, 0, 0, 1, 1, 0, 1, 0, 1,
-            1, 0, 1, 1, 1, 0, 1, 1, 1,
-            0, 0, 0, 0, 0, 1, 0, 1, 0,
-            0, 0, 1, 0, 1, 1, 0, 1, 0,
-            0, 0, 0, 1, 0, 0, 0, 0, 1,
-            1, 0, 0, 1, 0, 1, 0, 0, 1,
-            0, 1, 0, 0, 1, 1, 1, 1, 0,
-            1, 1, 0, 0, 1, 1, 1, 1, 1,
-        ), self.texture_manager.get_texture_coords("stone.png")*6, 0)
+            0, 1, 1, 
+            1, 1, 1, 
+            1, 1, 0, 
+            0, 1, 0, 
+            0, 1, 1, 
+            1, 1, 0, 
+            0, 0, 0, 
+            1, 0, 0, 
+            1, 0, 1, 
+            0, 0, 1, 
+            0, 0, 0, 
+            1, 0, 1, 
+            0, 0, 0, 
+            0, 0, 1, 
+            0, 1, 1, 
+            0, 1, 0, 
+            0, 0, 0, 
+            0, 1, 1, 
+            1, 0, 1, 
+            1, 0, 0, 
+            1, 1, 0, 
+            1, 1, 1, 
+            1, 0, 1, 
+            1, 1, 0,
+            0, 0, 1, 
+            1, 0, 1, 
+            1, 1, 1, 
+            0, 1, 1, 
+            0, 0, 1, 
+            1, 1, 1, 
+            1, 0, 0, 
+            0, 0, 0, 
+            0, 1, 0, 
+            1, 1, 0, 
+            1, 0, 0, 
+            0, 1, 0
+        ), self.texture_manager.get_texture_coords("grass_top.png")*6, 0)
 
     def drawcall(self):
         """

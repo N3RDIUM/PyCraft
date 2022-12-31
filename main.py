@@ -11,3 +11,4 @@ window.schedule_mainloop(world)
 if __name__ == "__main__":
     logger.info("[PyCraft] Starting mainloop...")
     window.mainloop()  # Start the mainloop
+    
