@@ -70,7 +70,7 @@ class TextureManager:
         image_data = np.expand_dims(image_data, axis=2)
 
         # Update the texture using glTexSubImage3D
-        glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, self.current_depth / self.data.shape[2],
+        glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, self.current_depth,
                         self.width, self.height, 1, GL_BGR, GL_UNSIGNED_BYTE, image_data)
 
         # Set the texture parameters
@@ -79,9 +79,12 @@ class TextureManager:
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        
+        # Increment the current depth
+        self.current_depth += 1 / self.depth
 
         # Return the texture coordinates for the slice
-        z = (1 + 2*self.current_depth) / (2*self.data.shape[2])
+        z = self.current_depth - 0.5 / self.depth
         filepath = basename(filepath)
         coords = (  # Texture coordinates for a GL_TRIANGLES
             0, 1, z,
@@ -96,9 +99,6 @@ class TextureManager:
             "filepath": filepath,
             "coords": coords
         })
-        
-        # Increment the current depth
-        self.current_depth += 1
         
         return self.texture_coords[filepath]
 

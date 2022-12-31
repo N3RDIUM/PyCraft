@@ -64,6 +64,8 @@ class Renderer:
         :param texture: The texture.
         :param offset: The offset.
         """
+        if offset == -1:
+            offset = len(self.buffers[id]["vertices"])
         # Modify the buffers
         self.buffers[id]["vertices_buffer"].modify(vertices, offset)
         self.buffers[id]["texture_buffer"].modify(texture, offset)

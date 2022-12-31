@@ -37,45 +37,58 @@ class World:
         # OpenGL stuff
         glEnable(GL_DEPTH_TEST)  # Enable depth testing
         glEnable(GL_CULL_FACE)  # Enable culling
+        
+        # Add a plane
+        for x in range(-10, 10):
+            for z in range(-10, 10):
+                self.add_block((x, 0, z))
 
-        self.renderer.modify("default", (
-            0, 1, 1, 
-            1, 1, 1, 
-            1, 1, 0, 
-            0, 1, 0, 
-            0, 1, 1, 
-            1, 1, 0, 
-            0, 0, 0, 
-            1, 0, 0, 
-            1, 0, 1, 
-            0, 0, 1, 
-            0, 0, 0, 
-            1, 0, 1, 
-            0, 0, 0, 
-            0, 0, 1, 
-            0, 1, 1, 
-            0, 1, 0, 
-            0, 0, 0, 
-            0, 1, 1, 
-            1, 0, 1, 
-            1, 0, 0, 
-            1, 1, 0, 
-            1, 1, 1, 
-            1, 0, 1, 
+    def add_block(self, position):
+        x, y, z = position
+        verts = [
+            0, 1, 1,
+            1, 1, 1,
             1, 1, 0,
-            0, 0, 1, 
-            1, 0, 1, 
-            1, 1, 1, 
-            0, 1, 1, 
-            0, 0, 1, 
-            1, 1, 1, 
-            1, 0, 0, 
-            0, 0, 0, 
-            0, 1, 0, 
-            1, 1, 0, 
-            1, 0, 0, 
+            0, 1, 0,
+            0, 1, 1,
+            1, 1, 0,
+            0, 0, 0,
+            1, 0, 0,
+            1, 0, 1,
+            0, 0, 1,
+            0, 0, 0,
+            1, 0, 1,
+            0, 0, 0,
+            0, 0, 1,
+            0, 1, 1,
+            0, 1, 0,
+            0, 0, 0,
+            0, 1, 1,
+            1, 0, 1,
+            1, 0, 0,
+            1, 1, 0,
+            1, 1, 1,
+            1, 0, 1,
+            1, 1, 0,
+            0, 0, 1,
+            1, 0, 1,
+            1, 1, 1,
+            0, 1, 1,
+            0, 0, 1,
+            1, 1, 1,
+            1, 0, 0,
+            0, 0, 0,
+            0, 1, 0,
+            1, 1, 0,
+            1, 0, 0,
             0, 1, 0
-        ), self.texture_manager.get_texture_coords("grass_top.png")*6, 0)
+        ]
+        for i in range(0, len(verts), 3):
+            verts[i] += x
+            verts[i + 1] += y
+            verts[i + 2] += z
+        self.renderer.modify("default", tuple(
+            verts), self.texture_manager.get_texture_coords("stone.png") * 6, -1)
 
     def drawcall(self):
         """
