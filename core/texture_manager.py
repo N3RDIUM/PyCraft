@@ -84,12 +84,12 @@ class TextureManager:
         z = (1 + 2*self.current_depth) / (2*self.data.shape[2])
         filepath = basename(filepath)
         coords = (  # Texture coordinates for a GL_TRIANGLES
+            0, 1, z,
+            1, 1, z,
+            1, 0, z,
             0, 0, z,
+            0, 1, z,
             1, 0, z,
-            1, 1, z,
-            1, 1, z,
-            1, 0, z,
-            0, 1, z
         )
         self.texture_coords[filepath] = coords
         self._texture_coords.append({
