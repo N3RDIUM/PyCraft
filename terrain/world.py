@@ -88,7 +88,7 @@ class World:
             verts[i + 1] += y
             verts[i + 2] += z
         self.renderer.modify("default", tuple(
-            verts), self.texture_manager.get_texture_coords("stone.png") * 6, -1)
+            verts), self.texture_manager.get_texture_coords("grass_top.png") * 6, -1)
 
     def drawcall(self):
         """

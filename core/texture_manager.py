@@ -45,7 +45,6 @@ class TextureManager:
         glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, self.width, self.height,
                      self.depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, self.data)
 
-        # Set the current depth to 0
         self.current_depth = 0
         self.texture_coords = {}
         self._texture_coords = []
@@ -58,10 +57,11 @@ class TextureManager:
 
         :return: The texture coordinates for the added slice
         """
-        # Load the image data from the file using PIL
-        image = Image.open(filepath)
-        image_data = np.array(image)
-
+        # Load the image
+        image_data = Image.open(filepath)
+        image_data = image_data.resize((self.width, self.height), Image.ANTIALIAS)
+        image_data = np.array(image_data)
+        
         # Convert the image data to the correct format and shape
         image_data = image_data[:, :, :3]  # Drop the alpha channel if present
         image_data = np.ascontiguousarray(
@@ -69,23 +69,20 @@ class TextureManager:
         # Add a singleton dimension for the z axis
         image_data = np.expand_dims(image_data, axis=2)
 
-        # Update the texture using glTexSubImage3D
-        glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, self.current_depth,
+        # Upload the data to the texture
+        glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, self.current_depth/self.depth,
                         self.width, self.height, 1, GL_BGR, GL_UNSIGNED_BYTE, image_data)
-
-        # Set the texture parameters
+        
+         # Set the texture parameters
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         
-        # Increment the current depth
-        self.current_depth += 1 / self.depth
-
-        # Return the texture coordinates for the slice
-        z = self.current_depth - 0.5 / self.depth
+        # Calculate the texture coordinates for the slice
         filepath = basename(filepath)
+        z = self.current_depth
         coords = (  # Texture coordinates for a GL_TRIANGLES
             0, 1, z,
             1, 1, z,
@@ -100,7 +97,10 @@ class TextureManager:
             "coords": coords
         })
         
-        return self.texture_coords[filepath]
+        # Increment the current depth
+        self.current_depth += 1
+    
+        return coords
 
     def get_texture_coords(self, filepath):
         """
