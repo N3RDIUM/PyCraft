@@ -86,9 +86,9 @@ class TextureManager:
         coords = (  # Texture coordinates for a GL_TRIANGLES
             0, 0, z,
             1, 0, z,
-            0, 1, z,
-            1, 0, z,
             1, 1, z,
+            1, 1, z,
+            1, 0, z,
             0, 1, z
         )
         self.texture_coords[filepath] = coords
