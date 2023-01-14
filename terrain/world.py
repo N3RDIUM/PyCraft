@@ -26,13 +26,13 @@ class World:
         # Initialize
         self.sky = Sky()
         self.player = Player(window=window, world=self)
-        self.texture_manager = TextureManager(1024)
+        self.texture_manager = TextureManager()
         self.renderer = Renderer(
             window=window, texture_manager=self.texture_manager)
 
         # Load the textures
         self.texture_manager.add_from_folder("assets/textures/block")
-        self.texture_manager.bind()
+        self.texture_manager.bind()  # Bind the texture manager
 
         # OpenGL stuff
         glEnable(GL_DEPTH_TEST)  # Enable depth testing
@@ -41,7 +41,8 @@ class World:
         # Add a plane
         for x in range(-10, 10):
             for z in range(-10, 10):
-                self.add_block((x, 0, z))
+                self.add_block((x, -1, z))
+                self.add_block((x,  0, z))
 
     def add_block(self, position):
         x, y, z = position
