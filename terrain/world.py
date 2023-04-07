@@ -31,7 +31,7 @@ class World:
             window=window, texture_manager=self.texture_manager)
 
         # Load the textures
-        self.texture_manager.add_from_folder("assets/textures/block")
+        self.texture_manager.load_textures("assets/textures/block")
         self.texture_manager.bind()  # Bind the texture manager
 
         # OpenGL stuff
@@ -89,7 +89,7 @@ class World:
             verts[i + 1] += y
             verts[i + 2] += z
         self.renderer.modify("default", tuple(
-            verts), self.texture_manager.get_texture_coords("grass_top.png") * 6, -1)
+            verts), self.texture_manager.get_texcoords("grass_top.png") * 6, -1)
 
     def drawcall(self):
         """
@@ -97,4 +97,5 @@ class World:
         """
         self.sky.drawcall()  # Draw the sky
         self.player.drawcall()  # Update the player
+        self.texture_manager.bind()  # Bind the texture manager
         self.renderer.drawcall()  # Draw the renderer

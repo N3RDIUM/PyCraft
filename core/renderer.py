@@ -82,5 +82,5 @@ class Renderer:
                 glBindBuffer(GL_ARRAY_BUFFER, buffer["vertices_buffer"].buf)
                 glVertexPointer(3, GL_FLOAT, 3 * 4, None)
                 glBindBuffer(GL_ARRAY_BUFFER, buffer["texture_buffer"].buf)
-                glTexCoordPointer(2, GL_FLOAT, 3 * 4, None)
+                glTexCoordPointer(3, GL_FLOAT, 3 * 4, None)
                 glDrawArrays(GL_TRIANGLES, 0, len(buffer["vertices"]))

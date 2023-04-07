@@ -1,34 +1,11 @@
 # imports
 from os import listdir
-from os.path import basename, exists, isfile, join
+from os.path import basename, isfile, join
 
 import numpy as np
-from OpenGL.GL import (GL_BGR, GL_NEAREST, GL_REPEAT, GL_RGBA, GL_RGBA8,
-                       GL_TEXTURE0, GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER,
-                       GL_TEXTURE_MIN_FILTER, GL_TEXTURE_WRAP_R,
-                       GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, GL_UNSIGNED_BYTE,
-                       glActiveTexture, glBindTexture, glEnable,
-                       glGenerateMipmap, glGenTextures, glTexImage3D,
-                       glTexParameteri, glTexSubImage3D)
+from OpenGL.GL import *
 from PIL import Image
 from tqdm import tqdm
-
-
-# imports
-from os import listdir
-from os.path import basename, exists, isfile, join
-
-import numpy as np
-from OpenGL.GL import (GL_TEXTURE_2D_ARRAY, GL_NEAREST, GL_REPEAT, GL_RGBA,
-                       GL_TEXTURE0, GL_TEXTURE_MAG_FILTER,
-                       GL_TEXTURE_MIN_FILTER, GL_TEXTURE_WRAP_R,
-                       GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, GL_UNSIGNED_BYTE,
-                       glActiveTexture, glBindTexture, GL_TEXTURE_MAX_LEVEL, GL_TEXTURE_BASE_LEVEL,
-                       glGenTextures, glTexImage3D,
-                       glTexParameteri, glTexSubImage3D, GLuint)
-from PIL import Image
-from tqdm import tqdm
-
 
 class TextureManager:
     """
@@ -40,99 +17,93 @@ class TextureManager:
     def __init__(self, max_textures=256):
         """
         Initialize the TextureManager
+        Use a 3d texture array to store the textures
 
         :param n_textures: The number of textures to allocate
         """
-        self.texture_width = 32
-        self.texture_height = 32
-
-        self.max_textures = max_textures
-
-        self.textures = []
-        self.texture_coords = {}
-
-        self.texture_array = GLuint(0)
-        glGenTextures(1, self.texture_array)
+        # Create the texture array
+        self.texture_array = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D_ARRAY, self.texture_array)
-
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT)
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_REPEAT)
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 
+        # Set the maximum number of textures
+        self.n_textures = max_textures
+        self.current_texture = 0
+
+        # Create the texture list
+        self.textures = {}
+        
+    def load_textures(self, texture_dir):
+        """
+        Load the textures from the given directory
+
+        :param texture_dir: The directory to load the textures from
+        """
+        # Load the textures
+        for texture_file in tqdm([join(texture_dir, f) for f in listdir(texture_dir) if isfile(join(texture_dir, f))]):
+            self.load_texture(texture_file)
+            
+    def load_texture(self, texture_file):
+        """
+        Load the texture from the given file
+
+        :param texture_file: The file to load the texture from
+        """
+        # Load the texture
+        texture = Image.open(texture_file)
+        texture = texture.convert("RGBA")
+        texture = texture.transpose(Image.FLIP_TOP_BOTTOM)
+        texture_data = np.array(list(texture.getdata()), np.uint8)
+        
+        # Generate the texture
         glTexImage3D(
-            GL_TEXTURE_2D_ARRAY, 0, GL_RGBA,
-            self.texture_width, self.texture_height, self.max_textures,
-            0, GL_RGBA, GL_UNSIGNED_BYTE, None)
-
-        # Set mipmap range parameters
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0)
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, 0)
-
-    def add_texture(self, texture):
-        if not texture in self.textures:
-            _texture_name = basename(texture)
-            self.textures.append(_texture_name)
-            z = self.textures.index(_texture_name)
-            self.texture_coords[_texture_name] = (
-                0, 0, z,
-                1, 0, z,
-                1, 1, z,
-                1, 1, z,
-                1, 0, z,
-                0, 1, z
-            )
-
-            texture_image = Image.open(texture)
-            texture_data = np.array(list(texture_image.getdata()), np.uint8)
-
-            glBindTexture(GL_TEXTURE_2D_ARRAY, self.texture_array)
-            glTexSubImage3D(
-                GL_TEXTURE_2D_ARRAY, 0,
-                0, 0, self.textures.index(_texture_name),
-                self.texture_width, self.texture_height, 1 / self.max_textures,
-                GL_RGBA, GL_UNSIGNED_BYTE,
-                texture_data)
-            glGenerateMipmap(GL_TEXTURE_2D_ARRAY)
-            glBindTexture(GL_TEXTURE_2D_ARRAY, 0)
-
-    def get_texture_coords(self, filepath):
+            GL_TEXTURE_2D_ARRAY, 0,
+            GL_RGBA8, texture.width, texture.height, self.n_textures,
+            0, GL_RGBA, GL_UNSIGNED_BYTE, None
+        )
+        glTexSubImage3D(
+            GL_TEXTURE_2D_ARRAY, 0, 0, 0, self.current_texture,
+            texture.width, texture.height, 1,
+            GL_RGBA, GL_UNSIGNED_BYTE, texture_data
+        )
+        
+        # Add the texture to the list
+        self.textures[basename(texture_file)] = self.current_texture
+        self.current_texture += 1
+        
+    def get_texture(self, texture_name):
         """
-        Get the texture coordinates for a slice
+        Get the texture with the given name
 
-        :param filepath: The path to the image file to get the texture coordinates for
-
-        :return: The texture coordinates for the slice
+        :param texture_name: The name of the texture to get
         """
-        return self.texture_coords[filepath]
-
-    def get_texcoords_from_index(self, index):
-        return self._texture_coords[index]["coords"]
-
-    def get_texture_index(self, filepath):
-        for i, texture in enumerate(self._texture_coords):
-            if texture["filepath"] == filepath:
-                return i
-        return -1
-
-    def add_from_folder(self, folder):
+        return self.textures[texture_name]
+    
+    def get_texcoords(self, texture_name):
         """
-        Add all the slices in a folder to the texture
+        Get the texture coordinates for the given texture
 
-        :param folder: The folder to add the slices from
+        :param texture_name: The name of the texture to get the coordinates for
         """
-        # Get all the files in the folder
-        files = [join(folder, f)
-                 for f in listdir(folder) if isfile(join(folder, f))]
-
-        # Add each file to the texture
-        for file in tqdm(files, desc=f"Loading textures from {folder}"):
-            self.add_texture(file)
-
+        # Get the texture
+        texture_idx = self.get_texture(texture_name)
+        
+        coords__3d = np.array([
+            0.0, 0.0, texture_idx,
+            1.0, 0.0, texture_idx,
+            1.0, 1.0, texture_idx,
+            0.0, 1.0, texture_idx
+        ], np.float32)
+        
+        return coords__3d
+    
     def bind(self):
         """
-        Generate mipmaps and bind the texture
+        Bind the texture array
         """
         glActiveTexture(GL_TEXTURE0)
+        glGenerateMipmap(GL_TEXTURE_2D_ARRAY)
         glBindTexture(GL_TEXTURE_2D_ARRAY, self.texture_array)
