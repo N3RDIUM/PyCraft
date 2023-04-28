@@ -1,7 +1,7 @@
 import random
 from core.logger import *
 from terrain.chunk import *
-from terrain.block import *
+from terrain.blocks.__base import *
 from player.player import *
 from settings import *
 from core.util import *

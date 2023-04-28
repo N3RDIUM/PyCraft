@@ -1,4 +1,4 @@
-from terrain.block import Block
+from terrain.blocks.__base import Block
 from models.cube import vertices
 
 class Block(Block):

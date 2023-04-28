@@ -1,4 +1,4 @@
-from terrain.block import *
+from terrain.blocks.__base import *
 from core.util import encode_vector
 import math
 from settings import *

@@ -1,6 +1,5 @@
 from OpenGL.GL import *
 from PIL import Image
-import pygame
 
 class TextureAtlasGenerator:
     def __init__(self, texture_size=32, n_textures = 100):
@@ -48,7 +47,7 @@ class TextureAtlas:
         self.texture_coords = {}
         self.save_path = None
 
-    def add(self, image, name):
+    def add(self, image, name, parent):
         self.atlas_generator.add(image)
         self.textures.append(image)
 
@@ -59,7 +58,7 @@ class TextureAtlas:
         w = _[3]
         h = _[4]
         # TexCoords for OpenGL
-        self.texture_coords[name] = (
+        self.texture_coords[parent + "/" + name] = (
             (x + w) / self.atlas_generator.texture_size,
             (y - h) / self.atlas_generator.texture_size,
 
@@ -86,18 +85,17 @@ class TextureAtlas:
         self.atlas_generator.save(path)
         self.save_path = path
 
-    def add_from_folder(self, path):
+    def add_from_folder(self, path, parent):
         import os
         for filename in os.listdir(path):
             if filename.endswith(".png"):
                 image = Image.open(path + filename)
-                self.add(image, filename)
+                self.add(image, filename, parent)
 
     def generate(self):
-        texSurface = pygame.image.load(self.save_path)
-        texData = pygame.image.tostring(texSurface, "RGBA", 1)
-        width = texSurface.get_width()
-        height = texSurface.get_height()
+        Img = Image.open(self.save_path)
+        width, height = Img.size
+        texData = Img.convert("RGBA").tobytes("raw", "RGBA", 0, -1)
         texid = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, texid)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 
