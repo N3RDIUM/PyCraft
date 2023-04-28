@@ -1,5 +1,6 @@
 from OpenGL.GL import *
 from PIL import Image
+import pickle
 
 class TextureAtlasGenerator:
     def __init__(self, texture_size=32, n_textures = 100):
@@ -84,6 +85,7 @@ class TextureAtlas:
     def save(self, path):
         self.atlas_generator.save(path)
         self.save_path = path
+        pickle.dump(self.texture_coords, open("assets/textures/textures.pickle", "wb"))
 
     def add_from_folder(self, path, parent):
         import os

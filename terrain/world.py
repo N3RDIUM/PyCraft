@@ -3,7 +3,7 @@ from OpenGL.GL import GL_CULL_FACE, GL_DEPTH_TEST, glColor3f, glEnable
 
 from core import Player, Renderer, TextureAtlas, logger
 from misc import Sky
-from terrain.block import blocks
+import importlib
 
 class World:
     """
@@ -32,6 +32,9 @@ class World:
         self.texture_manager.add_from_folder("assets/textures/block/", "_internals")
         self.texture_manager.save("assets/textures/atlas.png")
         self.texid = self.texture_manager.generate()
+        
+        # Load blocks
+        blocks = importlib.import_module("terrain.block").blocks
         
         # OpenGL stuff
         glEnable(GL_DEPTH_TEST)  # Enable depth testing

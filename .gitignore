@@ -139,5 +139,5 @@ atlas.png
 # PyCraft cache
 cache/
 
-# Block Pickle files
-blocks.pickle
+# Pickle files
+*.pickle
