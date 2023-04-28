@@ -14,8 +14,6 @@ class Buffer:
 
     This is a wrapper for OpenGL buffer objects.
     It supports persistent mapping.
-
-    BTW OpenAI's ChatGPT helped me with this!
     """
 
     def __init__(self, id):
@@ -66,3 +64,9 @@ class Buffer:
         self.data_ptr.contents[offset:offset + len(data)] = data
         glFlush()
         self.unmap_buffer()
+    
+    def bind(self):
+        """
+        Binds the buffer.
+        """
+        glBindBuffer(GL_ARRAY_BUFFER, self.buf)

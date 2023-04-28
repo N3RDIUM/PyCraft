@@ -144,7 +144,7 @@ class Window:
         logger.info("[Window/Shared Context] Starting shared context loop...")
         while not glfw.window_should_close(self.window):  # Side loop.
             for obj in self._scheduled_sc:  # Loop through the scheduled objects.
-                obj.update()  # Update the object.
+                obj.sharedcon()  # Call the shared context function.
             glfw.poll_events()  # Poll events.
         glfw.destroy_window(window2)  # Destroy the shared context window.
         glfw.terminate()  # Terminate GLFW.

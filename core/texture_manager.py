@@ -1,109 +1,112 @@
-# imports
-from os import listdir
-from os.path import basename, isfile, join
-
-import numpy as np
 from OpenGL.GL import *
 from PIL import Image
-from tqdm import tqdm
+import pygame
 
-class TextureManager:
-    """
-    TextureManager
+class TextureAtlasGenerator:
+    def __init__(self, texture_size=32, n_textures = 100):
+        self.texture_size = texture_size * n_textures
+        self.n_textures = n_textures
+        self.texture_atlas = Image.new("RGBA", (self.texture_size, self.texture_size), (0, 0, 0, 0))
+        self.texture_atlas_data = self.texture_atlas.load()
+        self.current_side = 0
+        self.current_x = 0
+        self.current_y = 0
+        self.used = []
 
-    A class to manage the textures used in the game
-    """
+    def add(self, image):
+        # Add image to texture atlas.
+        if image.size[0] > self.texture_size or image.size[1] > self.texture_size:
+            raise Exception("Image is too large for texture atlas.")
 
-    def __init__(self, max_textures=256):
-        """
-        Initialize the TextureManager
-        Use a 3d texture array to store the textures
+        if self.current_x + image.size[0] > self.texture_size:
+            self.current_x = 0
+            self.current_y += image.size[1]
+            self.current_side += 1
 
-        :param n_textures: The number of textures to allocate
-        """
-        # Create the texture array
-        self.texture_array = glGenTextures(1)
-        glBindTexture(GL_TEXTURE_2D_ARRAY, self.texture_array)
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT)
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT)
+        if self.current_y + image.size[1] > self.texture_size:
+            raise Exception("Texture atlas is full.")
 
-        # Set the maximum number of textures
-        self.n_textures = max_textures
-        self.current_texture = 0
+        self.texture_atlas.paste(image, (self.current_x, self.current_y))
+        self.used.append((self.current_side, self.current_x, self.current_y, image.size[0], image.size[1]))
+        self.current_x += image.size[0]
+        return self.current_side, self.current_x, self.current_y, image.size[0], image.size[1]
 
-        # Create the texture list
-        self.textures = {}
-        
-    def load_textures(self, texture_dir):
-        """
-        Load the textures from the given directory
+    def get_texture_atlas(self):
+        return self.texture_atlas
 
-        :param texture_dir: The directory to load the textures from
-        """
-        # Load the textures
-        for texture_file in tqdm([join(texture_dir, f) for f in listdir(texture_dir) if isfile(join(texture_dir, f))]):
-            self.load_texture(texture_file)
-            
-    def load_texture(self, texture_file):
-        """
-        Load the texture from the given file
+    def save(self, path):
+        self.texture_atlas.save(path)
 
-        :param texture_file: The file to load the texture from
-        """
-        # Load the texture
-        texture = Image.open(texture_file)
-        texture = texture.convert("RGBA")
-        texture = texture.transpose(Image.FLIP_TOP_BOTTOM)
-        texture_data = np.array(list(texture.getdata()), np.uint8)
-        
-        # Generate the texture
-        glTexImage3D(
-            GL_TEXTURE_2D_ARRAY, 0,
-            GL_RGBA8, texture.width, texture.height, self.n_textures,
-            0, GL_RGBA, GL_UNSIGNED_BYTE, None
+    def get_rect(self, index):
+        side, x, y, w, h = self.used[index]
+        return side, x, y, w, h
+
+class TextureAtlas:
+    def __init__(self):
+        self.atlas_generator = TextureAtlasGenerator()
+        self.textures = []
+        self.texture_coords = {}
+        self.save_path = None
+
+    def add(self, image, name):
+        self.atlas_generator.add(image)
+        self.textures.append(image)
+
+        # get texture coordinates
+        _ = self.atlas_generator.get_rect(len(self.textures) - 1)
+        x = _[1]
+        y = -_[2]
+        w = _[3]
+        h = _[4]
+        # TexCoords for OpenGL
+        self.texture_coords[name] = (
+            (x + w) / self.atlas_generator.texture_size,
+            (y - h) / self.atlas_generator.texture_size,
+
+            x / self.atlas_generator.texture_size,
+            (y - h) / self.atlas_generator.texture_size,
+
+            x / self.atlas_generator.texture_size,
+            y / self.atlas_generator.texture_size,
+
+            (x + w) / self.atlas_generator.texture_size,
+            y / self.atlas_generator.texture_size,
+
+            (x + w) / self.atlas_generator.texture_size,
+            (y - h) / self.atlas_generator.texture_size,
+
+            x / self.atlas_generator.texture_size,
+            y / self.atlas_generator.texture_size,
         )
-        glTexSubImage3D(
-            GL_TEXTURE_2D_ARRAY, 0, 0, 0, self.current_texture,
-            texture.width, texture.height, 1,
-            GL_RGBA, GL_UNSIGNED_BYTE, texture_data
-        )
-        
-        # Add the texture to the list
-        self.textures[basename(texture_file)] = self.current_texture
-        self.current_texture += 1
-        
-    def get_texture(self, texture_name):
-        """
-        Get the texture with the given name
 
-        :param texture_name: The name of the texture to get
-        """
-        return self.textures[texture_name]
-    
-    def get_texcoords(self, texture_name):
-        """
-        Get the texture coordinates for the given texture
+    def get_texture(self, name):
+        return self.texture_coords[name + ".png"]
 
-        :param texture_name: The name of the texture to get the coordinates for
-        """
-        # Get the texture
-        texture_idx = self.get_texture(texture_name)
-        
-        coords__3d = np.array([
-            0.0, 0.0, texture_idx,
-            1.0, 0.0, texture_idx,
-            1.0, 1.0, texture_idx,
-            0.0, 1.0, texture_idx
-        ], np.float32)
-        
-        return coords__3d
+    def save(self, path):
+        self.atlas_generator.save(path)
+        self.save_path = path
+
+    def add_from_folder(self, path):
+        import os
+        for filename in os.listdir(path):
+            if filename.endswith(".png"):
+                image = Image.open(path + filename)
+                self.add(image, filename)
+
+    def generate(self):
+        texSurface = pygame.image.load(self.save_path)
+        texData = pygame.image.tostring(texSurface, "RGBA", 1)
+        width = texSurface.get_width()
+        height = texSurface.get_height()
+        texid = glGenTextures(1)
+        glBindTexture(GL_TEXTURE_2D, texid)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 
+                0, GL_RGBA, GL_UNSIGNED_BYTE, texData)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        return texid
     
-    def bind(self):
-        """
-        Bind the texture array
-        """
-        glActiveTexture(GL_TEXTURE0)
-        glGenerateMipmap(GL_TEXTURE_2D_ARRAY)
-        glBindTexture(GL_TEXTURE_2D_ARRAY, self.texture_array)
+    def bind(self, texid):
+        glBindTexture(GL_TEXTURE_2D, texid)

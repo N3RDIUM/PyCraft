@@ -7,8 +7,9 @@ logger.info("[PyCraft] Initializing...")
 window = Window()
 world = World(window=window)
 window.schedule_mainloop(world)
+window.schedule_shared_context(world)
 
 if __name__ == "__main__":
     logger.info("[PyCraft] Starting mainloop...")
     window.mainloop()  # Start the mainloop
-    
+        

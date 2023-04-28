@@ -1,11 +1,9 @@
 # imports
-from random import randint
-
 from OpenGL.GL import GL_CULL_FACE, GL_DEPTH_TEST, glColor3f, glEnable
 
-from core import Player, Renderer, TextureManager, logger
+from core import Player, Renderer, TextureAtlas, logger
 from misc import Sky
-
+import threading
 
 class World:
     """
@@ -26,76 +24,51 @@ class World:
         # Initialize
         self.sky = Sky()
         self.player = Player(window=window, world=self)
-        self.texture_manager = TextureManager()
+        self.texture_manager = TextureAtlas()
         self.renderer = Renderer(
             window=window, texture_manager=self.texture_manager)
 
         # Load the textures
-        self.texture_manager.load_textures("assets/textures/block")
-        self.texture_manager.bind()  # Bind the texture manager
-
+        self.texture_manager.add_from_folder("assets/textures/block/")
+        self.texture_manager.save("assets/textures/atlas.png")
+        self.texid = self.texture_manager.generate()
+        
         # OpenGL stuff
         glEnable(GL_DEPTH_TEST)  # Enable depth testing
         glEnable(GL_CULL_FACE)  # Enable culling
         
-        # Add a plane
-        for x in range(-10, 10):
-            for z in range(-10, 10):
-                self.add_block((x, -1, z))
-                self.add_block((x,  0, z))
-
-    def add_block(self, position):
-        x, y, z = position
-        verts = [
-            0, 1, 1,
-            1, 1, 1,
-            1, 1, 0,
-            0, 1, 0,
-            0, 1, 1,
-            1, 1, 0,
-            0, 0, 0,
-            1, 0, 0,
-            1, 0, 1,
-            0, 0, 1,
-            0, 0, 0,
-            1, 0, 1,
-            0, 0, 0,
-            0, 0, 1,
-            0, 1, 1,
-            0, 1, 0,
-            0, 0, 0,
-            0, 1, 1,
-            1, 0, 1,
-            1, 0, 0,
-            1, 1, 0,
-            1, 1, 1,
-            1, 0, 1,
-            1, 1, 0,
-            0, 0, 1,
-            1, 0, 1,
-            1, 1, 1,
-            0, 1, 1,
-            0, 0, 1,
-            1, 1, 1,
-            1, 0, 0,
-            0, 0, 0,
-            0, 1, 0,
-            1, 1, 0,
-            1, 0, 0,
-            0, 1, 0
-        ]
-        for i in range(0, len(verts), 3):
-            verts[i] += x
-            verts[i + 1] += y
-            verts[i + 2] += z
-        self.renderer.modify("default", tuple(
-            verts), self.texture_manager.get_texcoords("grass_top.png") * 6, -1)
-
+        # Add a block
+        x, y, z = 0, 0, 0
+        X, Y, Z = 1, 1, 1
+        vertices = {
+            "top": (x, Y, Z,  X, Y, Z,  X, Y, z,  x, Y, z, x, Y, Z, X, Y, z,),
+            "bottom": (x, y, z,  X, y, z,  X, y, Z,  x, y, Z, x, y, z, X, y, Z,),
+            "left": (x, y, z,  x, y, Z,  x, Y, Z,  x, Y, z, x, y, z, x, Y, Z,),
+            "right": (X, y, Z,  X, y, z,  X, Y, z,  X, Y, Z, X, y, Z, X, Y, z,),
+            "back": (x, y, Z,  X, y, Z,  X, Y, Z,  x, Y, Z, x, y, Z, X, Y, Z,),
+            "front": (X, y, z,  x, y, z,  x, Y, z,  X, Y, z, X, y, z, x, Y, z,),
+        }
+        verts = []
+        verts.extend(vertices["top"])
+        verts.extend(vertices["bottom"])
+        verts.extend(vertices["left"])
+        verts.extend(vertices["right"])
+        verts.extend(vertices["back"])
+        verts.extend(vertices["front"])
+        
+        texCoords = []
+        for i in range(6):
+            texCoords.extend(self.texture_manager.texture_coords["grass_top.png"])
+        self.verts, self.texCoords = verts, texCoords
+        
     def drawcall(self):
         """
         Draw the world.
         """
+        self.texture_manager.bind(self.texid)
         self.sky.drawcall()  # Draw the sky
         self.player.drawcall()  # Update the player
-        self.texture_manager.bind()  # Bind the texture manager
         self.renderer.drawcall()  # Draw the renderer
+        
+    def sharedcon(self):
+        self.renderer.modify("default", self.verts, self.texCoords, 0)
