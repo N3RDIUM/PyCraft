@@ -11,7 +11,7 @@ class Chunk:
     
     A terrain chunk class for PyCraft.
     """
-    SIZE = (16, 1, 16)
+    SIZE = (16, 128, 16)
     def __init__(self, parent, position):
         self.parent = parent
         self.position = position
