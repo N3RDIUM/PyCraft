@@ -32,7 +32,7 @@ if __name__ == "__main__":
         os.mkdir("cache/vbo_add")
     else:
         shutil.rmtree("cache/vbo_add")
-        os.mkdir("cache/vbo_add")
+        os.mkdir("cache/vbo_adds")
 
     window = Window()
     world = World(window=window)

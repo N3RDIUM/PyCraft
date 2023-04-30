@@ -3,5 +3,5 @@ import os
 
 def start_helpers():
     for helper in os.listdir("helpers/helpers"):
-        if helper.endswith(".py"):
+        if helper.endswith(".py") or helper.endswith(".pyx"):
             subprocess.Popen(f"python helpers/helpers/{helper}", shell=True)
