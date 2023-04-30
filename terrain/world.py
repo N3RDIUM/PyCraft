@@ -2,6 +2,7 @@
 from OpenGL.GL import GL_CULL_FACE, GL_DEPTH_TEST, glEnable
 
 from core import Player, Renderer, TextureAtlas, logger
+from terrain.chunk import Chunk
 from misc import Sky
 import importlib
 
@@ -35,6 +36,10 @@ class World:
         
         # Load blocks
         self.blocks = importlib.import_module("terrain.block").blocks
+        
+        # Just create one chunk for now
+        self.chunk = Chunk(self, (0, 0, 0))
+        self.chunk.generate()
         
         # OpenGL stuff
         glEnable(GL_DEPTH_TEST)  # Enable depth testing

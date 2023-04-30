@@ -37,4 +37,4 @@ def save_pcdt(filename, data):
     BTW, PCDT stands for "PyCraft Data".
     """
     with open(filename, "wb") as f:  # Open the file
-        f.write(pcdt_compress(data))
+        f.write(pcdt_compress(str(data).encode("utf-8")))
