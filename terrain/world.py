@@ -1,5 +1,5 @@
 # imports
-from OpenGL.GL import GL_CULL_FACE, GL_DEPTH_TEST, glColor3f, glEnable
+from OpenGL.GL import GL_CULL_FACE, GL_DEPTH_TEST, glEnable
 
 from core import Player, Renderer, TextureAtlas, logger
 from misc import Sky
@@ -34,7 +34,7 @@ class World:
         self.texid = self.texture_manager.generate()
         
         # Load blocks
-        blocks = importlib.import_module("terrain.block").blocks
+        self.blocks = importlib.import_module("terrain.block").blocks
         
         # OpenGL stuff
         glEnable(GL_DEPTH_TEST)  # Enable depth testing

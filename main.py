@@ -1,9 +1,31 @@
 # imports
+import os
+import shutil
+
 from core import Window, logger
 from terrain import World
 
 # Initialize
 logger.info("[PyCraft] Initializing...")
+
+if not os.path.isdir("cache"):
+    os.mkdir("cache")
+else:
+    shutil.rmtree("cache")
+    os.mkdir("cache")
+    
+if not os.path.isdir("cache/requests"):
+    os.mkdir("cache/requests")
+else:
+    shutil.rmtree("cache/requests")
+    os.mkdir("cache/requests")
+    
+if not os.path.isdir("cache/results"):
+    os.mkdir("cache/results")
+else:
+    shutil.rmtree("cache/results")
+    os.mkdir("cache/results")
+
 window = Window()
 world = World(window=window)
 window.schedule_mainloop(world)
