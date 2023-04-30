@@ -67,8 +67,8 @@ class Renderer:
         if offset == -1:
             offset = len(self.buffers[id]["vertices"])
         # Modify the buffers
-        self.buffers[id]["vertices_buffer"].modify(vertices, offset)
-        self.buffers[id]["texture_buffer"].modify(texture, offset)
+        self.buffers[id]["vertices_buffer"].modify(data=vertices, offset=offset)
+        self.buffers[id]["texture_buffer"].modify(data=texture, offset=offset)
         self.buffers[id]["vertices"][offset:offset + len(vertices)] = vertices
         self.buffers[id]["texture"][offset:offset + len(texture)] = texture
 

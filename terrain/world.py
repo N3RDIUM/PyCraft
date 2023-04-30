@@ -38,8 +38,11 @@ class World:
         self.blocks = importlib.import_module("terrain.block").blocks
         
         # Just create one chunk for now
+        self.scheduled_chunks = []
+        self.chunks = {}
         self.chunk = Chunk(self, (0, 0, 0))
         self.chunk.generate()
+        self.chunks[self.chunk.buffer_id] = self.chunk
         
         # OpenGL stuff
         glEnable(GL_DEPTH_TEST)  # Enable depth testing
@@ -55,4 +58,6 @@ class World:
         self.renderer.drawcall()  # Draw the renderer
         
     def sharedcon(self):
-        pass
+        for chunk_id in self.scheduled_chunks:
+            chunk = self.chunks[chunk_id]
+            self.renderer.modify(id=chunk_id, vertices=chunk.vertices, texture=chunk.texCoords, offset=0)

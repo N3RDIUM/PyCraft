@@ -32,7 +32,7 @@ logger.info("[PyCraft] Loaded %d blocks. Loading block texture coords..." % len(
 texcoords = pickle.load(open("assets/textures/textures.pickle", "rb"))
 for block in blocks.values():
     texture = block.details["texture"]
-    for i in range(len(texture)):
+    for i in texture:
         texture[i] = texcoords[texture[i]]
     block.details["texture"] = texture
     
