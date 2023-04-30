@@ -27,6 +27,12 @@ if __name__ == "__main__":
     else:
         shutil.rmtree("cache/results")
         os.mkdir("cache/results")
+        
+    if not os.path.isdir("cache/vbo_add"):
+        os.mkdir("cache/vbo_add")
+    else:
+        shutil.rmtree("cache/vbo_add")
+        os.mkdir("cache/vbo_add")
 
     window = Window()
     world = World(window=window)

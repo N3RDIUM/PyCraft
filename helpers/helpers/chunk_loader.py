@@ -23,10 +23,11 @@ blocks = pickle.load(open("../../terrain/blocks/blocks.pickle", 'rb'))
 
 def block_exists(position, _blocks, _simulated_blocks):
     position = [int(position[0]), int(position[1]), int(position[2])]
-    if position_to_string(position) in list(_blocks) or position in list(_simulated_blocks):
+    if position_to_string(position) in list(_blocks):
         return True
-    else:
-        return False
+    if position_to_string(position) in list(_simulated_blocks):
+        return True
+    return False
 
 # Start generating chunks
 while True:
@@ -57,26 +58,31 @@ while True:
                 position[index] *= size[index]
                 position[index] = int(position[index])
             
-            shape = (size[0] + 2, size[1], size[2] + 2)
+            shape = (size[0] + 3, size[1], size[2] + 3)
             offset = (1, 0, 1)
             offset = (offset[0] + position[0], offset[1] + position[1], offset[2] + position[2])
-            noisevals = fns.Noise(seed=0, numWorkers=8).genAsGrid(shape=shape, start=offset,)
-            for x in tqdm.trange(position[0] - 1, position[0] + size[0] + 1, desc=f"Generating blocks for chunk at {position[0]}, {position[1]}, {position[2]}"):
-                for z in range(position[2] - 1, position[2] + size[2] + 1):
+            noisevals = fns.Noise(seed=0, numWorkers=8).genAsGrid(shape=shape, start=offset)
+            for x in tqdm.trange(position[0] - 1, position[0] + size[0] + 2, desc=f"Generating blocks for chunk at {position[0]}, {position[1]}, {position[2]}"):
+                for z in range(position[2] - 1, position[2] + size[2] + 2):
+                    if x < position[0] + 1 or x > position[0] + size[0] or z < position[2] + 1 or z > position[2] + size[2]:
+                        _ = True
+                    else:
+                        _ = False
                     # Get the height of the terrain at this position
-                    height = abs(int(opensimplex.noise2(x / 1000, z / 1000) * 100)) + 10
+                    height = abs(int(opensimplex.noise2(x / 10, z / 10) * 10)) + 5
                     # Iterate through the height
                     for y in range(position[1] - 1, height + 1):
-                        blocktype = "_internals/stone"
                         if y == height:
                             blocktype = "_internals/grass"
-                        elif y < height and y > height - 5:
+                        elif y < height and y > height - 15:
                             blocktype = "_internals/dirt"
-                        elif y < height - 5:
-                            if noisevals[x - position[0] + 1][y - position[1]][z - position[2] + 1] < 0.5:
+                        elif y < height - 15:
+                            if noisevals[x - position[0] + 1][y - position[1]][z - position[2] + 1] < 0.2:
                                 blocktype = "_internals/stone"
-                        # Add the block to the _blocks dictionary
-                        _blocks[position_to_string((x, y, z))] = blocktype        
+                        if _:
+                            _simulated_blocks[position_to_string((x, y, z))] = 0
+                        else:
+                            _blocks[position_to_string((x, y, z))] = blocktype
             
             # Then generate the vertices and texture coorinates
             vertices = []
@@ -106,8 +112,24 @@ while True:
             result = json.dumps({
                 "type": "chunk",
                 "position": _oldpos,
-                "vertices": vertices,
-                "texCoords": texCoords,
                 "blocks": _blocks
             })
             save_pcdt(f"../../cache/results/{_oldpos}.pcdt", result)
+            
+            # Split the data into batches of 4096
+            vertices = [vertices[i:i + 4096] for i in range(0, len(vertices), 4096)]
+            texCoords = [texCoords[i:i + 4096] for i in range(0, len(texCoords), 4096)]
+            # Group the vertices and texture coordinates into a list
+            batches = []
+            for index in range(len(vertices)):
+                batches.append({
+                    "id": f"{_oldpos}",
+                    "request_id": f"{_oldpos}-{index}",
+                    "vertices": vertices[index],
+                    "texCoords": [],
+                })
+            for index in range(len(texCoords)):
+                batches[index]["texCoords"] = texCoords[index]
+            # Save the batches
+            for batch in batches:
+                save_pcdt(f"../../cache/vbo_add/{batch['request_id']}.pcdt", json.dumps(batch))

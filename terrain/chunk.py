@@ -11,7 +11,7 @@ class Chunk:
     
     A terrain chunk class for PyCraft.
     """
-    SIZE = (16, 128, 16)
+    SIZE = (16, 256, 16)
     def __init__(self, parent, position):
         self.parent = parent
         self.position = position
@@ -37,10 +37,7 @@ class Chunk:
                 try:
                     data = json.loads(open_pcdt(f"cache/results/{result}"))
                     if data['position'] == self.buffer_id:
-                        self.vertices = data['vertices']
-                        self.texCoords = data['texCoords']
                         self.blocks = data['blocks']
-                        self.parent.scheduled_chunks.append(self.buffer_id)
                         os.remove(f"cache/results/{result}")
                         return
                 except:

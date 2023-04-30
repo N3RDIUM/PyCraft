@@ -2,9 +2,12 @@
 from OpenGL.GL import GL_CULL_FACE, GL_DEPTH_TEST, glEnable
 
 from core import Player, Renderer, TextureAtlas, logger
+from core.pcdt import open_pcdt
 from terrain.chunk import Chunk
 from misc import Sky
+import json
 import importlib
+import os
 
 class World:
     """
@@ -12,7 +15,7 @@ class World:
 
     The world class for PyCraft.
     """
-
+    RENDER_DISTANCE = 1
     def __init__(self, window=None):
         """
         Initialize the world.
@@ -40,13 +43,23 @@ class World:
         # Just create one chunk for now
         self.scheduled_chunks = []
         self.chunks = {}
-        self.chunk = Chunk(self, (0, 0, 0))
-        self.chunk.generate()
-        self.chunks[self.chunk.buffer_id] = self.chunk
         
         # OpenGL stuff
         glEnable(GL_DEPTH_TEST)  # Enable depth testing
         glEnable(GL_CULL_FACE)  # Enable culling
+        
+        # Generate the world
+        self.generate()
+        
+    def generate_chunk(self, position):
+        new = Chunk(self, position)
+        new.generate()
+        self.chunks[new.buffer_id] = new
+        
+    def generate(self):
+        for x in range(-self.RENDER_DISTANCE, self.RENDER_DISTANCE + 1):
+            for z in range(-self.RENDER_DISTANCE, self.RENDER_DISTANCE + 1):
+                self.generate_chunk((x, 0, z))
         
     def drawcall(self):
         """
@@ -58,6 +71,12 @@ class World:
         self.renderer.drawcall()  # Draw the renderer
         
     def sharedcon(self):
-        for chunk_id in self.scheduled_chunks:
-            chunk = self.chunks[chunk_id]
-            self.renderer.modify(id=chunk_id, vertices=chunk.vertices, texture=chunk.texCoords, offset=0)
+        # Listen for pcdt files in cache/vbo_add
+        files = os.listdir("cache/vbo_add")
+        for file in files:
+            try:
+                data = json.loads(open_pcdt(f"cache/vbo_add/{file}"))
+                self.renderer.modify(data['id'], data['vertices'], data['texCoords'], -1)
+                os.remove(f"cache/vbo_add/{file}")
+            except:
+                continue
