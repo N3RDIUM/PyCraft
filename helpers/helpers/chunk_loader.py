@@ -116,9 +116,10 @@ while True:
             })
             save_pcdt(f"../../cache/results/{_oldpos}.pcdt", result)
             
-            # Split the data into batches of 4096
-            vertices = [vertices[i:i + 4096] for i in range(0, len(vertices), 4096)]
-            texCoords = [texCoords[i:i + 4096] for i in range(0, len(texCoords), 4096)]
+            # Split the data into batches of X vertices
+            X = 8192
+            vertices = [vertices[i:i + X] for i in range(0, len(vertices), X)]
+            texCoords = [texCoords[i:i + X] for i in range(0, len(texCoords), X)]
             # Group the vertices and texture coordinates into a list
             batches = []
             for index in range(len(vertices)):
