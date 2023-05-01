@@ -77,8 +77,8 @@ class World:
         files = os.listdir("cache/vbo_add")
         for file in files:
             try:
-                data = json.loads(open_pcdt(f"cache/vbo_add/{file}"))
                 time.sleep(1 / len(self.chunks))
+                data = json.loads(open_pcdt(f"cache/vbo_add/{file}"))
                 self.renderer.modify(data['id'], data['vertices'], data['texCoords'], -1)
                 os.remove(f"cache/vbo_add/{file}")
             except:

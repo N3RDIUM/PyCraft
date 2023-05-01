@@ -70,17 +70,20 @@ while True:
                     dirt_height = height - abs(int(opensimplex.noise2(x / 10, z / 10) * 16))
                     # Iterate through the height
                     for y in range(position[1] - 1, height + 1):
+                        blocktype = None
                         if y == height:
                             blocktype = "_internals/grass_block"
                         elif y > dirt_height:
                             blocktype = "_internals/dirt"
                         else:
-                            blocktype = "_internals/stone"
-                        if _:
-                            _simulated_blocks[position_to_string((x, y, z))] = 0
-                        else:
-                            _blocks[position_to_string((x, y, z))] = blocktype
-            
+                            if abs(noisevals[x - position[0] + 1, y - position[1], z - position[2] + 1]) < 0.4:
+                                blocktype = "_internals/stone"
+                        if blocktype is not None:   
+                            if _:
+                                _simulated_blocks[position_to_string((x, y, z))] = 0
+                            else:
+                                _blocks[position_to_string((x, y, z))] = blocktype
+                
             vertices = []
             texCoords = []
             block_positions = set(list(_blocks.keys()) + list(_simulated_blocks.keys()))
@@ -110,8 +113,8 @@ while True:
             save_pcdt(f"../../cache/results/{_oldpos}.pcdt", result)
             
             # Split the data into batches of X vertices, Y texture coordinates
-            X = 8912 * 3
-            Y = 8192 * 2
+            X = 4096 * 3
+            Y = 4096 * 2
             vertices = [vertices[i:i + X] for i in range(0, len(vertices), X)]
             texCoords = [texCoords[i:i + Y] for i in range(0, len(texCoords), Y)]
             # Group the vertices and texture coordinates into a list
