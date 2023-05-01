@@ -72,13 +72,13 @@ while True:
                     for y in range(position[1] - 1, height + 1):
                         blocktype = None
                         if y == height:
-                            if abs(noisevals[x - position[0] + 1, y - position[1], z - position[2] + 1]) < 0.5:
+                            if abs(noisevals[x - position[0] + 1, y - position[1], z - position[2] + 1]) < 0.6:
                                 blocktype = "_internals/grass_block"
                         elif y > dirt_height:
-                            if abs(noisevals[x - position[0] + 1, y - position[1], z - position[2] + 1]) < 0.45:
+                            if abs(noisevals[x - position[0] + 1, y - position[1], z - position[2] + 1]) < 0.55:
                                 blocktype = "_internals/dirt"
                         else:
-                            if abs(noisevals[x - position[0] + 1, y - position[1], z - position[2] + 1]) < 0.4:
+                            if abs(noisevals[x - position[0] + 1, y - position[1], z - position[2] + 1]) < 0.5:
                                 blocktype = "_internals/stone"
                         if blocktype is not None:   
                             if _:
@@ -116,10 +116,11 @@ while True:
             
             # Split the data into batches of X vertices, Y texture coordinates
             # FIXME: The verts and texCoords do not reach the renderer intact.
-            # X = 16384 * 3
-            # Y = 16384 * 2
+            # X = 2048 * 3
+            # Y = 2048 * 2
             # vertices = [vertices[i:i + X] for i in range(0, len(vertices), X)]
             # texCoords = [texCoords[i:i + Y] for i in range(0, len(texCoords), Y)]
+            
             vertices = [vertices]
             texCoords = [texCoords]
             # Group the vertices and texture coordinates into a list
