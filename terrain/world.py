@@ -1,5 +1,5 @@
 # imports
-from OpenGL.GL import GL_CULL_FACE, GL_DEPTH_TEST, glEnable
+from OpenGL.GL import *
 
 from core import Player, Renderer, TextureAtlas, logger
 from core.pcdt import open_pcdt
@@ -9,7 +9,6 @@ from core.utils import position_to_string, string_to_position
 import json
 import importlib
 import os
-import time
 
 class World:
     """
@@ -49,6 +48,13 @@ class World:
         # OpenGL stuff
         glEnable(GL_DEPTH_TEST)  # Enable depth testing
         glEnable(GL_CULL_FACE)  # Enable culling
+        glEnable(GL_FOG)
+        glFogi(GL_FOG_MODE, GL_LINEAR)
+        glFogf(GL_FOG_DENSITY, 0.1)
+        glFogf(GL_FOG_START, 0.0)
+        glFogf(GL_FOG_END, self.RENDER_DISTANCE * Chunk.SIZE[0] / 3 * 2)
+        glFogfv(GL_FOG_COLOR, self.sky.color)
+        glHint(GL_FOG_HINT, GL_DONT_CARE)
         
         # Generate the world
         self.generate()
@@ -77,7 +83,6 @@ class World:
         files = os.listdir("cache/vbo_add")
         for file in files:
             try:
-                time.sleep(8 / len(self.chunks))
                 data = json.loads(open_pcdt(f"cache/vbo_add/{file}"))
                 self.renderer.modify(data['id'], data['vertices'], data['texCoords'], -1)
                 os.remove(f"cache/vbo_add/{file}")
@@ -97,14 +102,12 @@ class World:
                     ]
                     _chunk_pos = position_to_string(chunk_pos)
                     if not _chunk_pos in list(self.chunks.keys()):
-                        time.sleep(8 / len(self.chunks))
                         self.generate_chunk(chunk_pos)
             
             # Remove chunks that are too far away
             for chunk in self.chunks:
                 _chunk = string_to_position(chunk)
                 if abs(position[0] - _chunk[0]) > self.RENDER_DISTANCE or abs(position[2] - _chunk[2]) > self.RENDER_DISTANCE:
-                    time.sleep(8 / len(self.chunks))
                     self.chunks[chunk]._destroy()
                     del self.chunks[chunk]
         except RuntimeError:

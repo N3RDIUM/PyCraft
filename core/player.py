@@ -38,7 +38,7 @@ class Player:
         # Default state
         self.state = {
             "mouse_delta": [0, 0],
-            "position": [0, 0, 0],
+            "position": [0, 130, 0],
             "rotation": [0, 0, 0],
             "velocity": [0, 0, 0],
             "friction": 0.9,
