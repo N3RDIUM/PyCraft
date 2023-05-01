@@ -54,6 +54,14 @@ class Renderer:
             "texture": [],
             "enabled": True,
         }
+        
+    def remove_buffer(self, id):
+        """
+        Removes a buffer.
+
+        :param id: The ID of the buffer.
+        """
+        del self.buffers[id]
 
     def modify(self, id, vertices, texture, offset=0):
         """
@@ -77,12 +85,15 @@ class Renderer:
         """
         Renders the buffers.
         """
-        for id in self.buffers.keys():
-            buffer = self.buffers[id]
-            if buffer["enabled"]: # If the buffer is enabled
-                buffer["vertices_buffer"].bind()
-                glVertexPointer(3, GL_FLOAT, 0, None)
-                buffer["texture_buffer"].bind()
-                glTexCoordPointer(2, GL_FLOAT, 0, None)
-                glDrawArrays(GL_TRIANGLES, 0, len(buffer["vertices"]) // 3)
-                glBindBuffer(GL_ARRAY_BUFFER, 0)
+        try:
+            for id in self.buffers.keys():
+                buffer = self.buffers[id]
+                if buffer["enabled"]: # If the buffer is enabled
+                    buffer["vertices_buffer"].bind()
+                    glVertexPointer(3, GL_FLOAT, 0, None)
+                    buffer["texture_buffer"].bind()
+                    glTexCoordPointer(2, GL_FLOAT, 0, None)
+                    glDrawArrays(GL_TRIANGLES, 0, len(buffer["vertices"]) // 3)
+                    glBindBuffer(GL_ARRAY_BUFFER, 0)
+        except RuntimeError:
+            self.drawcall()

@@ -5,9 +5,11 @@ from core import Player, Renderer, TextureAtlas, logger
 from core.pcdt import open_pcdt
 from terrain.chunk import Chunk
 from misc import Sky
+from core.utils import position_to_string, string_to_position
 import json
 import importlib
 import os
+import time
 
 class World:
     """
@@ -15,7 +17,7 @@ class World:
 
     The world class for PyCraft.
     """
-    RENDER_DISTANCE = 1
+    RENDER_DISTANCE = 2
     def __init__(self, window=None):
         """
         Initialize the world.
@@ -76,7 +78,34 @@ class World:
         for file in files:
             try:
                 data = json.loads(open_pcdt(f"cache/vbo_add/{file}"))
+                time.sleep(1 / len(self.chunks))
                 self.renderer.modify(data['id'], data['vertices'], data['texCoords'], -1)
                 os.remove(f"cache/vbo_add/{file}")
             except:
                 continue
+        
+        try:
+            # Get player position
+            position = self.player.state['position']
+            position = (int(position[0]) // Chunk.SIZE[0], int(position[1]) // Chunk.SIZE[1], int(position[2]) // Chunk.SIZE[2])
+            for x in range(-self.RENDER_DISTANCE, self.RENDER_DISTANCE + 1):
+                for z in range(-self.RENDER_DISTANCE, self.RENDER_DISTANCE + 1):
+                    chunk_pos = [
+                        int(position[0] + x),
+                        int(0),
+                        int(position[2] + z)
+                    ]
+                    _chunk_pos = position_to_string(chunk_pos)
+                    if not _chunk_pos in list(self.chunks.keys()):
+                        time.sleep(1 / len(self.chunks))
+                        self.generate_chunk(chunk_pos)
+            
+            # Remove chunks that are too far away
+            for chunk in self.chunks:
+                _chunk = string_to_position(chunk)
+                if abs(position[0] - _chunk[0]) > self.RENDER_DISTANCE or abs(position[2] - _chunk[2]) > self.RENDER_DISTANCE:
+                    time.sleep(1 / len(self.chunks))
+                    self.chunks[chunk]._destroy()
+                    del self.chunks[chunk]
+        except RuntimeError:
+            pass

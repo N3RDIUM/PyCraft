@@ -42,3 +42,8 @@ class Chunk:
                         return
                 except:
                     continue
+                
+    def _destroy(self):
+        self.renderer.remove_buffer(self.buffer_id)
+        del self.position
+        del self.buffer_id

@@ -66,7 +66,7 @@ while True:
                     else:
                         _ = False
                     # Get the height of the terrain at this position
-                    height = abs(int(opensimplex.noise2(x / 10, z / 10) * 10)) + 50
+                    height = abs(int(opensimplex.noise2(x / 10, z / 10) * 10)) + 128
                     dirt_height = height - abs(int(opensimplex.noise2(x / 10, z / 10) * 16))
                     # Iterate through the height
                     for y in range(position[1] - 1, height + 1):
@@ -110,8 +110,8 @@ while True:
             save_pcdt(f"../../cache/results/{_oldpos}.pcdt", result)
             
             # Split the data into batches of X vertices, Y texture coordinates
-            X = 16384 * 3
-            Y = 16384 * 2
+            X = 8912 * 3
+            Y = 8192 * 2
             vertices = [vertices[i:i + X] for i in range(0, len(vertices), X)]
             texCoords = [texCoords[i:i + Y] for i in range(0, len(texCoords), Y)]
             # Group the vertices and texture coordinates into a list

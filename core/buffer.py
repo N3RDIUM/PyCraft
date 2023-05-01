@@ -70,3 +70,9 @@ class Buffer:
         Binds the buffer.
         """
         glBindBuffer(GL_ARRAY_BUFFER, self.buf)
+        
+    def __del__(self):
+        """
+        Deletes the buffer.
+        """
+        glDeleteBuffers(1, [self.buf])
