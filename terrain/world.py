@@ -77,7 +77,7 @@ class World:
         files = os.listdir("cache/vbo_add")
         for file in files:
             try:
-                time.sleep(1 / len(self.chunks))
+                time.sleep(8 / len(self.chunks))
                 data = json.loads(open_pcdt(f"cache/vbo_add/{file}"))
                 self.renderer.modify(data['id'], data['vertices'], data['texCoords'], -1)
                 os.remove(f"cache/vbo_add/{file}")
@@ -97,14 +97,14 @@ class World:
                     ]
                     _chunk_pos = position_to_string(chunk_pos)
                     if not _chunk_pos in list(self.chunks.keys()):
-                        time.sleep(1 / len(self.chunks))
+                        time.sleep(8 / len(self.chunks))
                         self.generate_chunk(chunk_pos)
             
             # Remove chunks that are too far away
             for chunk in self.chunks:
                 _chunk = string_to_position(chunk)
                 if abs(position[0] - _chunk[0]) > self.RENDER_DISTANCE or abs(position[2] - _chunk[2]) > self.RENDER_DISTANCE:
-                    time.sleep(1 / len(self.chunks))
+                    time.sleep(8 / len(self.chunks))
                     self.chunks[chunk]._destroy()
                     del self.chunks[chunk]
         except RuntimeError:
