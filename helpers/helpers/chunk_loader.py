@@ -72,9 +72,11 @@ while True:
                     for y in range(position[1] - 1, height + 1):
                         blocktype = None
                         if y == height:
-                            blocktype = "_internals/grass_block"
+                            if abs(noisevals[x - position[0] + 1, y - position[1], z - position[2] + 1]) < 0.5:
+                                blocktype = "_internals/grass_block"
                         elif y > dirt_height:
-                            blocktype = "_internals/dirt"
+                            if abs(noisevals[x - position[0] + 1, y - position[1], z - position[2] + 1]) < 0.45:
+                                blocktype = "_internals/dirt"
                         else:
                             if abs(noisevals[x - position[0] + 1, y - position[1], z - position[2] + 1]) < 0.4:
                                 blocktype = "_internals/stone"
