@@ -113,10 +113,13 @@ while True:
             save_pcdt(f"../../cache/results/{_oldpos}.pcdt", result)
             
             # Split the data into batches of X vertices, Y texture coordinates
-            X = 4096 * 3
-            Y = 4096 * 2
-            vertices = [vertices[i:i + X] for i in range(0, len(vertices), X)]
-            texCoords = [texCoords[i:i + Y] for i in range(0, len(texCoords), Y)]
+            # FIXME: The verts and texCoords do not reach the renderer intact.
+            # X = 16384 * 3
+            # Y = 16384 * 2
+            # vertices = [vertices[i:i + X] for i in range(0, len(vertices), X)]
+            # texCoords = [texCoords[i:i + Y] for i in range(0, len(texCoords), Y)]
+            vertices = [vertices]
+            texCoords = [texCoords]
             # Group the vertices and texture coordinates into a list
             batches = []
             for index in range(len(vertices)):
