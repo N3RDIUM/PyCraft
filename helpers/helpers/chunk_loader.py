@@ -67,15 +67,15 @@ while True:
                         _ = False
                     # Get the height of the terrain at this position
                     height = abs(int(opensimplex.noise2(x / 10, z / 10) * 10)) + 50
+                    dirt_height = height - abs(int(opensimplex.noise2(x / 10, z / 10) * 16))
                     # Iterate through the height
                     for y in range(position[1] - 1, height + 1):
                         if y == height:
-                            blocktype = "_internals/grass"
-                        elif y < height and y > height - 15:
+                            blocktype = "_internals/grass_block"
+                        elif y > dirt_height:
                             blocktype = "_internals/dirt"
-                        elif y < height - 15:
-                            if noisevals[x - position[0] + 1][y - position[1]][z - position[2] + 1] < 0.2:
-                                blocktype = "_internals/stone"
+                        else:
+                            blocktype = "_internals/stone"
                         if _:
                             _simulated_blocks[position_to_string((x, y, z))] = 0
                         else:

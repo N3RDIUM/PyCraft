@@ -13,6 +13,6 @@ class _Export(Block):
                 "back": "_internals/grass_side.png"
             },
             "texture_type": "single-face",
-            "name": "grass",
-            "id": "_internals/grass"
+            "name": "grass_block",
+            "id": "_internals/grass_block"
         }
