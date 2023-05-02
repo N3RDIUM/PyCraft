@@ -150,5 +150,3 @@ class World:
                 self.chunks[chunk].hide()
             else:
                 self.chunks[chunk].show()
-        
-        print(len(self.chunks))
