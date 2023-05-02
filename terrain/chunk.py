@@ -47,3 +47,8 @@ class Chunk:
         self.renderer.remove_buffer(self.buffer_id)
         del self.position
         del self.buffer_id
+        
+    def show(self):
+        self.renderer.buffers[self.buffer_id]["enabled"] = True
+    def hide(self):
+        self.renderer.buffers[self.buffer_id]["enabled"] = False

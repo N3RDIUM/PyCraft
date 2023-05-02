@@ -7,8 +7,10 @@ from terrain.chunk import Chunk
 from misc import Sky
 from core.utils import position_to_string, string_to_position
 import json
+import time
 import importlib
 import os
+import math
 
 class World:
     """
@@ -57,7 +59,9 @@ class World:
         glHint(GL_FOG_HINT, GL_DONT_CARE)
         
         # Generate the world
+        self.n = 0
         self.generate()
+        self.to_generate = []
         
     def generate_chunk(self, position):
         new = Chunk(self, position)
@@ -79,6 +83,8 @@ class World:
         self.renderer.drawcall()  # Draw the renderer
         
     def sharedcon(self):
+        self.n += 1
+        time.sleep(1/60)
         # Listen for pcdt files in cache/vbo_add
         files = os.listdir("cache/vbo_add")
         for file in files:
@@ -102,7 +108,7 @@ class World:
                     ]
                     _chunk_pos = position_to_string(chunk_pos)
                     if not _chunk_pos in list(self.chunks.keys()):
-                        self.generate_chunk(chunk_pos)
+                        self.to_generate.append(chunk_pos)
             
             # Remove chunks that are too far away
             for chunk in self.chunks:
@@ -112,3 +118,37 @@ class World:
                     del self.chunks[chunk]
         except RuntimeError:
             pass
+        
+        if self.n % 8 == 0:
+            if len(self.to_generate) > 0:
+                chunk = self.to_generate[-1]
+                self.generate_chunk(chunk)
+                self.to_generate.remove(chunk)
+                
+        # Get the chunks which are not visible to the player
+        rot = self.player.state['rotation']
+        chunks_not_visible = []
+        FOV = 100 # Field of view
+        for chunk in self.chunks:
+            # Get the chunk position
+            chunk_pos = string_to_position(chunk)
+            # Get the angle
+            angle = math.degrees(math.atan2(chunk_pos[2] - position[2], chunk_pos[0] - position[0]))
+            # Get the difference
+            diff = angle + rot[1] + 90
+            if diff > FOV / 2 or diff < -FOV / 2:
+                chunks_not_visible.append(chunk)
+        for chunk in self.chunks:
+            self.chunks[chunk].show()
+        for i in chunks_not_visible:
+            self.chunks[i].hide()
+            
+        # Show all chunks within the render distance / 4
+        for chunk in self.chunks:
+            dist = math.dist(position, string_to_position(chunk))
+            if dist > self.RENDER_DISTANCE * Chunk.SIZE[0] / 4:
+                self.chunks[chunk].hide()
+            else:
+                self.chunks[chunk].show()
+        
+        print(len(self.chunks))
