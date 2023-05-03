@@ -11,6 +11,7 @@ import json
 import pickle
 
 from core.pcdt import *
+from core import logger
 from models import add_position
 from core.utils import string_to_position, position_to_string
 from terrain.chunk import Chunk
@@ -36,6 +37,7 @@ while True:
                 request = json.loads(open_pcdt(f"../../cache/requests/{request}"))
                 if request['type'] == "generate-chunk":
                     os.remove(f"../../cache/requests/{request['position']}.pcdt")
+                    logger.info(f"[ChunkLoader] Processing request {request}")
                 else:
                     continue
             except:
@@ -44,6 +46,7 @@ while True:
             request['position'] = string_to_position(request['position'])
             
             # Generate all blocks first
+            logger.info(f"[ChunkLoader] Generating blocks for chunk at {_oldpos}")
             _blocks = {}
             _simulated_blocks = {}
             size = Chunk.SIZE
@@ -83,6 +86,8 @@ while True:
                             else:
                                 _blocks[position_to_string((x, y, z))] = blocktype
             
+            # Now generate the vertices and texture coordinates
+            logger.info(f"[ChunkLoader] Generating vertices and texture coordinates for chunk at {_oldpos}")
             X = 2048 * 3
             Y = 2048 * 2
             vertices = [[]]
@@ -110,6 +115,7 @@ while True:
                     texCoords.append([])
                     
             # Now return the vertices and texture coordinates
+            logger.info(f"[ChunkLoader] Saving chunk at {_oldpos}")
             result = json.dumps({
                 "type": "chunk",
                 "position": _oldpos,
@@ -118,6 +124,7 @@ while True:
             save_pcdt(f"../../cache/results/{_oldpos}.pcdt", result)         
             
             # Group the vertices and texture coordinates into a list
+            logger.info(f"[ChunkLoader] Transferring vertices and texture coordinates for chunk at {_oldpos}")
             batches = []
             for index in range(len(vertices)):
                 try:
