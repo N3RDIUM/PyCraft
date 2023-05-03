@@ -6,7 +6,6 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-import tqdm
 import time
 import json
 import pickle
@@ -17,8 +16,6 @@ from core.utils import string_to_position, position_to_string
 from terrain.chunk import Chunk
 import pyfastnoisesimd as fns
 import opensimplex
-import threading
-import numpy as np
 
 # Load the blocks from ../../terrain/blocks/blocks.pickle
 blocks = pickle.load(open("../../terrain/blocks/blocks.pickle", 'rb'))
@@ -85,9 +82,11 @@ while True:
                                 _simulated_blocks[position_to_string((x, y, z))] = 0
                             else:
                                 _blocks[position_to_string((x, y, z))] = blocktype
-                
-            vertices = []
-            texCoords = []
+            
+            X = 2048 * 3
+            Y = 2048 * 2
+            vertices = [[]]
+            texCoords = [[]]
             block_positions = set(list(_blocks.keys()) + list(_simulated_blocks.keys()))
 
             # Define the positions of all neighboring blocks
@@ -103,8 +102,12 @@ while True:
                     _n = [int(n) for n in _n]
                     _n = position_to_string(_n)
                     if not _n in block_positions:
-                        vertices.extend(add_position(idx, v[facename]))
-                        texCoords.extend(t[facename])
+                        vertices[-1].extend(add_position(idx, v[facename]))
+                        texCoords[-1].extend(t[facename])
+                if len(vertices[-1]) > X:
+                    vertices.append([])
+                if len(texCoords[-1]) > Y:
+                    texCoords.append([])
                     
             # Now return the vertices and texture coordinates
             result = json.dumps({
@@ -112,17 +115,8 @@ while True:
                 "position": _oldpos,
                 "blocks": _blocks
             })
-            save_pcdt(f"../../cache/results/{_oldpos}.pcdt", result)
+            save_pcdt(f"../../cache/results/{_oldpos}.pcdt", result)         
             
-            # Split the data into batches of X vertices, Y texture coordinates
-            # FIXME: The verts and texCoords do not reach the renderer intact.
-            # X = 2048 * 3
-            # Y = 2048 * 2
-            # vertices = [vertices[i:i + X] for i in range(0, len(vertices), X)]
-            # texCoords = [texCoords[i:i + Y] for i in range(0, len(texCoords), Y)]
-            
-            vertices = [vertices]
-            texCoords = [texCoords]
             # Group the vertices and texture coordinates into a list
             batches = []
             for index in range(len(vertices)):
