@@ -38,10 +38,16 @@ class Chunk:
                     data = json.loads(open_pcdt(f"cache/results/{result}"))
                     if data['position'] == self.buffer_id:
                         self.blocks = data['blocks']
+                        self.block_positions = list(data['blocks'].keys())
+                        for i in range(len(self.block_positions)):
+                            self.block_positions[i] = [int(i) for i in string_to_position(self.block_positions[i])]
                         os.remove(f"cache/results/{result}")
                         return
                 except:
                     continue
+                
+    def block_exists(self, position):
+        return list(position) in list(self.block_positions)
                 
     def _destroy(self):
         self.renderer.remove_buffer(self.buffer_id)

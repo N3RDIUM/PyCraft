@@ -5,7 +5,8 @@ from core import Player, Renderer, TextureAtlas, logger
 from core.pcdt import open_pcdt
 from terrain.chunk import Chunk
 from misc import Sky
-from core.utils import position_to_string, string_to_position
+import multiprocessing
+processes = multiprocessing.cpu_count()
 import json
 import time
 import importlib
@@ -86,6 +87,37 @@ class World:
     def chunk_requested(self, position):
         return list(position) in self.to_generate
     
+    def block_exists(self, position):
+        chunkpos = (int(position[0]) // Chunk.SIZE[0], 0, int(position[2]) // Chunk.SIZE[2])
+        try:
+            return self.chunk_exists(chunkpos) and self.chunks[chunkpos].block_exists(position)
+        except:
+            return False
+        
+    def check_collision(self, position):
+        position = [int(position[0]), int(position[1]), int(position[2])]
+        neighbors = [
+            # Typical block neighbors
+            (0, 1, 0), 
+            (0, -2, 0), 
+            
+            (1, 0, 0), 
+            (1, -1, 0),
+            (-1, 0, 0), 
+            (-1, -1, 0),
+            
+            (0, 0, 1),
+            (0, -1, 1), 
+            (0, 0, -1),
+            (0, -1, -1)
+        ]
+        results = [False]*10
+        for neighbor in neighbors:
+            if self.block_exists((position[0] + neighbor[0], position[1] + neighbor[1], position[2] + neighbor[2])):
+                results[neighbors.index(neighbor)] = True
+            else:
+                results[neighbors.index(neighbor)] = False
+        return results
     def sharedcon(self):
         self.n += 1
         time.sleep(1/60)
@@ -130,10 +162,11 @@ class World:
         # Generate chunks in queue
         if self.n % 4 == 0:
             if len(self.to_generate) > 0:
-                chunk = self.to_generate.pop(0)
-                time.sleep((1+self.RENDER_DISTANCE*2)/(100-self.RENDER_DISTANCE*2))
-                self.generate_chunk(chunk)
-                logger.info(f"[World] Generated chunk at {chunk}")
+                time.sleep((self.RENDER_DISTANCE)/(60-self.RENDER_DISTANCE))
+                for i in range(processes // 8):
+                    chunk = self.to_generate.pop(0)
+                    self.generate_chunk(chunk)
+                    logger.info(f"[World] Generated chunk at {chunk}")
                 
         # Get the chunks which are not visible to the player
         rot = self.player.state['rotation']

@@ -43,6 +43,7 @@ class Player:
             "velocity": [0, 0, 0],
             "friction": 0.9,
             "gravity": 9.81,
+            "terminal_velocity": 50,
             "speed": 0.1,
             "zoom": False,
             "fly": False,
@@ -115,7 +116,27 @@ class Player:
         self.state["velocity"][0] *= self.state["friction"]
         self.state["velocity"][1] *= self.state["friction"]
         self.state["velocity"][2] *= self.state["friction"]
-
+        
+        # Apply gravity
+        # self.state["velocity"][1] -= self.state["gravity"] / 100
+        # if self.state["velocity"][1] < -self.state["terminal_velocity"]:
+        #     self.state["velocity"][1] = -self.state["terminal_velocity"]
+        
+        # Check for collision
+        collision = self.world.check_collision(self.state["position"])
+        if collision[0] and self.state["velocity"][1] < 0:
+            self.state["velocity"][1] = 0
+        if collision[1] and self.state["velocity"][1] > 0:
+            self.state["velocity"][1] = 0
+        if collision[2] or collision[3] and self.state["velocity"][0] > 0:
+            self.state["velocity"][0] = 0
+        if collision[4] or collision[5] and self.state["velocity"][0] < 0:
+            self.state["velocity"][0] = 0
+        if collision[6] or collision[7] and self.state["velocity"][2] > 0:
+            self.state["velocity"][2] = 0
+        if collision[8] or collision[9] and self.state["velocity"][2] < 0:
+            self.state["velocity"][2] = 0
+        
         # Draw the player
         glRotatef(-self.state["rotation"][0], 1, 0, 0)
         glRotatef(-self.state["rotation"][1], 0, 1, 0)
