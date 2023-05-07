@@ -1,2 +1,4 @@
 glfw
 PyOpenGL
+OpenSimplex
+PyFastNoiseSIMD

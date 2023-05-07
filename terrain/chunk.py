@@ -20,6 +20,7 @@ class Chunk:
         # Create a VBO for the chunk
         self.buffer_id = position_to_string(self.position)
         self.renderer.create_buffer(self.buffer_id)
+        self.renderer.buffers[self.buffer_id]['enabled'] = False
         
     def generate(self):
         request = json.dumps({
@@ -42,6 +43,7 @@ class Chunk:
                         for i in range(len(self.block_positions)):
                             self.block_positions[i] = [int(i) for i in string_to_position(self.block_positions[i])]
                         os.remove(f"cache/results/{result}")
+                        self.renderer.buffers[self.buffer_id]['enabled'] = True
                         return
                 except:
                     continue
