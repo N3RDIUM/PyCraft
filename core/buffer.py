@@ -26,7 +26,7 @@ class Buffer:
         glBindBuffer(GL_ARRAY_BUFFER, self.buf)
 
         # Allocate storage for the buffer using glBufferStorage and specify the desired storage flags
-        glBufferStorage(GL_ARRAY_BUFFER, INIT_VBO_SIZE, None,
+        glBufferStorage(GL_ARRAY_BUFFER, self.size, None,
                         GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT)
 
     def map_buffer(self):
@@ -52,28 +52,28 @@ class Buffer:
 
         # Unbind the buffer
         glBindBuffer(GL_ARRAY_BUFFER, 0)
-        
-    def grow_buffer(self, size):
-        glBindBuffer(GL_COPY_READ_BUFFER, self.buf)
-        newbuf = glGenBuffers(1)
-        glBindBuffer(GL_COPY_WRITE_BUFFER, newbuf)
-        glBufferData(GL_COPY_WRITE_BUFFER, size, None, GL_STATIC_DRAW)
-        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, self.size)
-        # Now we have a new buffer with the same data, so we can delete the old one and create a new one with the persistent mapping
+    
+    def extend_vbo(self, new_size):
+        self.map_buffer()
+        data = np.asarray(self.data_ptr.contents)
+        glFlush()
+        self.unmap_buffer()
+        self.size = new_size
         glDeleteBuffers(1, [self.buf])
         self.buf = glGenBuffers(1)
         glBindBuffer(GL_ARRAY_BUFFER, self.buf)
-        self.size = size
-        # Allocate storage for the buffer using glBufferStorage and specify the desired storage flags
+        # Allocate storage for the buffer using glBufferData and specify the desired storage flags
         glBufferStorage(GL_ARRAY_BUFFER, self.size, None,
                         GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT)
-        # Now copy the data from the new buffer to the old one
-        glBindBuffer(GL_COPY_READ_BUFFER, newbuf)
-        glBindBuffer(GL_COPY_WRITE_BUFFER, self.buf)
-        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, self.size)
-        glBufferData(GL_COPY_READ_BUFFER, 0, None, GL_STATIC_DRAW)
-        glDeleteBuffers(1, [newbuf]) # Delete the new buffer
-    
+        self.map_buffer()
+        new_data = np.empty(new_size, dtype=data.dtype)
+        new_data[:len(data)] = data
+        self.data_ptr.contents = new_data.ctypes.data_as(ctypes.POINTER(ctypes.c_void_p))
+        glFlush()
+        self.unmap_buffer()
+        glBindBuffer(GL_ARRAY_BUFFER, 0)
+        glFlush()
+        
     def print_buffer_size(self):
         glBindBuffer(GL_ARRAY_BUFFER, self.buf)
         print("Buffer size: %d bytes" % glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE))
@@ -87,7 +87,8 @@ class Buffer:
         """
         # Modify the buffer
         if offset+len(data) > self.size:
-            self.grow_buffer(offset+len(data))
+            glBindBuffer(GL_ARRAY_BUFFER, 0)
+            self.extend_vbo(offset+len(data))
             glFlush()
         # Print the size of the buffer for debugging
         # self.print_buffer_size()
