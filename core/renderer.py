@@ -81,10 +81,12 @@ class Renderer:
         self.buffers[id]["vertices"][offset:offset + len(vertices)] = vertices
         self.buffers[id]["texture"][offset:offset + len(texture)] = texture
 
-    def drawcall(self):
+    def drawcall(self, lvl=0):
         """
         Renders the buffers.
         """
+        if lvl >= 1:
+            print("Warning: drawcall() called recursively", lvl, "times.")
         try:
             for id in self.buffers.keys():
                 buffer = self.buffers[id]
@@ -96,4 +98,4 @@ class Renderer:
                     glDrawArrays(GL_TRIANGLES, 0, len(buffer["vertices"]) // 3)
                     glBindBuffer(GL_ARRAY_BUFFER, 0)
         except RuntimeError:
-            self.drawcall()
+            self.drawcall(lvl+1)

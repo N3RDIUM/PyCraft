@@ -19,6 +19,9 @@ import pyfastnoisesimd as fns
 import opensimplex
 import threading
 
+# Get the process pid
+process_id = os.getpid()
+
 # Load the blocks from ../../terrain/blocks/blocks.pickle
 blocks = pickle.load(open("../../terrain/blocks/blocks.pickle", 'rb'))
 
@@ -39,7 +42,7 @@ while True:
                     request = json.loads(open_pcdt(f"../../cache/requests/{request}"))
                     if request['type'] == "generate-chunk":
                         os.remove(f"../../cache/requests/{request['position']}.pcdt")
-                        logger.info(f"[ChunkLoader] Processing request {request}")
+                        logger.info(f"[ChunkLoader] [{process_id}] Processing request {request}")
                     else:
                         return
                 except:
@@ -48,7 +51,7 @@ while True:
                 request['position'] = string_to_position(request['position'])
                 
                 # Generate all blocks first
-                logger.info(f"[ChunkLoader] Generating blocks for chunk at {_oldpos}")
+                logger.info(f"[ChunkLoader] [{process_id}] Generating blocks for chunk at {_oldpos}")
                 _blocks = {}
                 _simulated_blocks = {}
                 size = Chunk.SIZE
@@ -89,7 +92,7 @@ while True:
                                     _blocks[position_to_string((x, y, z))] = blocktype
                 
                 # Now generate the vertices and texture coordinates
-                logger.info(f"[ChunkLoader] Generating vertices and texture coordinates for chunk at {_oldpos}")
+                logger.info(f"[ChunkLoader] [{process_id}] Generating vertices and texture coordinates for chunk at {_oldpos}")
                 X = 4096 * 3
                 Y = 4096 * 2
                 vertices = [[]]
@@ -117,7 +120,7 @@ while True:
                         texCoords.append([])
                         
                 # Now return the vertices and texture coordinates
-                logger.info(f"[ChunkLoader] Transferring vertices and texture coordinates for chunk at {_oldpos}")
+                logger.info(f"[ChunkLoader] [{process_id}] Transferring vertices and texture coordinates for chunk at {_oldpos}")
                 batches = []
                 for index in range(len(vertices)):
                     try:
@@ -134,7 +137,7 @@ while True:
                 for batch in batches:
                     save_pcdt(f"../../cache/vbo_add/{batch['request_id']}.pcdt", json.dumps(batch))
                     
-                logger.info(f"[ChunkLoader] Saving chunk at {_oldpos}")
+                logger.info(f"[ChunkLoader] [{process_id}] Saving chunk at {_oldpos}")
                 result = json.dumps({
                     "type": "chunk",
                     "position": _oldpos,

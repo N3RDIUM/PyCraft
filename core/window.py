@@ -1,5 +1,6 @@
 # imports
 import threading
+import time
 
 import glfw
 from OpenGL.GL import (GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_MODELVIEW,
@@ -8,6 +9,8 @@ from OpenGL.GL import (GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_MODELVIEW,
 from OpenGL.GLU import gluPerspective
 
 from .logger import logging as logger
+from core.text import display_debug
+from settings import VERSION
 
 ##################################################
 # Errors                                         #
@@ -64,6 +67,12 @@ class Window:
         # Make the window the current context.
         logger.info("[Window] Setting up window...")
         glfw.make_context_current(self.window)
+        self.previous_frame = 0
+        self.current_frame = 0
+        self.fps = 0
+        self.smooth_fps_samples = []
+        self.smooth_fps = 0
+        self.logs = []
 
         self._scheduled_sc = []  # Scheduled shared context objects.
         self._scheduled_main = []  # Scheduled main context objects.
@@ -154,12 +163,31 @@ class Window:
         Main loop.
         """
         while not glfw.window_should_close(self.window):  # Main loop.
+            self.current_frame = time.time()
             # OpenGL stuff.
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             self._update_3d()
 
             for obj in self._scheduled_main:  # Loop through the scheduled objects.
                 obj.drawcall()  # Draw the object.
+                
+            self.fps = 1 / (self.current_frame - self.previous_frame)
+            self.smooth_fps_samples.append(self.fps)
+            self.smooth_fps = sum(self.smooth_fps_samples) / len(self.smooth_fps_samples)
+            if len(self.smooth_fps_samples) > 64:
+                self.smooth_fps_samples = self.smooth_fps_samples[1:]
+            if self.fps < 45:
+                self.logs.append("Warning: Low FPS (" + str(self.fps) + "). Consider lowering chunk render distance.")
+            if self.fps < 20:
+                self.logs.append("Warning: Very low FPS (" + str(self.fps) + ")! (foreshadowing)")
+            if self.fps < 10:
+                self.logs.append("Warning: Extremely low FPS (" + str(self.fps) + "). Do you have a potato?")
+            if len(self.logs) > 16:
+                self.logs = self.logs[1:]
+            display = self.logs.copy() + [str(self.fps) + " FPS (exact)", str(int(self.smooth_fps)) + " FPS (smooth, 64 samples)"] + [f"PyCraft {VERSION}"]
+            display_debug((8, 8), display)
+                
             # GLFW stuff.
             glfw.poll_events()
             glfw.swap_buffers(self.window)
+            self.previous_frame = self.current_frame

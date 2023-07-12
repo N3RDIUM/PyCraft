@@ -19,7 +19,7 @@ class World:
 
     The world class for PyCraft.
     """
-    RENDER_DISTANCE = 5
+    RENDER_DISTANCE = 2
     def __init__(self, window=None):
         """
         Initialize the world.
@@ -49,14 +49,14 @@ class World:
         
         # OpenGL stuff
         glEnable(GL_DEPTH_TEST)  # Enable depth testing
-        # glEnable(GL_CULL_FACE)  # Enable culling
-        # glEnable(GL_FOG)
-        # glFogi(GL_FOG_MODE, GL_LINEAR)
-        # glFogf(GL_FOG_DENSITY, 0.1)
-        # glFogf(GL_FOG_START, 0.0)
-        # glFogf(GL_FOG_END, self.RENDER_DISTANCE * Chunk.SIZE[0] / 3 * 2)
-        # glFogfv(GL_FOG_COLOR, self.sky.color)
-        # glHint(GL_FOG_HINT, GL_DONT_CARE)
+        glEnable(GL_CULL_FACE)  # Enable culling
+        glEnable(GL_FOG)
+        glFogi(GL_FOG_MODE, GL_LINEAR)
+        glFogf(GL_FOG_DENSITY, 0.1)
+        glFogf(GL_FOG_START, 0.0)
+        glFogf(GL_FOG_END, self.RENDER_DISTANCE * Chunk.SIZE[0] / 3 * 2)
+        glFogfv(GL_FOG_COLOR, self.sky.color)
+        glHint(GL_FOG_HINT, GL_DONT_CARE)
         
         # Generate the world
         self.n = 0
@@ -129,8 +129,8 @@ class World:
                 self.renderer.modify(data['id'], data['vertices'], data['texCoords'], -1)
                 os.remove(f"cache/vbo_add/{file}")
             except:
-                continue
-        
+                pass
+    
         try:
             # Get player position
             position = self.player.state['position']

@@ -43,5 +43,9 @@ if __name__ == "__main__":
     start_helpers()
     
     logger.info("[PyCraft] Starting mainloop...")
-    window.mainloop()  # Start the mainloop
+    try:
+        window.mainloop()  # Start the mainloop
+    except KeyboardInterrupt:
+        print("KeyboardInterrupt detected, exiting...")
+        exit(0)
         
