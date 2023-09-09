@@ -1,3 +1,5 @@
 glfw
 PyOpenGL
 PyOpenGL-Accelerate
+numpy
+pillow
