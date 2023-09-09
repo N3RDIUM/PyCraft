@@ -1,4 +1,0 @@
-glfw
-PyOpenGL
-OpenSimplex
-PyFastNoiseSIMD
