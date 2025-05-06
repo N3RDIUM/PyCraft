@@ -8,6 +8,7 @@ from OpenGL.GL import (
     GL_FLOAT,
     GL_FRAGMENT_SHADER,
     GL_TRIANGLES,
+    GL_TRUE,
     GL_VERTEX_SHADER,
     glBindVertexArray,
     glClear,
@@ -26,9 +27,9 @@ from OpenGL.GL.shaders import compileProgram, compileShader
 from core.dynamic_vbo import DynamicVBO
 from core.state import State
 
-data = np.array(
-    [[-0.5, -0.5, 0.0], [0.5, -0.5, 0.0], [0.0, 0.5, 0.0]], dtype=np.float32
-)
+# TODO: use glm
+
+data = np.random.rand(120).astype(np.float32)
 
 VERTEX_SHADER = """
 #version 330 core
@@ -50,16 +51,18 @@ void main() {
 
 def main():
     if not glfw.init():
-        return
-
+        raise Exception("GLFW could not be initialized!")
+    
+    glfw.window_hint(glfw.SAMPLES, 4)
     glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
     glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
+    glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL_TRUE)
     glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
     window = glfw.create_window(640, 480, "Hello World", None, None)
     if not window:
         glfw.terminate()
-        return
+        raise Exception("Could not create GLFW window!")
 
     glfw.make_context_current(window)
     state = State()
@@ -70,7 +73,7 @@ def main():
     vbo.set_data(data)
     buffer = vbo.get_latest_buffer()
     if buffer is None:
-        return
+        raise Exception("Failed to initialize DynamicVBO!")
 
     shader_program = compileProgram(
         compileShader(VERTEX_SHADER, GL_VERTEX_SHADER),
@@ -106,7 +109,7 @@ def main():
         glEnableVertexAttribArray(0)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
 
-        glDrawArrays(GL_TRIANGLES, 0, 3)
+        glDrawArrays(GL_TRIANGLES, 0, 40)
 
         glDisableVertexAttribArray(0)
         buffer.unbind()
