@@ -1,9 +1,101 @@
-import logging
-logging.basicConfig(format="[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s")
-logging.getLogger(__name__).setLevel(logging.DEBUG)
+import glfw
+import math
+from OpenGL.GL import *
+from OpenGL.GL.shaders import compileProgram, compileShader
+from core.state import State
+from core.dyn_vbo import DynVBO
+import numpy as np
 
-from core.window import Window
+data = np.array([
+    [-0.5, -0.5, 0.0],
+    [ 0.5, -0.5, 0.0],
+    [ 0.0,  0.5, 0.0]
+], dtype=np.float32)
+
+VERTEX_SHADER = """
+#version 330 core
+layout(location = 0) in vec3 position;
+uniform mat4 transform;
+void main() {
+    gl_Position = transform * vec4(position, 1.0);
+}
+"""
+
+FRAGMENT_SHADER = """
+#version 330 core
+out vec4 FragColor;
+void main() {
+    FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+}
+"""
+
+
+def main():
+    if not glfw.init():
+        return
+ 
+    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
+    glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+
+    window = glfw.create_window(640, 480, "Hello World", None, None)
+    if not window:
+        glfw.terminate()
+        return
+
+    glfw.make_context_current(window)
+    state = State()
+    vao = glGenVertexArrays(1)
+    glBindVertexArray(vao)
+
+    vbo = DynVBO(state)
+    vbo.set_data(data)
+    buffer = vbo.get_latest_buffer()
+    if buffer is None:
+        return
+
+    shader_program = compileProgram(
+        compileShader(VERTEX_SHADER, GL_VERTEX_SHADER),
+        compileShader(FRAGMENT_SHADER, GL_FRAGMENT_SHADER),
+    )
+
+    while not glfw.window_should_close(window):
+        glClear(GL_COLOR_BUFFER_BIT)
+        glClearColor(0.15, 0.15, 0.15, 1.0)
+
+        glUseProgram(shader_program)
+
+        angle = glfw.get_time()
+
+        cos_theta = math.cos(angle)
+        sin_theta = math.sin(angle)
+
+        rotation = np.array([
+            [cos_theta, -sin_theta, 0, 0],
+            [sin_theta,  cos_theta, 0, 0],
+            [0,          0,         1, 0],
+            [0,          0,         0, 1],
+        ], dtype=np.float32)
+
+        transform_loc = glGetUniformLocation(shader_program, "transform")
+        glUniformMatrix4fv(transform_loc, 1, GL_FALSE, rotation)
+
+        buffer.bind()
+
+        glEnableVertexAttribArray(0)
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
+
+        glDrawArrays(GL_TRIANGLES, 0, 3)
+
+        glDisableVertexAttribArray(0)
+        buffer.unbind()
+
+        state.on_drawcall()
+        glfw.swap_buffers(window)
+        glfw.poll_events()
+
+    glfw.terminate()
+
 
 if __name__ == "__main__":
-    window = Window()
-    window.mainloop()
+    main()
