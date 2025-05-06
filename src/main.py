@@ -1,16 +1,34 @@
-import glfw
 import math
-from OpenGL.GL import *
-from OpenGL.GL.shaders import compileProgram, compileShader
-from core.state import State
-from core.dyn_vbo import DynVBO
-import numpy as np
 
-data = np.array([
-    [-0.5, -0.5, 0.0],
-    [ 0.5, -0.5, 0.0],
-    [ 0.0,  0.5, 0.0]
-], dtype=np.float32)
+import glfw
+import numpy as np
+from OpenGL.GL import (
+    GL_COLOR_BUFFER_BIT,
+    GL_FALSE,
+    GL_FLOAT,
+    GL_FRAGMENT_SHADER,
+    GL_TRIANGLES,
+    GL_VERTEX_SHADER,
+    glBindVertexArray,
+    glClear,
+    glClearColor,
+    glDisableVertexAttribArray,
+    glDrawArrays,
+    glEnableVertexAttribArray,
+    glGenVertexArrays,
+    glGetUniformLocation,
+    glUniformMatrix4fv,
+    glUseProgram,
+    glVertexAttribPointer,
+)
+from OpenGL.GL.shaders import compileProgram, compileShader
+
+from core.dynamic_vbo import DynamicVBO
+from core.state import State
+
+data = np.array(
+    [[-0.5, -0.5, 0.0], [0.5, -0.5, 0.0], [0.0, 0.5, 0.0]], dtype=np.float32
+)
 
 VERTEX_SHADER = """
 #version 330 core
@@ -33,7 +51,7 @@ void main() {
 def main():
     if not glfw.init():
         return
- 
+
     glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
     glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
     glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
@@ -48,7 +66,7 @@ def main():
     vao = glGenVertexArrays(1)
     glBindVertexArray(vao)
 
-    vbo = DynVBO(state)
+    vbo = DynamicVBO(state)
     vbo.set_data(data)
     buffer = vbo.get_latest_buffer()
     if buffer is None:
@@ -65,17 +83,20 @@ def main():
 
         glUseProgram(shader_program)
 
-        angle = glfw.get_time()
+        angle: float = glfw.get_time()
 
         cos_theta = math.cos(angle)
         sin_theta = math.sin(angle)
 
-        rotation = np.array([
-            [cos_theta, -sin_theta, 0, 0],
-            [sin_theta,  cos_theta, 0, 0],
-            [0,          0,         1, 0],
-            [0,          0,         0, 1],
-        ], dtype=np.float32)
+        rotation = np.array(
+            [
+                [cos_theta, -sin_theta, 0, 0],
+                [sin_theta, cos_theta, 0, 0],
+                [0, 0, 1, 0],
+                [0, 0, 0, 1],
+            ],
+            dtype=np.float32,
+        )
 
         transform_loc = glGetUniformLocation(shader_program, "transform")
         glUniformMatrix4fv(transform_loc, 1, GL_FALSE, rotation)

@@ -19,7 +19,7 @@ class DisposableBuffer:
 
 BufferList: TypeAlias = list[DisposableBuffer]
 
-class DynVBO:
+class DynamicVBO:
     def __init__(
         self, 
         state: State
