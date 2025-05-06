@@ -3,13 +3,16 @@ import math
 import glfw
 import numpy as np
 from OpenGL.GL import (
+    GL_ARRAY_BUFFER,
     GL_COLOR_BUFFER_BIT,
+    GL_DEPTH_BUFFER_BIT,
     GL_FALSE,
     GL_FLOAT,
     GL_FRAGMENT_SHADER,
     GL_TRIANGLES,
     GL_TRUE,
     GL_VERTEX_SHADER,
+    glBindBuffer,
     glBindVertexArray,
     glClear,
     glClearColor,
@@ -51,8 +54,8 @@ void main() {
 
 def main():
     if not glfw.init():
-        raise Exception("GLFW could not be initialized!")
-    
+        raise Exception("[Main] GLFW could not be initialized")
+
     glfw.window_hint(glfw.SAMPLES, 4)
     glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
     glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
@@ -62,10 +65,10 @@ def main():
     window = glfw.create_window(640, 480, "Hello World", None, None)
     if not window:
         glfw.terminate()
-        raise Exception("Could not create GLFW window!")
+        raise Exception("[Main] Could not create GLFW window")
 
     glfw.make_context_current(window)
-    state = State()
+    state = State(window)
     vao = glGenVertexArrays(1)
     glBindVertexArray(vao)
 
@@ -73,7 +76,7 @@ def main():
     vbo.set_data(data)
     buffer = vbo.get_latest_buffer()
     if buffer is None:
-        raise Exception("Failed to initialize DynamicVBO!")
+        raise Exception("[Main] Failed to initialize DynamicVBO")
 
     shader_program = compileProgram(
         compileShader(VERTEX_SHADER, GL_VERTEX_SHADER),
@@ -81,7 +84,7 @@ def main():
     )
 
     while not glfw.window_should_close(window):
-        glClear(GL_COLOR_BUFFER_BIT)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glClearColor(0.15, 0.15, 0.15, 1.0)
 
         glUseProgram(shader_program)
@@ -104,15 +107,14 @@ def main():
         transform_loc = glGetUniformLocation(shader_program, "transform")
         glUniformMatrix4fv(transform_loc, 1, GL_FALSE, rotation)
 
-        buffer.bind()
-
+        glBindBuffer(GL_ARRAY_BUFFER, buffer)
         glEnableVertexAttribArray(0)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
 
         glDrawArrays(GL_TRIANGLES, 0, 40)
 
         glDisableVertexAttribArray(0)
-        buffer.unbind()
+        glBindBuffer(GL_ARRAY_BUFFER, 0)
 
         state.on_drawcall()
         glfw.swap_buffers(window)
