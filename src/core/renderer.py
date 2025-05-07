@@ -43,15 +43,15 @@ class Renderer:
         self.vao: np.uint32 = glGenVertexArrays(1)
         glBindVertexArray(self.vao)
         self.shared.start_thread()
-
+        
         self.asset_manager: AssetManager | None = None
 
         self.vbo = DynamicVBO(state)
-        data = np.random.rand(1200).astype(np.float32)
+        data = np.random.rand(120000).astype(np.float32)
         data *= 2
         data -= 1
         data /= 2
-        self.vbo.set_data(data)
+        self.shared.schedule_fn(lambda: self.vbo.set_data(data))
 
     def drawcall(self) -> None:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -70,8 +70,11 @@ class Renderer:
 
         transform_loc = glGetUniformLocation(self.asset_manager.get_shader_program("main"), "transform")
         glUniformMatrix4fv(transform_loc, 1, GL_FALSE, glm.value_ptr(rotation))
-
-        buffer = self.vbo.latest_buffer
+    
+        try:
+            buffer = self.vbo.latest_buffer
+        except IndexError:
+            return
 
         glBindBuffer(GL_ARRAY_BUFFER, buffer)
         glEnableVertexAttribArray(0)
