@@ -10,7 +10,7 @@ class SharedContext:
         self.thread: threading.Thread | None = None
         self.window: Any | None = None
     
-    def start_thread(self):
+    def start_thread(self) -> None:
         if self.thread is not None:
             raise Exception("[core.shared_context.SharedContext] Tried to start thread multiple times")
         self.thread = threading.Thread(
@@ -19,7 +19,7 @@ class SharedContext:
         )
         self.thread.start()
 
-    def start(self):
+    def start(self) -> None:
         glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
         self.window = glfw.create_window(1, 1, "Shared Context", None, self.state.window)
         if self.window is None:
@@ -34,7 +34,7 @@ class SharedContext:
         glfw.destroy_window(self.window)
         self.state.shared_context_alive = False
 
-    def step(self):
+    def step(self) -> None:
         # Do stuff here
 
         glfw.swap_buffers(self.window)
