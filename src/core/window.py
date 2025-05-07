@@ -1,5 +1,5 @@
 import glfw
-from OpenGL.GL import GL_TRUE
+from OpenGL.GL import GL_TRUE, glViewport
 
 from .state import State
 from .renderer import Renderer
@@ -26,6 +26,9 @@ class Window:
 
     def start_mainloop(self) -> None:
         while not glfw.window_should_close(self.state.window):
+            width, height = glfw.get_window_size(self.state.window)
+            glViewport(0, 0, width, height)
+
             self.mainloop_step()
 
             glfw.swap_buffers(self.state.window)

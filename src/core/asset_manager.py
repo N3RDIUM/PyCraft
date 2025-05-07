@@ -16,7 +16,7 @@ class AssetManager:
 
         self.shaders = {}
 
-    def load_assets(self, asset_dir: str = ASSET_DIR) -> None:
+    def load_assets(self, asset_dir: str = ASSET_DIR, name_prefix: str = "") -> None:
         shader_dir = os.path.join(asset_dir, "shaders/")
         shader_pairs = set()
 
@@ -29,7 +29,7 @@ class AssetManager:
                 vert = f.read()
             with open(os.path.join(shader_dir, name + ".frag")) as f:
                 frag = f.read()
-            self.shaders[name] = compileProgram(
+            self.shaders[name_prefix + name] = compileProgram(
                 compileShader(vert, GL_VERTEX_SHADER),
                 compileShader(frag, GL_FRAGMENT_SHADER),
             )
