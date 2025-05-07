@@ -47,7 +47,7 @@ class Renderer:
         self.asset_manager: AssetManager | None = None
 
         self.vbo = DynamicVBO(state)
-        data = np.random.rand(120000).astype(np.float32)
+        data = np.random.rand(12000000).astype(np.float32)
         data *= 2
         data -= 1
         data /= 2
