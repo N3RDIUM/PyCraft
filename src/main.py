@@ -6,9 +6,11 @@ from OpenGL.GL import (
     GL_ARRAY_BUFFER,
     GL_COLOR_BUFFER_BIT,
     GL_DEPTH_BUFFER_BIT,
+    GL_DEPTH_TEST,
     GL_FALSE,
     GL_FLOAT,
     GL_FRAGMENT_SHADER,
+    GL_LESS,
     GL_TRIANGLES,
     GL_TRUE,
     GL_VERTEX_SHADER,
@@ -16,8 +18,10 @@ from OpenGL.GL import (
     glBindVertexArray,
     glClear,
     glClearColor,
+    glDepthFunc,
     glDisableVertexAttribArray,
     glDrawArrays,
+    glEnable,
     glEnableVertexAttribArray,
     glGenVertexArrays,
     glGetUniformLocation,
@@ -31,6 +35,8 @@ from core.dynamic_vbo import DynamicVBO
 from core.state import State
 
 # TODO: use glm
+# TODO: logging
+# TODO: organize and refactor code
 
 data = np.random.rand(120).astype(np.float32)
 
@@ -87,6 +93,9 @@ def main():
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glClearColor(0.15, 0.15, 0.15, 1.0)
 
+        glEnable(GL_DEPTH_TEST)
+        glDepthFunc(GL_LESS)
+
         glUseProgram(shader_program)
 
         angle: float = glfw.get_time()
@@ -111,7 +120,7 @@ def main():
         glEnableVertexAttribArray(0)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
 
-        glDrawArrays(GL_TRIANGLES, 0, 40)
+        glDrawArrays(GL_TRIANGLES, 0, 120)
 
         glDisableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, 0)
@@ -120,6 +129,7 @@ def main():
         glfw.swap_buffers(window)
         glfw.poll_events()
 
+    state.on_close()
     glfw.terminate()
 
 
