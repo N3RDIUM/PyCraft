@@ -24,6 +24,10 @@ from OpenGL.GL import (
 import numpy as np
 import glfw
 import math
+try:
+    from pyglm import glm
+except ImportError:
+    import glm
 
 from .dynamic_vbo import DynamicVBO
 from .state import State
@@ -43,7 +47,11 @@ class Renderer:
         self.asset_manager: AssetManager | None = None
 
         self.vbo = DynamicVBO(state)
-        self.vbo.set_data(np.random.rand(120).astype(np.float32))
+        data = np.random.rand(1200).astype(np.float32)
+        data *= 2
+        data -= 1
+        data /= 2
+        self.vbo.set_data(data)
 
     def drawcall(self) -> None:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -56,23 +64,12 @@ class Renderer:
             self.asset_manager = self.state.asset_manager
         self.asset_manager.use_shader("main")
 
-        angle: float = glfw.get_time()
-
-        cos_theta = math.cos(angle)
-        sin_theta = math.sin(angle)
-
-        rotation = np.array(
-            [
-                [cos_theta, -sin_theta, 0, 0],
-                [sin_theta, cos_theta, 0, 0],
-                [0, 0, 1, 0],
-                [0, 0, 0, 1],
-            ],
-            dtype=np.float32,
-        )
+        angle: float = glm.radians(glfw.get_time() * 10)
+        matrix = glm.mat4()
+        rotation = glm.rotate(matrix, angle, glm.vec3(0, 1, 0))
 
         transform_loc = glGetUniformLocation(self.asset_manager.get_shader_program("main"), "transform")
-        glUniformMatrix4fv(transform_loc, 1, GL_FALSE, rotation)
+        glUniformMatrix4fv(transform_loc, 1, GL_FALSE, glm.value_ptr(rotation))
 
         buffer = self.vbo.latest_buffer
 
@@ -80,7 +77,7 @@ class Renderer:
         glEnableVertexAttribArray(0)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
 
-        glDrawArrays(GL_TRIANGLES, 0, 40)
+        glDrawArrays(GL_TRIANGLES, 0, 400)
 
         glDisableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, 0)
