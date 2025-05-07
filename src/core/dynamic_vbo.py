@@ -54,7 +54,8 @@ class DynamicVBO:
         # TODO: actually implementing the dyn part
         # TODO: from that Vercidium vid :P
 
-    def get_latest_buffer(self) -> np.uint32 | None:
+    @property
+    def latest_buffer(self) -> np.uint32 | None:
         return self.buffers[0].buffer
 
     def set_data(self, data: BufferData) -> None:
