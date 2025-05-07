@@ -5,6 +5,7 @@ class State:
         self.frame: int = 0
         self.window: Any = window
         self.alive: bool = True
+        self.shared_context_alive: bool = False
 
     def on_drawcall(self) -> None:
         self.frame += 1

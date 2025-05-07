@@ -1,23 +1,42 @@
 import glfw
-
+import threading
+from typing import Any
 
 class SharedContext:
     def __init__(self, state) -> None:
         self.state = state
         if state.window is None:
-            raise Exception("[SharedContext] Could not retrieve window from state")
+            raise Exception("[core.shared_context.SharedContext] Could not retrieve window from state")
+        self.thread: threading.Thread | None = None
+        self.window: Any | None = None
+    
+    def start_thread(self):
+        if self.thread is not None:
+            raise Exception("[core.shared_context.SharedContext] Tried to start thread multiple times")
+        self.thread = threading.Thread(
+            target = self.start,
+            daemon = True
+        )
+        self.thread.start()
 
+    def start(self):
         glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
-        self.window = glfw.create_window(1, 1, "Shared Context", None, state.window)
+        self.window = glfw.create_window(1, 1, "Shared Context", None, self.state.window)
         if self.window is None:
-            raise Exception("[SharedContext] Failed to initialize GLFW window")
+            raise Exception("[core.shared_context.SharedContext] Failed to initialize GLFW window")
+        self.state.shared_context_alive = True
 
         glfw.make_context_current(self.window)
 
-        while state.alive:
+        while self.state.alive:
             self.step()
 
         glfw.destroy_window(self.window)
+        self.state.shared_context_alive = False
 
     def step(self):
-        print(self.state.frame)
+        # Do stuff here
+
+        glfw.swap_buffers(self.window)
+        glfw.poll_events()
+

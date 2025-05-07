@@ -2,9 +2,10 @@ import glfw
 from OpenGL.GL import GL_TRUE
 
 from .state import State
+from .renderer import Renderer
 
 class Window:
-    def __init__(self):
+    def __init__(self) -> None:
         if not glfw.init():
             raise Exception("[core.window.Window] Init failed: Could not initialize glfw")
 
@@ -18,9 +19,24 @@ class Window:
         if not window:
             glfw.terminate()
             raise Exception("[core.window.Window] Init failed: Could not create GLFW window")
+        glfw.make_context_current(window)
 
         self.state: State = State(window)
+        self.renderer: Renderer = Renderer(self.state)
 
-    def mainloop(self):
-        pass
+    def start_mainloop(self) -> None:
+        while not glfw.window_should_close(self.state.window):
+            self.mainloop_step()
+
+            glfw.swap_buffers(self.state.window)
+            glfw.poll_events()
+
+        self.state.on_close()
+        while self.state.shared_context_alive:
+            pass
+        glfw.terminate()
+
+    def mainloop_step(self) -> None:
+        self.renderer.drawcall()
+        self.state.on_drawcall()
 
