@@ -37,6 +37,7 @@ from core.state import State
 # TODO: use glm
 # TODO: logging
 # TODO: organize and refactor code
+# TODO: update viewport on resize
 
 data = np.random.rand(120).astype(np.float32)
 
