@@ -91,9 +91,8 @@ class Renderer:
         glEnable(GL_CULL_FACE)
         glCullFace(GL_BACK)
         glFrontFace(GL_CW)
-        glEnable(GL_DEPTH_CLAMP)
 
-        self.vbo.set_data(gen_data())
+        glEnable(GL_DEPTH_CLAMP)
 
         if self.asset_manager is None:
             self.asset_manager = self.state.asset_manager
@@ -119,6 +118,7 @@ class Renderer:
 
         buffer = self.vbo.latest_buffer
         if buffer is None:
+            self.vbo.set_data(gen_data())
             return
 
         glBindBuffer(GL_ARRAY_BUFFER, buffer)
