@@ -41,6 +41,12 @@ from .dynamic_vbo import DELETE_UNNEEDED, DynamicVBOHandler
 from .shared_context import SharedContext
 from .state import State
 
+def gen_data():
+    blocks = []
+    for i in range(16):
+        for j in range(16):
+            blocks.append(BOX)
+    return np.vstack(tuple(blocks))
 
 class Renderer:
     def __init__(self, state: State) -> None:
@@ -69,7 +75,7 @@ class Renderer:
         glCullFace(GL_BACK)
         glFrontFace(GL_CW)
 
-        self.vbo.set_data(BOX)
+        self.vbo.set_data(gen_data())
 
         if self.asset_manager is None:
             self.asset_manager = self.state.asset_manager
@@ -78,7 +84,8 @@ class Renderer:
 
         angle: float = glm.radians(glfw.get_time() * 64)
         matrix = glm.mat4()
-        rotation = glm.rotate(matrix, angle, glm.vec3(1, 0, 1))
+        matrix = glm.translate(matrix, glm.vec3(0, 0, 64))
+        matrix = glm.rotate(matrix, angle, glm.vec3(1, 0, 1))
 
         transform_loc = glGetUniformLocation(
             self.asset_manager.get_shader_program("main"), "transform"
@@ -93,7 +100,7 @@ class Renderer:
         glEnableVertexAttribArray(0)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
 
-        glDrawArrays(GL_TRIANGLES, 0, 36)
+        glDrawArrays(GL_TRIANGLES, 0, 36 * 16 * 16)
 
         glDisableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, 0)
