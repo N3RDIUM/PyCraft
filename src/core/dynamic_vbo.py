@@ -38,6 +38,10 @@ class DisposableBuffer:
         glFlush()
         self.ready_frame = state.frame
 
+    @property
+    def ready(self) -> bool:
+        return self.ready_frame is not None
+
     def dispose(self) -> None:
         raise NotImplementedError
 
@@ -51,16 +55,20 @@ class DynamicVBO:
         self.data: BufferData | None = None
         self.buffers: BufferList = []
         self.state: State = state
-        # TODO: actually implementing the dyn part
-        # TODO: from that Vercidium vid :P
 
     @property
     def latest_buffer(self) -> np.uint32 | None:
-        return self.buffers[0].buffer
+        latest: np.uint32 | None = None
+        for buffer in self.buffers:
+            if not buffer.ready:
+                continue
+            latest = buffer.buffer
+            break
+        return latest
 
     def set_data(self, data: BufferData) -> None:
         self.data = data
         buffer = DisposableBuffer(data)
         buffer.send_to_gpu(self.state)
-        self.buffers.append(buffer)
+        self.buffers.insert(0, buffer)
 

@@ -71,9 +71,8 @@ class Renderer:
         transform_loc = glGetUniformLocation(self.asset_manager.get_shader_program("main"), "transform")
         glUniformMatrix4fv(transform_loc, 1, GL_FALSE, glm.value_ptr(rotation))
     
-        try:
-            buffer = self.vbo.latest_buffer
-        except IndexError:
+        buffer = self.vbo.latest_buffer
+        if buffer is None:
             return
 
         glBindBuffer(GL_ARRAY_BUFFER, buffer)
