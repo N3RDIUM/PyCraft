@@ -47,8 +47,23 @@ aspect_ratio = 800 / 600
 near = 0.1
 far = 100.0 
 
+def translate(box, pos):
+    new = np.array(box, dtype=np.float32)
+    for i in range(len(box)):
+        f = i % 3
+        new[i] += pos[f]
+    return new
+
 def gen_data():
-    return BOX
+    thing = []
+    a = 16
+    for x in range(-a, a + 1):
+        for y in range(-a, a + 1):
+            z = 0
+            if (x + y)% 2 == 0:
+                z = 1
+            thing.append(translate(BOX, [x, y, z]))
+    return np.vstack(tuple(thing))
 
 class Renderer:
     def __init__(self, state: State) -> None:
@@ -89,7 +104,7 @@ class Renderer:
         aspect_ratio = width / height
 
         model = glm.mat4(1.0)
-        model = glm.translate(model, glm.vec3(0, 0, -4))
+        model = glm.translate(model, glm.vec3(0, 0, -64))
         model = glm.rotate(model, glm.radians(glfw.get_time() * 42), glm.vec3(0, 1, 0))
 
         camera = glm.mat4(1.0)
@@ -110,7 +125,7 @@ class Renderer:
         glEnableVertexAttribArray(0)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
 
-        glDrawArrays(GL_TRIANGLES, 0, 36 * 16 * 16)
+        glDrawArrays(GL_TRIANGLES, 0, 36 * 64 * 64)
 
         glDisableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, 0)
