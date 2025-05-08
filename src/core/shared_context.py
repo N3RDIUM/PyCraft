@@ -29,7 +29,7 @@ class SharedContext:
 
     def start(self) -> None:
         glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
-        self.window = glfw.create_window(1, 1, "Shared Context", None, self.state.window)
+        self.window = glfw.create_window(1, 1, "Shared Context", None, self.state.window.window)
         if self.window is None:
             raise Exception("[core.shared_context.SharedContext] Failed to initialize GLFW window")
         self.state.shared_context_alive = True

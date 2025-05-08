@@ -7,6 +7,7 @@ from OpenGL.GL import (
     GL_CULL_FACE,
     GL_CW,
     GL_DEPTH_BUFFER_BIT,
+    GL_DEPTH_CLAMP,
     GL_DEPTH_TEST,
     GL_FALSE,
     GL_FLOAT,
@@ -41,12 +42,13 @@ from .dynamic_vbo import DELETE_UNNEEDED, DynamicVBOHandler
 from .shared_context import SharedContext
 from .state import State
 
+fov = glm.radians(45.0)
+aspect_ratio = 800 / 600
+near = 0.1
+far = 100.0 
+
 def gen_data():
-    blocks = []
-    for i in range(16):
-        for j in range(16):
-            blocks.append(BOX)
-    return np.vstack(tuple(blocks))
+    return BOX
 
 class Renderer:
     def __init__(self, state: State) -> None:
@@ -74,6 +76,7 @@ class Renderer:
         glEnable(GL_CULL_FACE)
         glCullFace(GL_BACK)
         glFrontFace(GL_CW)
+        glEnable(GL_DEPTH_CLAMP)
 
         self.vbo.set_data(gen_data())
 
@@ -82,15 +85,22 @@ class Renderer:
             return
         self.asset_manager.use_shader("main")
 
-        angle: float = glm.radians(glfw.get_time() * 64)
-        matrix = glm.mat4()
-        matrix = glm.translate(matrix, glm.vec3(0, 0, 64))
-        matrix = glm.rotate(matrix, angle, glm.vec3(1, 0, 1))
+        width, height = self.state.window.size
+        aspect_ratio = width / height
+
+        model = glm.mat4(1.0)
+        model = glm.translate(model, glm.vec3(0, 0, -4))
+        model = glm.rotate(model, glm.radians(glfw.get_time() * 42), glm.vec3(0, 1, 0))
+
+        camera = glm.mat4(1.0)
+        camera = glm.rotate(camera, glm.radians(glfw.get_time() * 64), glm.vec3(0, 0, 1))
+
+        matrix = glm.perspective(fov, aspect_ratio, near, far) * camera * model
 
         transform_loc = glGetUniformLocation(
             self.asset_manager.get_shader_program("main"), "transform"
         )
-        glUniformMatrix4fv(transform_loc, 1, GL_FALSE, glm.value_ptr(rotation))
+        glUniformMatrix4fv(transform_loc, 1, GL_FALSE, glm.value_ptr(matrix))
 
         buffer = self.vbo.latest_buffer
         if buffer is None:

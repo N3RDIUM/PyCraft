@@ -15,23 +15,23 @@ class Window:
         glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL_TRUE)
         glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
-        window = glfw.create_window(640, 480, "PyCraft", None, None)
-        if not window:
+        self.window = glfw.create_window(640, 480, "PyCraft", None, None)
+        if not self.window:
             glfw.terminate()
             raise Exception("[core.window.Window] Init failed: Could not create GLFW window")
-        glfw.make_context_current(window)
+        glfw.make_context_current(self.window)
 
-        self.state: State = State(window)
+        self.state: State = State(self)
         self.renderer: Renderer = Renderer(self.state)
 
     def start_mainloop(self) -> None:
-        while not glfw.window_should_close(self.state.window):
-            width, height = glfw.get_window_size(self.state.window)
+        while not glfw.window_should_close(self.window):
+            width, height = self.size
             glViewport(0, 0, width, height)
 
             self.mainloop_step()
 
-            glfw.swap_buffers(self.state.window)
+            glfw.swap_buffers(self.window)
             glfw.poll_events()
 
         self.state.on_close()
@@ -42,4 +42,8 @@ class Window:
     def mainloop_step(self) -> None:
         self.renderer.drawcall()
         self.state.on_drawcall()
+
+    @property
+    def size(self):
+        return glfw.get_window_size(self.window)
 
