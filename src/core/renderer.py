@@ -41,11 +41,7 @@ from .asset_manager import AssetManager
 from .dynamic_vbo import DELETE_UNNEEDED, DynamicVBOHandler
 from .shared_context import SharedContext
 from .state import State
-
-fov = glm.radians(45.0)
-aspect_ratio = 800 / 600
-near = 0.1
-far = 100.0 
+from .camera import Camera
 
 def translate(box, pos):
     new = np.array(box, dtype=np.float32)
@@ -81,6 +77,8 @@ class Renderer:
         self.vbo = self.vbo_handler.new_buffer("main")
         self.shared.register_vbo_handler(self.vbo_handler, "main")
 
+        self.camera: Camera = Camera(state)
+
     def drawcall(self) -> None:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glClearColor(0.15, 0.15, 0.15, 1.0)
@@ -106,10 +104,7 @@ class Renderer:
         model = glm.translate(model, glm.vec3(0, 0, -64))
         model = glm.rotate(model, glm.radians(glfw.get_time() * 42), glm.vec3(0, 1, 0))
 
-        camera = glm.mat4(1.0)
-        camera = glm.rotate(camera, glm.radians(glfw.get_time() * 64), glm.vec3(0, 0, 1))
-
-        matrix = glm.perspective(fov, aspect_ratio, near, far) * camera * model
+        matrix = self.camera.get_matrix() * model
 
         transform_loc = glGetUniformLocation(
             self.asset_manager.get_shader_program("main"), "transform"
