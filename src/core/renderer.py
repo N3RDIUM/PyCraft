@@ -89,3 +89,6 @@ class Renderer:
         glDisableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, 0)
 
+        # TODO: "DynamicVBOManager" to handle this and the set_data thing in the shared ctx thread
+        self.vbo.update_buffers()
+

@@ -9,6 +9,7 @@ from OpenGL.GL import (
     glBufferSubData,
     glFlush,
     glGenBuffers,
+    glDeleteBuffers
 )
 
 from .state import State
@@ -42,8 +43,9 @@ class DisposableBuffer:
     def ready(self) -> bool:
         return self.ready_frame is not None
 
-    def dispose(self) -> None:
-        raise NotImplementedError
+    def __del__(self) -> None:
+        del self.data
+        glDeleteBuffers(1, self.buffer)
 
 BufferList: TypeAlias = list[DisposableBuffer]
 
@@ -73,8 +75,11 @@ class DynamicVBO:
         self.buffers.insert(0, buffer)
 
     def update_buffers(self) -> None:
-        # Basically, don't have more than one "ready" buffer allocated
-        # in the queue. If that's the case, delete all but one. Do not
-        # touch the buffers which aren't ready.
-        raise NotImplementedError
+        ready: int = 0
+        for i in range(len(self.buffers) - 1):
+            if not self.buffers[i].ready:
+                continue
+            ready += 1
+            if ready > 1:
+                del self.buffers[i]
 
