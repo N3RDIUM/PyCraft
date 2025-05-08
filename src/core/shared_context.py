@@ -11,14 +11,7 @@ class SharedContext:
         self.thread: threading.Thread | None = None
         self.window: Any | None = None
         self.function_queue = []
-        self.vbo_handlers: dict[str, DynamicVBOHandler] = {}
 
-    def register_vbo_handler(self, handler: DynamicVBOHandler, id: str) -> None:
-        self.vbo_handlers[id] = handler
-
-    def unregister_vbo_handler(self, id: str) -> DynamicVBOHandler:
-        return self.vbo_handlers.pop(id)
-    
     def start_thread(self) -> None:
         if self.thread is not None:
             raise Exception("[core.shared_context.SharedContext] Tried to start thread multiple times")
@@ -49,9 +42,9 @@ class SharedContext:
         if len(self.function_queue) > 0:
             fn = self.function_queue.pop(0)
             fn()
-
-        for handler in self.vbo_handlers:
-            self.vbo_handlers[handler].update()
+        
+        if self.state.vbo_handler:
+            self.state.vbo_handler.update()
 
         glfw.swap_buffers(self.window)
         glfw.poll_events()

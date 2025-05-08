@@ -9,7 +9,7 @@ from OpenGL.GL import (
     glBufferSubData,
     glFlush,
     glGenBuffers,
-    glDeleteBuffers
+    glDeleteBuffers,
 )
 
 from .state import State
@@ -19,6 +19,7 @@ SEND_TO_GPU = 1
 
 BufferData: TypeAlias = np.typing.NDArray[np.float32]
 
+
 class DisposableBuffer:
     def __init__(self, data: BufferData) -> None:
         self.data: BufferData = data
@@ -27,18 +28,8 @@ class DisposableBuffer:
 
     def send_to_gpu(self, state: State) -> None:
         glBindBuffer(GL_ARRAY_BUFFER, self.buffer)
-        glBufferData(
-            GL_ARRAY_BUFFER, 
-            self.data.nbytes,
-            None, 
-            GL_STATIC_DRAW
-        )
-        glBufferSubData(
-            GL_ARRAY_BUFFER,
-            0,
-            self.data.nbytes,
-            self.data
-        )
+        glBufferData(GL_ARRAY_BUFFER, self.data.nbytes, None, GL_STATIC_DRAW)
+        glBufferSubData(GL_ARRAY_BUFFER, 0, self.data.nbytes, self.data)
         glFlush()
         self.ready_frame = state.frame
 
@@ -50,11 +41,13 @@ class DisposableBuffer:
         del self.data
         glDeleteBuffers(1, self.buffer)
 
+
 BufferList: TypeAlias = list[DisposableBuffer]
+
 
 class DynamicVBO:
     def __init__(
-        self, 
+        self,
         state: State,
     ) -> None:
         self.data: BufferData | None = None
@@ -90,28 +83,32 @@ class DynamicVBO:
             if ready_buffer_count > 1:
                 del self.buffers[i]
 
+
 DynamicBufferStore: TypeAlias = dict[str, DynamicVBO]
 
+
 class DynamicVBOHandler:
-    def __init__(
-        self,
-        state: State
-    ) -> None:
+    def __init__(self, state: State) -> None:
         self.state: State = state
         self.vbos: DynamicBufferStore = {}
+
+        if self.state.vbo_handler is not None:
+            raise Exception(
+                "[core.dynamic_vbo.DynamicVBOHandler] Tried to create multiple instances of this class"
+            )
+        self.state.vbo_handler = self
 
     def new_buffer(self, id: str) -> DynamicVBO:
         buffer = DynamicVBO(self.state)
         self.vbos[id] = buffer
         return buffer
-    
+
     def get_buffer(self, id: str) -> DynamicVBO:
         return self.vbos[id]
-    
+
     def remove_buffer(self, id: str) -> None:
         del self.vbos[id]
 
     def update(self) -> None:
         for vbo in self.vbos:
             self.vbos[vbo].update_buffers()
-

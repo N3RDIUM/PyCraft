@@ -75,7 +75,6 @@ class Renderer:
 
         self.vbo_handler = DynamicVBOHandler(state)
         self.vbo = self.vbo_handler.new_buffer("main")
-        self.shared.register_vbo_handler(self.vbo_handler, "main")
 
         self.camera: Camera = Camera(state)
 
