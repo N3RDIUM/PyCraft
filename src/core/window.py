@@ -4,10 +4,13 @@ from OpenGL.GL import GL_TRUE, glViewport
 from .state import State
 from .renderer import Renderer
 
+
 class Window:
     def __init__(self) -> None:
         if not glfw.init():
-            raise Exception("[core.window.Window] Init failed: Could not initialize glfw")
+            raise Exception(
+                "[core.window.Window] Init failed: Could not initialize glfw"
+            )
 
         glfw.window_hint(glfw.SAMPLES, 4)
         glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
@@ -18,7 +21,9 @@ class Window:
         self.window = glfw.create_window(640, 480, "PyCraft", None, None)
         if not self.window:
             glfw.terminate()
-            raise Exception("[core.window.Window] Init failed: Could not create GLFW window")
+            raise Exception(
+                "[core.window.Window] Init failed: Could not create GLFW window"
+            )
         glfw.make_context_current(self.window)
 
         self.state: State = State(self)
@@ -46,4 +51,3 @@ class Window:
     @property
     def size(self):
         return glfw.get_window_size(self.window)
-

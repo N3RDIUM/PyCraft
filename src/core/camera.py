@@ -5,10 +5,11 @@ except ImportError:
 
 from .state import State
 
+
 class Camera:
     def __init__(self, state: State):
         self.fov: float = 45.0
-        self.aspect: float = 16/9
+        self.aspect: float = 16 / 9
         self.near: float = 0.1
         self.far: float = 1000.0
 
@@ -28,12 +29,6 @@ class Camera:
 
         width, height = self.state.window.size
         self.aspect = width / height
-        
-        matrix = glm.perspective(
-            self.fov,
-            self.aspect,
-            self.near,
-            self.far
-        ) * matrix
-        return matrix
 
+        matrix = glm.perspective(self.fov, self.aspect, self.near, self.far) * matrix
+        return matrix

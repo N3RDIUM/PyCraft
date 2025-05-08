@@ -47,4 +47,3 @@ class AssetManager:
                 f"[core.asset_manager.AssetManager] Tried to use shader {name} but it doesn't exist or isn't loaded yet"
             )
         return self.shaders[name]
-

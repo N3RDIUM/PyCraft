@@ -6,4 +6,3 @@ if __name__ == "__main__":
     asset_manager: AssetManager = AssetManager(window.state)
     asset_manager.load_assets()
     window.start_mainloop()
-

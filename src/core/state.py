@@ -1,6 +1,7 @@
 import time
 from typing import Any
 
+
 class State:
     def __init__(self, window: Any) -> None:
         self.frame: int = 0
@@ -16,7 +17,7 @@ class State:
 
     def on_drawcall(self) -> None:
         now = time.time_ns()
-        delta = (now - self.last_frame_time)
+        delta = now - self.last_frame_time
         self.fps = 1_000_000_000 / delta
         self.last_frame_time = now
 
@@ -24,4 +25,3 @@ class State:
 
     def on_close(self) -> None:
         self.alive = False
-

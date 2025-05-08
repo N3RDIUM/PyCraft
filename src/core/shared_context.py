@@ -3,32 +3,41 @@ import threading
 from typing import Any
 from .dynamic_vbo import DynamicVBOHandler
 
+
 class SharedContext:
     def __init__(self, state) -> None:
         self.state = state
         if state.window is None:
-            raise Exception("[core.shared_context.SharedContext] Could not retrieve window from state")
+            raise Exception(
+                "[core.shared_context.SharedContext] Could not retrieve window from state"
+            )
         self.thread: threading.Thread | None = None
         self.window: Any | None = None
         self.function_queue = []
 
     def start_thread(self) -> None:
         if self.thread is not None:
-            raise Exception("[core.shared_context.SharedContext] Tried to start thread multiple times")
+            raise Exception(
+                "[core.shared_context.SharedContext] Tried to start thread multiple times"
+            )
         self.thread = threading.Thread(
-            target = self.start,
+            target=self.start,
         )
         self.thread.start()
 
     def start(self) -> None:
         glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
-        self.window = glfw.create_window(1, 1, "Shared Context", None, self.state.window.window)
+        self.window = glfw.create_window(
+            1, 1, "Shared Context", None, self.state.window.window
+        )
         if self.window is None:
-            raise Exception("[core.shared_context.SharedContext] Failed to initialize GLFW window")
+            raise Exception(
+                "[core.shared_context.SharedContext] Failed to initialize GLFW window"
+            )
         self.state.shared_context_alive = True
 
         glfw.make_context_current(self.window)
-        
+
         while self.state.alive:
             self.step()
 
@@ -42,10 +51,9 @@ class SharedContext:
         if len(self.function_queue) > 0:
             fn = self.function_queue.pop(0)
             fn()
-        
+
         if self.state.vbo_handler:
             self.state.vbo_handler.update()
 
         glfw.swap_buffers(self.window)
         glfw.poll_events()
-

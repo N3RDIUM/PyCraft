@@ -1,5 +1,6 @@
 import numpy as np
 from core.state import State
+from core.dynamic_vbo import DynamicVBO
 
 CHUNK_SIDE = 16
 
@@ -12,7 +13,7 @@ class Chunk:
         self.terrain: np.typing.NDArray[np.uint64] = np.zeros(
             tuple(CHUNK_SIDE for _ in range(3)), dtype=np.uint64
         )
-        self.buffer = self.state.vbo_handler.new_buffer(self.id)
+        self.buffer: DynamicVBO = self.state.vbo_handler.new_buffer(self.id)
 
     @property
     def id(self) -> str:

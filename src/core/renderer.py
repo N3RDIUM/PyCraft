@@ -43,6 +43,7 @@ from .shared_context import SharedContext
 from .state import State
 from .camera import Camera
 
+
 def translate(box, pos):
     new = np.array(box, dtype=np.float32)
     for i in range(len(box)):
@@ -50,16 +51,18 @@ def translate(box, pos):
         new[i] += pos[f]
     return new
 
+
 def gen_data():
     thing = []
     a = 16
     for x in range(-a, a + 1):
         for y in range(-a, a + 1):
             z = 0
-            if (x + y)% 2 == 0:
+            if (x + y) % 2 == 0:
                 z = 1
             thing.append(translate(BOX, [x, y, z]))
     return np.vstack(tuple(thing))
+
 
 class Renderer:
     def __init__(self, state: State) -> None:
