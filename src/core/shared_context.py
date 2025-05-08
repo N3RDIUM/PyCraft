@@ -13,9 +13,11 @@ class SharedContext:
         self.function_queue = []
         self.vbo_handlers: dict[str, DynamicVBOHandler] = {}
 
-    def add_vbo_handler(self, handler: DynamicVBOHandler, id: str) -> None:
+    def register_vbo_handler(self, handler: DynamicVBOHandler, id: str) -> None:
         self.vbo_handlers[id] = handler
-        # TODO remove
+
+    def unregister_vbo_handler(self, id: str) -> DynamicVBOHandler:
+        return self.vbo_handlers.pop(id)
     
     def start_thread(self) -> None:
         if self.thread is not None:
