@@ -14,6 +14,9 @@ from OpenGL.GL import (
 
 from .state import State
 
+DELETE_UNNEEDED = 0
+SEND_TO_GPU = 1
+
 BufferData: TypeAlias = np.typing.NDArray[np.float32]
 
 class DisposableBuffer:
@@ -70,16 +73,45 @@ class DynamicVBO:
 
     def set_data(self, data: BufferData) -> None:
         self.data = data
+        # TODO: Hash data, only continue if changed
         buffer = DisposableBuffer(data)
-        buffer.send_to_gpu(self.state)
         self.buffers.insert(0, buffer)
 
-    def update_buffers(self) -> None:
-        ready: int = 0
+    def update_buffers(self, mode: int = SEND_TO_GPU) -> None:
+        ready_buffer_count: int = 0
         for i in range(len(self.buffers) - 1):
-            if not self.buffers[i].ready:
+            if not self.buffers[i].ready and mode == SEND_TO_GPU:
+                self.buffers[i].send_to_gpu(self.state)
                 continue
-            ready += 1
-            if ready > 1:
+
+            if mode != DELETE_UNNEEDED:
+                continue
+            ready_buffer_count += 1
+            if ready_buffer_count > 1:
                 del self.buffers[i]
+
+DynamicBufferStore: TypeAlias = dict[str, DynamicVBO]
+
+class DynamicVBOHandler:
+    def __init__(
+        self,
+        state: State
+    ) -> None:
+        self.state: State = state
+        self.vbos: DynamicBufferStore = {}
+
+    def new_buffer(self, id: str) -> DynamicVBO:
+        buffer = DynamicVBO(self.state)
+        self.vbos[id] = buffer
+        return buffer
+    
+    def get_buffer(self, id: str) -> DynamicVBO:
+        return self.vbos[id]
+    
+    def remove_buffer(self, id: str) -> None:
+        del self.vbos[id]
+
+    def update(self) -> None:
+        for vbo in self.vbos:
+            self.vbos[vbo].update_buffers()
 

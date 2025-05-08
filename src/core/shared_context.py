@@ -1,6 +1,7 @@
 import glfw
 import threading
 from typing import Any
+from .dynamic_vbo import DynamicVBOHandler
 
 class SharedContext:
     def __init__(self, state) -> None:
@@ -9,7 +10,12 @@ class SharedContext:
             raise Exception("[core.shared_context.SharedContext] Could not retrieve window from state")
         self.thread: threading.Thread | None = None
         self.window: Any | None = None
-        self.schedule = []
+        self.function_queue = []
+        self.vbo_handlers: dict[str, DynamicVBOHandler] = {}
+
+    def add_vbo_handler(self, handler: DynamicVBOHandler, id: str) -> None:
+        self.vbo_handlers[id] = handler
+        # TODO remove
     
     def start_thread(self) -> None:
         if self.thread is not None:
@@ -35,12 +41,15 @@ class SharedContext:
         self.state.shared_context_alive = False
 
     def schedule_fn(self, func) -> None:
-        self.schedule.append(func)
+        self.function_queue.append(func)
 
     def step(self) -> None:
-        if len(self.schedule) > 0:
-            fn = self.schedule.pop(0)
+        if len(self.function_queue) > 0:
+            fn = self.function_queue.pop(0)
             fn()
+
+        for handler in self.vbo_handlers:
+            self.vbo_handlers[handler].update()
 
         glfw.swap_buffers(self.window)
         glfw.poll_events()

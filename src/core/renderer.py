@@ -29,7 +29,7 @@ try:
 except ImportError:
     import glm
 
-from .dynamic_vbo import DynamicVBO
+from .dynamic_vbo import DynamicVBOHandler, DELETE_UNNEEDED
 from .state import State
 from .asset_manager import AssetManager
 from .shared_context import SharedContext
@@ -53,8 +53,9 @@ class Renderer:
         
         self.asset_manager: AssetManager | None = None
 
-        self.vbo = DynamicVBO(state)
-        self.shared.schedule_fn(lambda: self.vbo.set_data(gen_data()))
+        self.vbo_handler = DynamicVBOHandler(state)
+        self.vbo = self.vbo_handler.new_buffer("main")
+        self.shared.add_vbo_handler(self.vbo_handler, "main")
 
     def drawcall(self) -> None:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -67,7 +68,7 @@ class Renderer:
             self.asset_manager = self.state.asset_manager
             return
         self.asset_manager.use_shader("main")
-        self.shared.schedule_fn(lambda: self.vbo.set_data(gen_data()))
+        self.vbo.set_data(gen_data())
 
         angle: float = glm.radians(glfw.get_time() * 10)
         matrix = glm.mat4()
@@ -90,5 +91,5 @@ class Renderer:
         glBindBuffer(GL_ARRAY_BUFFER, 0)
 
         # TODO: "DynamicVBOManager" to handle this and the set_data thing in the shared ctx thread
-        self.vbo.update_buffers()
+        self.vbo.update_buffers(mode = DELETE_UNNEEDED)
 
