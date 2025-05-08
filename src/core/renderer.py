@@ -34,6 +34,13 @@ from .state import State
 from .asset_manager import AssetManager
 from .shared_context import SharedContext
 
+def gen_data():
+    data = np.random.rand(1200).astype(np.float32)
+    data *= 2
+    data -= 1
+    data /= 2
+    return data
+
 class Renderer:
     def __init__(self, state: State) -> None:
         self.state = state
@@ -47,11 +54,7 @@ class Renderer:
         self.asset_manager: AssetManager | None = None
 
         self.vbo = DynamicVBO(state)
-        data = np.random.rand(1200).astype(np.float32)
-        data *= 2
-        data -= 1
-        data /= 2
-        self.shared.schedule_fn(lambda: self.vbo.set_data(data))
+        self.shared.schedule_fn(lambda: self.vbo.set_data(gen_data()))
 
     def drawcall(self) -> None:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -62,7 +65,9 @@ class Renderer:
 
         if self.asset_manager is None:
             self.asset_manager = self.state.asset_manager
+            return
         self.asset_manager.use_shader("main")
+        self.shared.schedule_fn(lambda: self.vbo.set_data(gen_data()))
 
         angle: float = glm.radians(glfw.get_time() * 10)
         matrix = glm.mat4()

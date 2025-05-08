@@ -50,7 +50,7 @@ BufferList: TypeAlias = list[DisposableBuffer]
 class DynamicVBO:
     def __init__(
         self, 
-        state: State
+        state: State,
     ) -> None:
         self.data: BufferData | None = None
         self.buffers: BufferList = []
@@ -71,4 +71,10 @@ class DynamicVBO:
         buffer = DisposableBuffer(data)
         buffer.send_to_gpu(self.state)
         self.buffers.insert(0, buffer)
+
+    def update_buffers(self) -> None:
+        # Basically, don't have more than one "ready" buffer allocated
+        # in the queue. If that's the case, delete all but one. Do not
+        # touch the buffers which aren't ready.
+        raise NotImplementedError
 

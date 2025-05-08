@@ -1,5 +1,4 @@
 import glfw
-import time
 import threading
 from typing import Any
 
@@ -29,7 +28,6 @@ class SharedContext:
 
         glfw.make_context_current(self.window)
         
-        time.sleep(1)
         while self.state.alive:
             self.step()
 
