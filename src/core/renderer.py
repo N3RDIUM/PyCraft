@@ -69,17 +69,15 @@ class Renderer:
 
         glEnable(GL_DEPTH_CLAMP)
 
+        if self.state.player is not None:
+            self.state.player.drawcall()
+
         if self.asset_manager is None:
             self.asset_manager = self.state.asset_manager
             return
         self.asset_manager.use_shader("main")
 
-        model = glm.mat4(1.0)
-        model = glm.translate(model, glm.vec3(0, 0, -64))
-        model = glm.rotate(model, glm.radians(glfw.get_time() * 42), glm.vec3(0, 1, 0))
-
-        matrix = self.camera.get_matrix() * model
-
+        matrix = self.camera.get_matrix()
         transform_loc = glGetUniformLocation(
             self.asset_manager.get_shader_program("main"), "transform"
         )

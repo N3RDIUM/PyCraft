@@ -40,16 +40,7 @@ class Chunk:
         for x in range(CHUNK_SIDE - 1):
             for y in range(CHUNK_SIDE - 1):
                 for z in range(CHUNK_SIDE - 1):
-                    self.terrain[x + 1][y + 1][z + 1] = (
-                        random.random()
-                        > sqrt(
-                            (x - CHUNK_SIDE / 2) ** 2
-                            + (y - CHUNK_SIDE / 2) ** 2
-                            + (z - CHUNK_SIDE / 2) ** 2
-                        )
-                        / CHUNK_SIDE
-                        * 2
-                    )
+                    self.terrain[x + 1][y + 1][z + 1] = 1
 
     def append_to_mesh(self, data: np.typing.NDArray[np.float32]) -> None:
         if self.mesh is None:

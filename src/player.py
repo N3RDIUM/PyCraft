@@ -18,6 +18,7 @@ class Player:
         """
         # Set properties
         self.state: State = state
+        self.state.player = self
 
         # Lock mouse pointer
         self.lock = True
@@ -27,8 +28,8 @@ class Player:
         # Default state
         self.state_map = {
             "mouse_delta": [0, 0],
-            "position": [0, 0, 0],
-            "rotation": [0, 0, 0],
+            "position": [0, 0, -10],
+            "rotation": [0, -180, 0],
             "velocity": [0, 0, 0],
             "friction": 0.9,
             "gravity": 9.81,
@@ -47,37 +48,37 @@ class Player:
         dx, dz = math.sin(rotY), math.cos(rotY)
 
         # Key handlers
-        if glfw.get_key(self.window.window, glfw.KEY_W) == glfw.PRESS:
+        if glfw.get_key(self.state.window.window, glfw.KEY_S) == glfw.PRESS:
             self.state_map["velocity"][0] += dx*sens
             self.state_map["velocity"][2] -= dz*sens
-        if glfw.get_key(self.window.window, glfw.KEY_S) == glfw.PRESS:
+        if glfw.get_key(self.state.window.window, glfw.KEY_W) == glfw.PRESS:
             self.state_map["velocity"][0] -= dx*sens
             self.state_map["velocity"][2] += dz*sens
-        if glfw.get_key(self.window.window, glfw.KEY_A) == glfw.PRESS:
+        if glfw.get_key(self.state.window.window, glfw.KEY_D) == glfw.PRESS:
             self.state_map["velocity"][0] -= dz*sens
             self.state_map["velocity"][2] -= dx*sens
-        if glfw.get_key(self.window.window, glfw.KEY_D) == glfw.PRESS:
+        if glfw.get_key(self.state.window.window, glfw.KEY_A) == glfw.PRESS:
             self.state_map["velocity"][0] += dz*sens
             self.state_map["velocity"][2] += dx*sens
-        if glfw.get_key(self.window.window, glfw.KEY_LEFT_CONTROL) == glfw.PRESS:
-            self.state_map["speed"] = 0.05
+        if glfw.get_key(self.state.window.window, glfw.KEY_LEFT_CONTROL) == glfw.PRESS:
+            self.state_map["speed"] = 0.1
         else:
-            self.state_map["speed"] = 0.03
+            self.state_map["speed"] = 0.08
 
         # ESC to release mouse
-        if glfw.get_key(self.window.window, glfw.KEY_ESCAPE) == glfw.PRESS:
-            glfw.set_input_mode(self.window.window,
+        if glfw.get_key(self.state.window.window, glfw.KEY_ESCAPE) == glfw.PRESS:
+            glfw.set_input_mode(self.state.window.window,
                                 glfw.CURSOR, glfw.CURSOR_NORMAL)
             self.lock = False
         # L to lock mouse
-        if glfw.get_key(self.window.window, glfw.KEY_L) == glfw.PRESS:
-            glfw.set_input_mode(self.window.window,
+        if glfw.get_key(self.state.window.window, glfw.KEY_L) == glfw.PRESS:
+            glfw.set_input_mode(self.state.window.window,
                                 glfw.CURSOR, glfw.CURSOR_DISABLED)
             self.lock = True
 
         # mouse rotation: get dx and dy
         if self.lock:
-            current_position = glfw.get_cursor_pos(self.window.window)
+            current_position = glfw.get_cursor_pos(self.state.window.window)
             dx = current_position[0] - self.state_map["mouse_delta"][0]
             dy = current_position[1] - self.state_map["mouse_delta"][1]
             dy = -dy  # invert y
@@ -90,10 +91,10 @@ class Player:
             self.state_map["mouse_delta"] = current_position  # update mouse delta
 
         # SHIFT to fly down
-        if glfw.get_key(self.window.window, glfw.KEY_LEFT_SHIFT) == glfw.PRESS:
+        if glfw.get_key(self.state.window.window, glfw.KEY_SPACE) == glfw.PRESS:
             self.state_map["velocity"][1] -= 0.05
         # SPACE to fly up
-        if glfw.get_key(self.window.window, glfw.KEY_SPACE) == glfw.PRESS:
+        if glfw.get_key(self.state.window.window, glfw.KEY_LEFT_SHIFT) == glfw.PRESS:
             self.state_map["velocity"][1] += 0.05
 
         self.state_map["position"][0] += self.state_map["velocity"][0]
@@ -106,7 +107,7 @@ class Player:
         self.state_map["velocity"][2] *= self.state_map["friction"]
 
         # Do the thing
+        rot = [self.state_map["rotation"][i] * -1 for i in range(3)]
         self.state.camera.position = self.state_map["position"]
-        self.state.camera.rotation = self.state_map["rotation"]
-        print(self.state_map)
+        self.state.camera.rotation = rot
 

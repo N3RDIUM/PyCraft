@@ -21,11 +21,11 @@ class Camera:
 
     def get_matrix(self):
         matrix = glm.mat4(1.0)
-        matrix = glm.translate(matrix, glm.vec3(tuple(self.position)))
         for i in range(3):
             thing = glm.vec3(0.0)
             thing[i] = 1.0
             matrix = glm.rotate(matrix, glm.radians(self.rotation[i]), thing)
+        matrix = glm.translate(matrix, glm.vec3(tuple(self.position)))
 
         width, height = self.state.window.size
         self.aspect = width / height
