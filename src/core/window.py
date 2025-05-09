@@ -3,7 +3,7 @@ from OpenGL.GL import GL_TRUE, glViewport
 
 from .state import State
 from .renderer import Renderer
-
+from terrain.chunk import Chunk
 
 class Window:
     def __init__(self) -> None:
@@ -28,6 +28,7 @@ class Window:
 
         self.state: State = State(self)
         self.renderer: Renderer = Renderer(self.state)
+        self.n = 0
 
     def start_mainloop(self) -> None:
         while not glfw.window_should_close(self.window):
@@ -35,6 +36,11 @@ class Window:
             glViewport(0, 0, width, height)
 
             self.mainloop_step()
+            if self.n < 64:
+                x = self.n % 8 - 4
+                y = self.n // 8 - 4
+                Chunk([x, -1, y], self.state)
+                self.n += 1
 
             glfw.swap_buffers(self.window)
             glfw.poll_events()
