@@ -3,7 +3,7 @@ from core.state import State
 from core.mesh import Mesh
 from .block import front, back, left, right, top, bottom, uv
 
-CHUNK_SIDE = 8
+CHUNK_SIDE = 16
 CHUNK_DIMS = tuple(CHUNK_SIDE + 2 for _ in range(3))  # Padding of 2 for "obvious reasons"
 
 class Chunk:
