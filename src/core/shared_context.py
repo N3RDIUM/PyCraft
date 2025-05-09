@@ -1,3 +1,4 @@
+import time
 import glfw
 import threading
 from typing import Any
@@ -38,6 +39,7 @@ class SharedContext:
 
         while self.state.alive:
             self.step()
+            time.sleep(0.025)
 
         self.state.mesh_handler.on_close()
         glfw.destroy_window(self.window)

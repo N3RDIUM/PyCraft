@@ -50,7 +50,7 @@ class Chunk:
 
     def generate_vertices(self) -> None:
         def translate(x, y, z):
-            return np.array([[x, y, z] for _ in range(6)], dtype=np.float32).flatten()
+            return np.array([np.array([x, y, z]) + np.array(self.position) * (CHUNK_SIDE - 1) for _ in range(6)], dtype=np.float32).flatten()
 
         for i in range(CHUNK_SIDE ** 3):
             x = i % CHUNK_SIDE

@@ -137,14 +137,23 @@ class MeshHandler:
         del self.meshes[id]
 
     def drawcall(self) -> None:
-        for mesh in self.meshes:
-            self.meshes[mesh].render()
+        try:
+            for mesh in self.meshes:
+                self.meshes[mesh].render()
+        except RuntimeError:
+            pass
 
     def update(self, mode: int = SEND_TO_GPU) -> None:
-        for mesh in self.meshes:
-            self.meshes[mesh].update_buffers(mode)
+        try:
+            for mesh in self.meshes:
+                self.meshes[mesh].update_buffers(mode)
+        except RuntimeError:
+            pass
 
     def on_close(self) -> None:
-        for mesh in self.meshes:
-            self.meshes[mesh].on_close()
+        try:
+            for mesh in self.meshes:
+                self.meshes[mesh].on_close()
+        except RuntimeError:
+            self.on_close()
 
