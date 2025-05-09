@@ -12,7 +12,6 @@ class SharedContext:
             )
         self.thread: threading.Thread | None = None
         self.window: Any | None = None
-        self.function_queue = []
 
     def start_thread(self) -> None:
         if self.thread is not None:
@@ -37,22 +36,16 @@ class SharedContext:
 
         glfw.make_context_current(self.window)
 
+        time.sleep(1)
         while self.state.alive:
             self.step()
-            time.sleep(0.025)
+            time.sleep(1 / 60)
 
         self.state.mesh_handler.on_close()
         glfw.destroy_window(self.window)
         self.state.shared_context_alive = False
 
-    def schedule_fn(self, func) -> None:
-        self.function_queue.append(func)
-
     def step(self) -> None:
-        if len(self.function_queue) > 0:
-            fn = self.function_queue.pop(0)
-            fn()
-        
         if self.state.world:
             self.state.world.update()
 

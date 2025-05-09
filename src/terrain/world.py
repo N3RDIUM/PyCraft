@@ -13,24 +13,25 @@ class World:
         self.chunks = {}
         self.mesh: Mesh = self.state.mesh_handler.new_mesh("world")
 
-        for x in range(-RENDER_DIST, RENDER_DIST + 1):
-            for z in range(-RENDER_DIST, RENDER_DIST + 1):
-                chunk = Chunk([x, -1, z])
-                self.chunks[chunk.id] = chunk
-
-    def drawcall(self) -> None:
-        pass
-
     def update(self) -> None:
+        # INFGEN here
+        # WORLD: Impl global block_exists func. Gen in 2 stages: terrain gen all then mesh gen all
+
+        if len(self.chunks) == 0:
+            for x in range(-RENDER_DIST, RENDER_DIST + 1):
+                for z in range(-RENDER_DIST, RENDER_DIST + 1):
+                    chunk = Chunk([x, -1, z])
+                    self.chunks[chunk.id] = chunk
+
         for id in self.chunks:
             chunk = self.chunks[id]
 
-            if chunk.generated:
+            if chunk.generated: # In 2-stage gen: status instead of generated
                 continue
 
             self.chunks[id].generate()
 
-        self.update_mesh()
+            self.update_mesh()
 
     def update_mesh(self) -> None:
         vertices = []

@@ -64,7 +64,7 @@ class Mesh:
     def set_data(self, vertices, uvs) -> None:
         vertex_buf = DisposableBuffer(vertices, VERTEX)
         uv_buf = DisposableBuffer(uvs, UV)
-        self.buffers.append((vertex_buf, uv_buf))
+        self.buffers.insert(0, (vertex_buf, uv_buf))
 
     def render(self) -> None:
         buffers = self.get_latest_buffer()

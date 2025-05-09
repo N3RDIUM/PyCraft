@@ -43,6 +43,9 @@ class Chunk:
             z = i // ((CHUNK_SIDE - 1) ** 2)
             self.terrain[x + 1][y + 1][z + 1] = 1
 
+        vertices = []
+        uvs = []
+
         def translate(x, y, z):
             return np.array([np.array([x, y, z]) + np.array(self.position) * (CHUNK_SIDE - 1) for _ in range(6)], dtype=np.float32).flatten()
 
@@ -55,23 +58,26 @@ class Chunk:
                 continue
 
             if self.is_air(x, y, z + 1):
-                self.append_to_vertices(front + translate(x, y, z))
-                self.append_to_uv(uv)
+                vertices.append(front + translate(x, y, z))
+                uvs.append(uv)
             if self.is_air(x, y, z - 1):
-                self.append_to_vertices(back + translate(x, y, z))
-                self.append_to_uv(uv)
+                vertices.append(back + translate(x, y, z))
+                uvs.append(uv)
             if self.is_air(x - 1, y, z):
-                self.append_to_vertices(right + translate(x, y, z))
-                self.append_to_uv(uv)
+                vertices.append(right + translate(x, y, z))
+                uvs.append(uv)
             if self.is_air(x + 1, y, z):
-                self.append_to_vertices(left + translate(x, y, z))
-                self.append_to_uv(uv)
+                vertices.append(left + translate(x, y, z))
+                uvs.append(uv)
             if self.is_air(x, y - 1, z):
-                self.append_to_vertices(top + translate(x, y, z))
-                self.append_to_uv(uv)
+                vertices.append(top + translate(x, y, z))
+                uvs.append(uv)
             if self.is_air(x, y + 1, z):
-                self.append_to_vertices(bottom + translate(x, y, z))
-                self.append_to_uv(uv)
+                vertices.append(bottom + translate(x, y, z))
+                uvs.append(uv)
+
+        self.vertices = np.hstack(vertices)
+        self.uvs = np.hstack(uvs)
 
         self.generated = True
 
