@@ -79,3 +79,4 @@ class Chunk:
                         self.append_to_mesh(translate(top, (x, y - 1, z)))
                     if self.is_air(x, y + 1, z):
                         self.append_to_mesh(translate(bottom, (x, y + 1, z)))
+
