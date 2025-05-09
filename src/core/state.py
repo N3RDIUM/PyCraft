@@ -9,7 +9,7 @@ class State:
         self.alive: bool = True
         self.shared_context_alive: bool = False
         self.asset_manager: Any | None = None
-        self.vbo_handler: Any | None = None
+        self.mesh_handler: Any | None = None
         self.camera: Any | None = None
         self.player: Any | None = None
 

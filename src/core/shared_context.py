@@ -1,8 +1,6 @@
 import glfw
 import threading
 from typing import Any
-from .dynamic_vbo import DynamicVBOHandler
-
 
 class SharedContext:
     def __init__(self, state) -> None:
@@ -41,7 +39,7 @@ class SharedContext:
         while self.state.alive:
             self.step()
 
-        self.state.vbo_handler.on_close()
+        self.state.mesh_handler.on_close()
         glfw.destroy_window(self.window)
         self.state.shared_context_alive = False
 
@@ -53,8 +51,8 @@ class SharedContext:
             fn = self.function_queue.pop(0)
             fn()
 
-        if self.state.vbo_handler:
-            self.state.vbo_handler.update()
+        if self.state.mesh_handler:
+            self.state.mesh_handler.update()
 
         glfw.swap_buffers(self.window)
         glfw.poll_events()

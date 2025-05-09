@@ -8,7 +8,9 @@ mkShell rec {
         python312Packages.pyopengl
         python312Packages.pyopengl-accelerate
         python312Packages.glfw
+        python312Packages.pyglm
         python312Packages.numpy
+        python312Packages.pillow
     ];
     LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
 }

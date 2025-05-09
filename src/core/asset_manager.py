@@ -1,13 +1,14 @@
 import os
+import numpy as np
+from PIL import Image
 from typing import Any
-
 from OpenGL.GL import GL_FRAGMENT_SHADER, GL_VERTEX_SHADER, glUseProgram
+from OpenGL.GL import *
 from OpenGL.GL.shaders import compileProgram, compileShader
 
 from .state import State
 
 ASSET_DIR = "./assets/"
-
 
 class AssetManager:
     def __init__(self, state: State) -> None:
@@ -15,6 +16,7 @@ class AssetManager:
         self.state.asset_manager = self
 
         self.shaders = {}
+        self.texture = None
 
     def load_assets(self, asset_dir: str = ASSET_DIR, name_prefix: str = "") -> None:
         shader_dir = os.path.join(asset_dir, "shaders/")
@@ -34,6 +36,25 @@ class AssetManager:
                 compileShader(frag, GL_FRAGMENT_SHADER),
             )
 
+        texture_dir = os.path.join(asset_dir, "textures/")
+        for file in os.listdir(texture_dir):
+            texture = Image.open(os.path.join(texture_dir, file))
+            data = np.array(texture.getdata())
+
+            self.texture = glGenTextures(1)
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+            glBindTexture(GL_TEXTURE_2D, self.texture)
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
+
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture.size[0], texture.size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, data)
+            glGenerateMipmap(GL_TEXTURE_2D)
+
+            glBindTexture(GL_TEXTURE_2D, 0)
+
     def use_shader(self, name: str) -> None:
         if name not in self.shaders:
             raise Exception(
@@ -47,3 +68,7 @@ class AssetManager:
                 f"[core.asset_manager.AssetManager] Tried to use shader {name} but it doesn't exist or isn't loaded yet"
             )
         return self.shaders[name]
+    
+    def bind_texture(self) -> None:
+        glBindTexture(GL_TEXTURE_2D, self.texture)
+

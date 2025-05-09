@@ -1,4 +1,3 @@
-import glfw
 import numpy as np
 from OpenGL.GL import (
     GL_ARRAY_BUFFER,
@@ -29,6 +28,7 @@ from OpenGL.GL import (
     glUniformMatrix4fv,
     glVertexAttribPointer,
 )
+from OpenGL.GL import *
 
 try:
     from pyglm import glm
@@ -36,7 +36,7 @@ except ImportError:
     import glm
 
 from .asset_manager import AssetManager
-from .dynamic_vbo import DELETE_UNNEEDED, DynamicVBOHandler
+from .mesh import DELETE_UNNEEDED, MeshHandler
 from .shared_context import SharedContext
 from .state import State
 from .camera import Camera
@@ -53,7 +53,7 @@ class Renderer:
 
         self.asset_manager: AssetManager | None = None
 
-        self.vbo_handler = DynamicVBOHandler(state)
+        self.mesh_handler = MeshHandler(state)
         self.camera: Camera = Camera(state)
 
     def drawcall(self) -> None:
@@ -83,22 +83,7 @@ class Renderer:
         )
         glUniformMatrix4fv(transform_loc, 1, GL_FALSE, glm.value_ptr(matrix))
 
-        for vbo in self.vbo_handler.all_buffers():
-            buffer = vbo.latest_buffer
-
-            if buffer is None:
-                continue
-            if not vbo.visible:
-                continue
-
-            glBindBuffer(GL_ARRAY_BUFFER, buffer)
-            glEnableVertexAttribArray(0)
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
-
-            glDrawArrays(GL_TRIANGLES, 0, 16 * 16 * 16 * 36)
-
-            glDisableVertexAttribArray(0)
-            glBindBuffer(GL_ARRAY_BUFFER, 0)
-
-        self.vbo_handler.update(DELETE_UNNEEDED)
+        self.asset_manager.bind_texture()
+        self.mesh_handler.drawcall()
+        self.mesh_handler.update(DELETE_UNNEEDED)
 
