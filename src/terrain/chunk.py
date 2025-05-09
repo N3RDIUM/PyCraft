@@ -54,6 +54,7 @@ class Chunk:
                     if self.is_air(x, y, z):
                         continue
 
+                    # TODO: Remove unseeable faces
                     self.append_to_mesh(translate(front, (x, y, z)))
                     self.append_to_mesh(translate(back, (x, y, z)))
                     self.append_to_mesh(translate(right, (x, y, z)))
