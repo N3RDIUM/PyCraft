@@ -6,7 +6,7 @@ from .block import front, back, left, right, top, bottom
 CHUNK_SIDE = 16
 CHUNK_DIMS = tuple(CHUNK_SIDE + 2 for _ in range(3)) # Padding of 2 for obvious reasons
 
-def translate(mesh: np.typing.NDArray[np.float32], position: tuple):
+def translate(mesh: np.typing.NDArray[np.float32], position: tuple[int, int, int]):
     new = np.array(mesh, dtype=np.float32)
     for i in range(len(mesh)):
         f = i % 3
