@@ -83,7 +83,7 @@ class Mesh:
         glEnableVertexAttribArray(1)
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, None)
 
-        glDrawArrays(GL_TRIANGLES, 0, 16 * 16 * 16 * 36)
+        glDrawArrays(GL_TRIANGLES, 0, len(vertex.data) // 3)
 
         glDisableVertexAttribArray(0)
         glDisableVertexAttribArray(1)
@@ -108,8 +108,7 @@ class Mesh:
                 del self.buffers[i]
 
     def on_close(self) -> None:
-        for i in range(len(self.buffers)):
-            del self.buffers[i]
+        del self.buffers
 
 MeshStore: TypeAlias = dict[str, Mesh]
 
@@ -149,11 +148,15 @@ class MeshHandler:
                 self.meshes[mesh].update_buffers(mode)
         except RuntimeError:
             pass
+        except IndexError:
+            self.update(mode)
 
     def on_close(self) -> None:
         try:
             for mesh in self.meshes:
                 self.meshes[mesh].on_close()
         except RuntimeError:
+            self.on_close()
+        except KeyError:
             self.on_close()
 

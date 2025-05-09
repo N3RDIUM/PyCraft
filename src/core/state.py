@@ -11,6 +11,7 @@ class State:
         self.mesh_handler: Any | None = None
         self.camera: Any | None = None
         self.player: Any | None = None
+        self.world: Any | None = None
 
         self.last_frame_time: int = time.time_ns()
         self.fps = 0

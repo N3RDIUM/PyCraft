@@ -52,6 +52,9 @@ class SharedContext:
         if len(self.function_queue) > 0:
             fn = self.function_queue.pop(0)
             fn()
+        
+        if self.state.world:
+            self.state.world.update()
 
         if self.state.mesh_handler:
             self.state.mesh_handler.update()
