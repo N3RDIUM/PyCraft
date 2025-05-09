@@ -66,13 +66,12 @@ class DynamicVBO:
 
     def set_data(self, data: BufferData) -> None:
         self.data = data
-        # TODO: Hash data, only continue if changed
         buffer = DisposableBuffer(data)
-        self.buffers.insert(0, buffer)
+        self.buffers.append(buffer)
 
     def update_buffers(self, mode: int = SEND_TO_GPU) -> None:
         ready_buffer_count: int = 0
-        for i in range(len(self.buffers) - 1):
+        for i in range(len(self.buffers)):
             if not self.buffers[i].ready and mode == SEND_TO_GPU:
                 self.buffers[i].send_to_gpu(self.state)
                 continue
@@ -105,10 +104,14 @@ class DynamicVBOHandler:
 
     def get_buffer(self, id: str) -> DynamicVBO:
         return self.vbos[id]
+    
+    def all_buffers(self):
+        return self.vbos.values()
 
     def remove_buffer(self, id: str) -> None:
         del self.vbos[id]
 
-    def update(self) -> None:
+    def update(self, mode: int = SEND_TO_GPU) -> None:
         for vbo in self.vbos:
-            self.vbos[vbo].update_buffers()
+            self.vbos[vbo].update_buffers(mode)
+

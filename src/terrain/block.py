@@ -1,6 +1,6 @@
 import numpy as np
 
-BOX = np.array([
+front = np.array([
     0, 1, 0, # Front
     1, 1, 0,
     0, 0, 0,
@@ -8,7 +8,9 @@ BOX = np.array([
     1, 1, 0,
     1, 0, 0,
     0, 0, 0,
+], dtype = np.float32) - 0.5
 
+right = np.array([
     1, 1, 0, # Right
     1, 1, 1,
     1, 0, 0,
@@ -16,7 +18,9 @@ BOX = np.array([
     1, 0, 1,
     1, 0, 0,
     1, 1, 1,
+], dtype = np.float32) - 0.5
 
+back = np.array([
     1, 1, 1, # Back
     0, 1, 1,
     1, 0, 1,
@@ -24,7 +28,9 @@ BOX = np.array([
     0, 0, 1,
     1, 0, 1,
     0, 1, 1,
+], dtype = np.float32) - 0.5
 
+left = np.array([
     0, 1, 1, # Left
     0, 1, 0,
     0, 0, 1,
@@ -32,7 +38,9 @@ BOX = np.array([
     0, 0, 0,
     0, 0, 1,
     0, 1, 0,
+], dtype = np.float32) - 0.5
 
+top = np.array([
     0, 1, 1, # Top
     1, 1, 1,
     0, 1, 0,
@@ -40,7 +48,9 @@ BOX = np.array([
     1, 1, 0,
     0, 1, 0,
     1, 1, 1,
+], dtype = np.float32) - 0.5
 
+bottom = np.array([
     0, 0, 0, # Bottom
     1, 0, 0,
     0, 0, 1,

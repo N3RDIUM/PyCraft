@@ -35,34 +35,11 @@ try:
 except ImportError:
     import glm
 
-from terrain.block import BOX
-
 from .asset_manager import AssetManager
 from .dynamic_vbo import DELETE_UNNEEDED, DynamicVBOHandler
 from .shared_context import SharedContext
 from .state import State
 from .camera import Camera
-
-
-def translate(box, pos):
-    new = np.array(box, dtype=np.float32)
-    for i in range(len(box)):
-        f = i % 3
-        new[i] += pos[f]
-    return new
-
-
-def gen_data():
-    thing = []
-    a = 16
-    for x in range(-a, a + 1):
-        for y in range(-a, a + 1):
-            z = 0
-            if (x + y) % 2 == 0:
-                z = 1
-            thing.append(translate(BOX, [x, y, z]))
-    return np.vstack(tuple(thing))
-
 
 class Renderer:
     def __init__(self, state: State) -> None:
@@ -77,8 +54,6 @@ class Renderer:
         self.asset_manager: AssetManager | None = None
 
         self.vbo_handler = DynamicVBOHandler(state)
-        self.vbo = self.vbo_handler.new_buffer("main")
-
         self.camera: Camera = Camera(state)
 
     def drawcall(self) -> None:
@@ -111,19 +86,20 @@ class Renderer:
         )
         glUniformMatrix4fv(transform_loc, 1, GL_FALSE, glm.value_ptr(matrix))
 
-        buffer = self.vbo.latest_buffer
-        if buffer is None:
-            self.vbo.set_data(gen_data())
-            return
+        for vbo in self.vbo_handler.all_buffers():
+            buffer = vbo.latest_buffer
 
-        glBindBuffer(GL_ARRAY_BUFFER, buffer)
-        glEnableVertexAttribArray(0)
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
+            if buffer is None:
+                continue
 
-        glDrawArrays(GL_TRIANGLES, 0, 36 * 64 * 64)
+            glBindBuffer(GL_ARRAY_BUFFER, buffer)
+            glEnableVertexAttribArray(0)
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
 
-        glDisableVertexAttribArray(0)
-        glBindBuffer(GL_ARRAY_BUFFER, 0)
+            glDrawArrays(GL_TRIANGLES, 0, 16 * 16 * 16 * 36)
 
-        # TODO: "DynamicVBOManager" to handle this and the set_data thing in the shared ctx thread
-        self.vbo.update_buffers(mode=DELETE_UNNEEDED)
+            glDisableVertexAttribArray(0)
+            glBindBuffer(GL_ARRAY_BUFFER, 0)
+
+        self.vbo_handler.update(DELETE_UNNEEDED)
+
