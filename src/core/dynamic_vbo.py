@@ -38,9 +38,8 @@ class DisposableBuffer:
         return self.ready_frame is not None
 
     def __del__(self) -> None:
-        del self.data
         glDeleteBuffers(1, self.buffer)
-
+        del self.data
 
 BufferList: TypeAlias = list[DisposableBuffer]
 
@@ -53,6 +52,7 @@ class DynamicVBO:
         self.data: BufferData | None = None
         self.buffers: BufferList = []
         self.state: State = state
+        self.visible: bool = True
 
     @property
     def latest_buffer(self) -> np.uint32 | None:

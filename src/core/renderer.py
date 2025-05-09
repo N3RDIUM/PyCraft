@@ -88,6 +88,8 @@ class Renderer:
 
             if buffer is None:
                 continue
+            if not vbo.visible:
+                continue
 
             glBindBuffer(GL_ARRAY_BUFFER, buffer)
             glEnableVertexAttribArray(0)
