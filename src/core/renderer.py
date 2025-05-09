@@ -78,7 +78,6 @@ class Renderer:
         model = glm.translate(model, glm.vec3(0, 0, -64))
         model = glm.rotate(model, glm.radians(glfw.get_time() * 42), glm.vec3(0, 1, 0))
 
-        self.camera.rotation[2] = glfw.get_time() * 64
         matrix = self.camera.get_matrix() * model
 
         transform_loc = glGetUniformLocation(

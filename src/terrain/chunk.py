@@ -48,17 +48,22 @@ class Chunk:
         return self.terrain[x][y][z] == 0
 
     def generate_mesh(self) -> None:
-        for x in range(CHUNK_SIDE):
-            for y in range(CHUNK_SIDE):
-                for z in range(CHUNK_SIDE):
+        for x in range(1, CHUNK_SIDE + 1):
+            for y in range(1, CHUNK_SIDE + 1):
+                for z in range(1, CHUNK_SIDE + 1):
                     if self.is_air(x, y, z):
                         continue
 
-                    # TODO: Remove unseeable faces
-                    self.append_to_mesh(translate(front, (x, y, z)))
-                    self.append_to_mesh(translate(back, (x, y, z)))
-                    self.append_to_mesh(translate(right, (x, y, z)))
-                    self.append_to_mesh(translate(left, (x, y, z)))
-                    self.append_to_mesh(translate(top, (x, y, z)))
-                    self.append_to_mesh(translate(bottom, (x, y, z)))
+                    if self.is_air(x, y, z + 1):
+                        self.append_to_mesh(translate(front, (x, y, z + 1)))
+                    if self.is_air(x, y, z - 1):
+                        self.append_to_mesh(translate(back, (x, y, z - 1)))
+                    if self.is_air(x - 1, y, z):
+                        self.append_to_mesh(translate(right, (x - 1, y, z)))
+                    if self.is_air(x + 1, y, z):
+                        self.append_to_mesh(translate(left, (x + 1, y, z)))
+                    if self.is_air(x, y - 1, z):
+                        self.append_to_mesh(translate(top, (x, y - 1, z)))
+                    if self.is_air(x, y + 1, z):
+                        self.append_to_mesh(translate(bottom, (x, y + 1, z)))
 
