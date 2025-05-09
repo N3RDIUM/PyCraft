@@ -1,4 +1,4 @@
-from .chunk import Chunk
+from .chunk import Chunk, CHUNK_SIDE
 from core.state import State
 from core.mesh import Mesh
 import numpy as np
@@ -14,14 +14,28 @@ class World:
         self.mesh: Mesh = self.state.mesh_handler.new_mesh("world")
 
     def update(self) -> None:
-        # INFGEN here
         # WORLD: Impl global block_exists func. Gen in 2 stages: terrain gen all then mesh gen all
+        required_chunks = []
+        player_position = self.state.camera.position
+        camera_chunk = list((int(player_position[i] // (CHUNK_SIDE - 1)) for i in range(3)))
+        for x in range(-RENDER_DIST, RENDER_DIST + 1):
+            for z in range(-RENDER_DIST, RENDER_DIST + 1):
+                translated_x = x - camera_chunk[0]
+                translated_z = z - camera_chunk[2]
+                required_chunks.append((translated_x, -1, translated_z))
 
-        if len(self.chunks) == 0:
-            for x in range(-RENDER_DIST, RENDER_DIST + 1):
-                for z in range(-RENDER_DIST, RENDER_DIST + 1):
-                    chunk = Chunk([x, -1, z])
-                    self.chunks[chunk.id] = chunk
+        for required in required_chunks:
+            if required not in list(self.chunks.keys()):
+                chunk = Chunk(required)
+                self.chunks[required] = chunk
+
+        to_delete = []
+        for chunk in list(self.chunks.keys()):
+            if chunk not in required_chunks:
+                to_delete.append(chunk)
+        
+        for chunk in to_delete:
+            del self.chunks[chunk]
 
         for id in self.chunks:
             chunk = self.chunks[id]
@@ -36,7 +50,7 @@ class World:
     def update_mesh(self) -> None:
         vertices = []
         uvs = []
-        for id in self.chunks:
+        for id in list(self.chunks.keys()):
             chunk = self.chunks[id]
 
             if not chunk.generated:

@@ -53,7 +53,7 @@ class Mesh:
         self.state: State = state
 
     def get_latest_buffer(self) -> np.uint32 | None:
-        latest  = None
+        latest = None
         for buffer in self.buffers:
             if not buffer[0].ready or not buffer[1].ready:
                 continue
@@ -71,10 +71,7 @@ class Mesh:
         if buffers is None:
             return
         vertex, uv = buffers
-
-        if vertex.buffer is None or uv.buffer is None:
-            return
-
+    
         glBindBuffer(GL_ARRAY_BUFFER, vertex.buffer)
         glEnableVertexAttribArray(0)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
@@ -103,8 +100,11 @@ class Mesh:
 
             if mode != DELETE_UNNEEDED:
                 continue
+            ready = vertex.ready and uv.ready
+            if ready:
+                continue
             ready_buffer_count += 1
-            if ready_buffer_count > 1:
+            if ready_buffer_count > 3:
                 del self.buffers[i]
 
     def on_close(self) -> None:
