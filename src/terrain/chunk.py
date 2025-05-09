@@ -1,11 +1,13 @@
 import numpy as np
+from math import sqrt
 from core.state import State
 import random
 from core.dynamic_vbo import DynamicVBO
 from .block import front, back, left, right, top, bottom
 
 CHUNK_SIDE = 16
-CHUNK_DIMS = tuple(CHUNK_SIDE + 2 for _ in range(3)) # Padding of 2 for obvious reasons
+CHUNK_DIMS = tuple(CHUNK_SIDE + 2 for _ in range(3))  # Padding of 2 for obvious reasons
+
 
 def translate(mesh: np.typing.NDArray[np.float32], position: tuple[int, int, int]):
     new = np.array(mesh, dtype=np.float32)
@@ -13,6 +15,7 @@ def translate(mesh: np.typing.NDArray[np.float32], position: tuple[int, int, int
         f = i % 3
         new[i] += position[f]
     return new
+
 
 class Chunk:
     def __init__(self, position: list[int], state: State):
@@ -37,7 +40,16 @@ class Chunk:
         for x in range(CHUNK_SIDE - 1):
             for y in range(CHUNK_SIDE - 1):
                 for z in range(CHUNK_SIDE - 1):
-                    self.terrain[x + 1][y + 1][z + 1] = random.random() > 0.42
+                    self.terrain[x + 1][y + 1][z + 1] = (
+                        random.random()
+                        > sqrt(
+                            (x - CHUNK_SIDE / 2) ** 2
+                            + (y - CHUNK_SIDE / 2) ** 2
+                            + (z - CHUNK_SIDE / 2) ** 2
+                        )
+                        / CHUNK_SIDE
+                        * 2
+                    )
 
     def append_to_mesh(self, data: np.typing.NDArray[np.float32]) -> None:
         if self.mesh is None:
@@ -67,4 +79,3 @@ class Chunk:
                         self.append_to_mesh(translate(top, (x, y - 1, z)))
                     if self.is_air(x, y + 1, z):
                         self.append_to_mesh(translate(bottom, (x, y + 1, z)))
-

@@ -8,7 +8,7 @@ front = np.array([
     1, 1, 0,
     1, 0, 0,
     0, 0, 0,
-], dtype = np.float32) - 0.5
+], dtype = np.float32)
 
 right = np.array([
     1, 1, 0, # Right
@@ -18,7 +18,7 @@ right = np.array([
     1, 0, 1,
     1, 0, 0,
     1, 1, 1,
-], dtype = np.float32) - 0.5
+], dtype = np.float32)
 
 back = np.array([
     1, 1, 1, # Back
@@ -28,7 +28,7 @@ back = np.array([
     0, 0, 1,
     1, 0, 1,
     0, 1, 1,
-], dtype = np.float32) - 0.5
+], dtype = np.float32)
 
 left = np.array([
     0, 1, 1, # Left
@@ -38,7 +38,7 @@ left = np.array([
     0, 0, 0,
     0, 0, 1,
     0, 1, 0,
-], dtype = np.float32) - 0.5
+], dtype = np.float32)
 
 top = np.array([
     0, 1, 1, # Top
@@ -48,7 +48,7 @@ top = np.array([
     1, 1, 0,
     0, 1, 0,
     1, 1, 1,
-], dtype = np.float32) - 0.5
+], dtype = np.float32)
 
 bottom = np.array([
     0, 0, 0, # Bottom
@@ -58,5 +58,5 @@ bottom = np.array([
     1, 0, 1,
     0, 0, 1,
     1, 0, 0,
-], dtype = np.float32) - 0.5
+], dtype = np.float32)
 
