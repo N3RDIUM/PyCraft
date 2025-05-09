@@ -1,4 +1,3 @@
-import time
 import numpy as np
 from core.state import State
 from core.dynamic_vbo import DynamicVBO
@@ -6,15 +5,6 @@ from .block import front, back, left, right, top, bottom
 
 CHUNK_SIDE = 16
 CHUNK_DIMS = tuple(CHUNK_SIDE + 2 for _ in range(3))  # Padding of 2 for "obvious reasons"
-
-
-def translate(mesh: np.typing.NDArray[np.float32], position: tuple[int, int, int]):
-    new = np.array(mesh, dtype=np.float32)
-    for i in range(len(mesh)):
-        f = i % 3
-        new[i] += position[f]
-    return new
-
 
 class Chunk:
     def __init__(self, position: list[int], state: State):
@@ -27,15 +17,9 @@ class Chunk:
         self.mesh: np.typing.NDArray[np.float32] | None = None
         self.buffer: DynamicVBO = self.state.vbo_handler.new_buffer(self.id)
 
-        t = time.time()
         self.generate_terrain()
-        print(f"Terrain geeneration took {time.time() - t}ms")
-        t = time.time()
         self.generate_mesh()
-        print(f"Mesh generation took {time.time() - t}ms")
-        t = time.time()
         self.buffer.set_data(self.mesh)
-        print(f"Send mesh took {time.time() - t}ms")
 
     @property
     def id(self) -> str:
@@ -58,6 +42,9 @@ class Chunk:
         return self.terrain[x][y][z] == 0
 
     def generate_mesh(self) -> None:
+        def translate(x, y, z):
+            return np.array([[x, y, z] for _ in range(6)], dtype=np.float32).flatten()
+
         for i in range(CHUNK_SIDE ** 3):
             x = i % CHUNK_SIDE
             y = (i // CHUNK_SIDE) % CHUNK_SIDE
@@ -67,15 +54,15 @@ class Chunk:
                 continue
 
             if self.is_air(x, y, z + 1):
-                self.append_to_mesh(translate(front, (x, y, z + 1)))
+                self.append_to_mesh(front + translate(x, y, z + 1))
             if self.is_air(x, y, z - 1):
-                self.append_to_mesh(translate(back, (x, y, z - 1)))
+                self.append_to_mesh(back + translate(x, y, z - 1))
             if self.is_air(x - 1, y, z):
-                self.append_to_mesh(translate(right, (x - 1, y, z)))
+                self.append_to_mesh(right + translate(x - 1, y, z))
             if self.is_air(x + 1, y, z):
-                self.append_to_mesh(translate(left, (x + 1, y, z)))
+                self.append_to_mesh(left + translate(x + 1, y, z))
             if self.is_air(x, y - 1, z):
-                self.append_to_mesh(translate(top, (x, y - 1, z)))
+                self.append_to_mesh(top + translate(x, y - 1, z))
             if self.is_air(x, y + 1, z):
-                self.append_to_mesh(translate(bottom, (x, y + 1, z)))
+                self.append_to_mesh(bottom + translate(x, y + 1, z))
 
