@@ -54,16 +54,10 @@ class Chunk:
                     if self.is_air(x, y, z):
                         continue
 
-                    if self.is_air(x, y, z - 1):
-                        self.append_to_mesh(translate(front, (x, y, z)))
-                    if self.is_air(x, y, z - 1):
-                        self.append_to_mesh(translate(back, (x, y, z)))
-                    if self.is_air(x - 1, y, z):
-                        self.append_to_mesh(translate(right, (x, y, z)))
-                    if self.is_air(x + 1, y, z):
-                        self.append_to_mesh(translate(left, (x, y, z)))
-                    if self.is_air(x, y - 1, z):
-                        self.append_to_mesh(translate(top, (x, y, z)))
-                    if self.is_air(x, y + 1, z):
-                        self.append_to_mesh(translate(bottom, (x, y, z)))
+                    self.append_to_mesh(translate(front, (x, y, z)))
+                    self.append_to_mesh(translate(back, (x, y, z)))
+                    self.append_to_mesh(translate(right, (x, y, z)))
+                    self.append_to_mesh(translate(left, (x, y, z)))
+                    self.append_to_mesh(translate(top, (x, y, z)))
+                    self.append_to_mesh(translate(bottom, (x, y, z)))
 
