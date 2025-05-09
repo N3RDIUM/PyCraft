@@ -82,6 +82,9 @@ class DynamicVBO:
             if ready_buffer_count > 1:
                 del self.buffers[i]
 
+    def on_close(self) -> None:
+        for i in range(len(self.buffers)):
+            del self.buffers[i]
 
 DynamicBufferStore: TypeAlias = dict[str, DynamicVBO]
 
@@ -114,4 +117,8 @@ class DynamicVBOHandler:
     def update(self, mode: int = SEND_TO_GPU) -> None:
         for vbo in self.vbos:
             self.vbos[vbo].update_buffers(mode)
+
+    def on_close(self) -> None:
+        for vbo in self.vbos:
+            self.vbos[vbo].on_close()
 

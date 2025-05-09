@@ -41,6 +41,7 @@ class SharedContext:
         while self.state.alive:
             self.step()
 
+        self.state.vbo_handler.on_close()
         glfw.destroy_window(self.window)
         self.state.shared_context_alive = False
 
