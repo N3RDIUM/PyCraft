@@ -4,7 +4,7 @@ from OpenGL.GL import (
     GL_BACK,
     GL_COLOR_BUFFER_BIT,
     GL_CULL_FACE,
-    GL_CW,
+    GL_CCW,
     GL_DEPTH_BUFFER_BIT,
     GL_DEPTH_CLAMP,
     GL_DEPTH_TEST,
@@ -65,7 +65,7 @@ class Renderer:
 
         glEnable(GL_CULL_FACE)
         glCullFace(GL_BACK)
-        glFrontFace(GL_CW)
+        glFrontFace(GL_CCW)
 
         glEnable(GL_DEPTH_CLAMP)
 

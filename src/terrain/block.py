@@ -3,8 +3,8 @@ import numpy as np
 # BUG: FACES ARE INVERTED (FRONT IS BACK, BACK IS FRONT ETC)
 # WHICH IS WHY WE ARE HAVING TO TRANSLATE WITH +1 IN CHUNK.PY
 
-front = np.array([
-    0, 1, 0, # Front
+back = np.array([
+    0, 1, 0,
     1, 1, 0,
     0, 0, 0,
     
@@ -13,8 +13,8 @@ front = np.array([
     1, 1, 0,
 ], dtype = np.float32)
 
-right = np.array([
-    1, 1, 0, # Right
+left = np.array([
+    1, 1, 0,
     1, 1, 1,
     1, 0, 0,
 
@@ -23,8 +23,8 @@ right = np.array([
     1, 1, 1,
 ], dtype = np.float32)
 
-back = np.array([
-    1, 1, 1, # Back
+front = np.array([
+    1, 1, 1,
     0, 1, 1,
     1, 0, 1,
 
@@ -33,8 +33,8 @@ back = np.array([
     0, 1, 1,
 ], dtype = np.float32)
 
-left = np.array([
-    0, 1, 1, # Left
+right = np.array([
+    0, 1, 1,
     0, 1, 0,
     0, 0, 1,
 
@@ -43,8 +43,8 @@ left = np.array([
     0, 1, 0,
 ], dtype = np.float32)
 
-top = np.array([
-    0, 1, 1, # Top
+bottom = np.array([
+    0, 1, 1,
     1, 1, 1,
     0, 1, 0,
 
@@ -53,8 +53,8 @@ top = np.array([
     1, 1, 1,
 ], dtype = np.float32)
 
-bottom = np.array([
-    0, 0, 0, # Bottom
+top = np.array([
+    0, 0, 0,
     1, 0, 0,
     0, 0, 1,
 

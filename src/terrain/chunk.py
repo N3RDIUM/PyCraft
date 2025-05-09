@@ -61,21 +61,21 @@ class Chunk:
                 continue
 
             if self.is_air(x, y, z + 1):
-                self.append_to_vertices(front + translate(x, y, z + 1))
+                self.append_to_vertices(front + translate(x, y, z))
                 self.append_to_uv(uv)
             if self.is_air(x, y, z - 1):
-                self.append_to_vertices(back + translate(x, y, z - 1))
+                self.append_to_vertices(back + translate(x, y, z))
                 self.append_to_uv(uv)
             if self.is_air(x - 1, y, z):
-                self.append_to_vertices(right + translate(x - 1, y, z))
+                self.append_to_vertices(right + translate(x, y, z))
                 self.append_to_uv(uv)
             if self.is_air(x + 1, y, z):
-                self.append_to_vertices(left + translate(x + 1, y, z))
+                self.append_to_vertices(left + translate(x, y, z))
                 self.append_to_uv(uv)
             if self.is_air(x, y - 1, z):
-                self.append_to_vertices(top + translate(x, y - 1, z))
+                self.append_to_vertices(top + translate(x, y, z))
                 self.append_to_uv(uv)
             if self.is_air(x, y + 1, z):
-                self.append_to_vertices(bottom + translate(x, y + 1, z))
+                self.append_to_vertices(bottom + translate(x, y, z))
                 self.append_to_uv(uv)
 
