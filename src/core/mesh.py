@@ -108,6 +108,7 @@ class Mesh:
                 continue
 
         self.buffers = new_buffers
+        print(self.buffers)
 
     def on_close(self) -> None:
         del self.buffers

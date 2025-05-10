@@ -1,33 +1,4 @@
 import numpy as np
-from OpenGL.GL import (
-    GL_ARRAY_BUFFER,
-    GL_BACK,
-    GL_COLOR_BUFFER_BIT,
-    GL_CULL_FACE,
-    GL_CCW,
-    GL_DEPTH_BUFFER_BIT,
-    GL_DEPTH_CLAMP,
-    GL_DEPTH_TEST,
-    GL_FALSE,
-    GL_FLOAT,
-    GL_LESS,
-    GL_TRIANGLES,
-    glBindBuffer,
-    glBindVertexArray,
-    glClear,
-    glClearColor,
-    glCullFace,
-    glDepthFunc,
-    glDisableVertexAttribArray,
-    glDrawArrays,
-    glEnable,
-    glEnableVertexAttribArray,
-    glFrontFace,
-    glGenVertexArrays,
-    glGetUniformLocation,
-    glUniformMatrix4fv,
-    glVertexAttribPointer,
-)
 from OpenGL.GL import *
 
 try:

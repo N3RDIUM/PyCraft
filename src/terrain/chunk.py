@@ -1,7 +1,7 @@
 import numpy as np
 from .block import front, back, left, right, top, bottom, uv
 
-CHUNK_SIDE = 16
+CHUNK_SIDE = 2
 CHUNK_DIMS = tuple(CHUNK_SIDE + 2 for _ in range(3))  # Padding of 2 for "obvious reasons"
 FACES = [
     ((0, 0, 1), front),
