@@ -3,7 +3,7 @@ from core.state import State
 from core.mesh import Mesh
 import numpy as np
 
-RENDER_DIST = 8
+RENDER_DIST = 4
 
 class World:
     def __init__(self, state: State) -> None:
@@ -14,7 +14,6 @@ class World:
         self.mesh: Mesh = self.state.mesh_handler.new_mesh("world")
 
     def update(self) -> None:
-        # WORLD: Impl global block_exists func. Gen in 2 stages: terrain gen all then mesh gen all
         required_chunks = []
         player_position = self.state.camera.position
         camera_chunk = list((int(player_position[i] // (CHUNK_SIDE - 1)) for i in range(3)))
