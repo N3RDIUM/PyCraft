@@ -27,25 +27,18 @@ class DisposableBuffer:
         self.data: BufferData = data
         self.type: int = type
         self.buffer: np.uint32 = glGenBuffers(1)
-        self.ready_frame: int | None = None
-
-    def send_to_gpu(self, state: State) -> None:
+        self.ready: bool = False
+        
+    def send_to_gpu(self) -> None:
         glBindBuffer(GL_ARRAY_BUFFER, self.buffer)
         glBufferData(GL_ARRAY_BUFFER, self.data.nbytes, None, GL_STATIC_DRAW)
         glBufferSubData(GL_ARRAY_BUFFER, 0, self.data.nbytes, self.data)
         glFlush()
-        self.ready_frame = state.frame
-
-    @property
-    def ready(self) -> bool:
-        return self.ready_frame is not None
+        self.ready = True
 
     def __del__(self) -> None:
         glDeleteBuffers(1, self.buffer)
         del self.data
-
-class DummyBuffer(DisposableBuffer):
-    pass
 
 class Mesh:
     def __init__(
@@ -90,14 +83,31 @@ class Mesh:
         glBindBuffer(GL_ARRAY_BUFFER, 0)
 
     def update_buffers(self, mode: int = SEND_TO_GPU) -> None:
-        for i in range(len(self.buffers)):
-            vertex, uv = self.buffers[i]
-            if not vertex.ready and mode == SEND_TO_GPU:
-                vertex.send_to_gpu(self.state)
+        for (vertex, uv) in self.buffers:
+            if not mode == SEND_TO_GPU:
                 continue
-            if not uv.ready and mode == SEND_TO_GPU:
-                uv.send_to_gpu(self.state)
+            
+            if not vertex.ready:
+                vertex.send_to_gpu()
+            if not uv.ready:
+                uv.send_to_gpu()
+
+        if mode != DELETE_UNNEEDED:
+            return
+        new_buffers = []
+            
+        latest = self.get_latest_buffer()
+        if latest is not None:
+            new_buffers.append(latest)
+
+        for (vertex, uv) in self.buffers:
+            ready = vertex.ready and uv.ready
+
+            if not ready:
+                new_buffers.append((vertex, uv))
                 continue
+
+        self.buffers = new_buffers
 
     def on_close(self) -> None:
         del self.buffers
@@ -139,6 +149,8 @@ class MeshHandler:
             for mesh in self.meshes:
                 self.meshes[mesh].update_buffers(mode)
         except RuntimeError:
+            pass
+        except IndexError:
             pass
 
     def on_close(self) -> None:
