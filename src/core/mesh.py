@@ -44,6 +44,9 @@ class DisposableBuffer:
         glDeleteBuffers(1, self.buffer)
         del self.data
 
+class DummyBuffer(DisposableBuffer):
+    pass
+
 class Mesh:
     def __init__(
         self,
@@ -87,8 +90,6 @@ class Mesh:
         glBindBuffer(GL_ARRAY_BUFFER, 0)
 
     def update_buffers(self, mode: int = SEND_TO_GPU) -> None:
-        ready_buffer_count: int = 0
-
         for i in range(len(self.buffers)):
             vertex, uv = self.buffers[i]
             if not vertex.ready and mode == SEND_TO_GPU:
@@ -97,15 +98,6 @@ class Mesh:
             if not uv.ready and mode == SEND_TO_GPU:
                 uv.send_to_gpu(self.state)
                 continue
-
-            if mode != DELETE_UNNEEDED:
-                continue
-            ready = vertex.ready and uv.ready
-            if ready:
-                continue
-            ready_buffer_count += 1
-            if ready_buffer_count > 3:
-                del self.buffers[i]
 
     def on_close(self) -> None:
         del self.buffers
@@ -148,8 +140,6 @@ class MeshHandler:
                 self.meshes[mesh].update_buffers(mode)
         except RuntimeError:
             pass
-        except IndexError:
-            self.update(mode)
 
     def on_close(self) -> None:
         try:

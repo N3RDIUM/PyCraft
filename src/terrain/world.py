@@ -3,7 +3,7 @@ from core.state import State
 from core.mesh import Mesh
 import numpy as np
 
-RENDER_DIST = 4
+RENDER_DIST = 8
 
 class World:
     def __init__(self, state: State) -> None:
@@ -18,8 +18,8 @@ class World:
         required_chunks = []
         player_position = self.state.camera.position
         camera_chunk = list((int(player_position[i] // (CHUNK_SIDE - 1)) for i in range(3)))
-        for x in range(-RENDER_DIST, RENDER_DIST + 1):
-            for z in range(-RENDER_DIST, RENDER_DIST + 1):
+        for x in range(-RENDER_DIST - 1, RENDER_DIST):
+            for z in range(-RENDER_DIST - 1, RENDER_DIST):
                 translated_x = x - camera_chunk[0]
                 translated_z = z - camera_chunk[2]
                 required_chunks.append((translated_x, -1, translated_z))
@@ -36,7 +36,8 @@ class World:
         
         for chunk in to_delete:
             del self.chunks[chunk]
-
+        
+        updated = False
         for id in self.chunks:
             chunk = self.chunks[id]
 
@@ -44,8 +45,11 @@ class World:
                 continue
 
             self.chunks[id].generate()
-
-            self.update_mesh()
+            updated = True
+        
+        if not updated:
+            return
+        self.update_mesh()
 
     def update_mesh(self) -> None:
         vertices = []
@@ -59,8 +63,8 @@ class World:
             vertices.append(chunk.vertices)
             uvs.append(chunk.uvs)
     
-        vertices = np.hstack(tuple(vertices))
-        uvs = np.hstack(tuple(uvs))
+        vertices = np.hstack(vertices)
+        uvs = np.hstack(uvs)
 
         self.mesh.set_data(vertices, uvs)
 
