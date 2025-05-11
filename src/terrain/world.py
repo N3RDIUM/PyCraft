@@ -4,8 +4,7 @@ from core.mesh import Mesh
 import numpy as np
 import multiprocessing
 
-RENDER_DIST = 8
-RENDER_HEIGHT = 1
+RENDER_DIST = 12
 
 class ChunkStorage:
     def __init__(self) -> None:
