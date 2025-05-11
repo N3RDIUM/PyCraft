@@ -4,18 +4,22 @@ from .block import front, back, left, right, top, bottom, uv
 CHUNK_SIDE = 16
 CHUNK_DIMS = tuple(CHUNK_SIDE + 2 for _ in range(3))  # Padding of 2 for "obvious reasons"
 FACES = [
-    ((0, 0, 1), front),
-    ((0, 0, -1), back),
-    ((-1, 0, 0), right),
-    ((1, 0, 0), left),
-    ((0, -1, 0), top),
-    ((0, 1, 0), bottom),
+    ((0, 0, 1), front.reshape((6, 3))),
+    ((0, 0, -1), back.reshape((6, 3))),
+    ((-1, 0, 0), right.reshape((6, 3))),
+    ((1, 0, 0), left.reshape((6, 3))),
+    ((0, -1, 0), top.reshape((6, 3))),
+    ((0, 1, 0), bottom.reshape((6, 3))),
 ]
 
+NOT_GENERATED = 0
+TERRAIN_GENERATED = 1
+MESH_GENERATED = 2
+
 class Chunk:
-    def __init__(self, position: list[int]):
-        self.position: list[int] = position
-        self.generated: bool = False
+    def __init__(self, position: tuple[int, int, int]):
+        self.position = position
+        self.state = NOT_GENERATED
 
         self.terrain: np.typing.NDArray[np.uint8] = np.zeros(
             CHUNK_DIMS, dtype=np.uint8
@@ -27,47 +31,71 @@ class Chunk:
     def id(self) -> str:
         return f"chunk_{self.position[0]}_{self.position[1]}_{self.position[2]}"
 
-    def append_to_vertices(self, data: np.typing.NDArray[np.float32]) -> None:
-        if self.vertices is None:
-            self.vertices = data
-            return
-        self.vertices = np.hstack((self.vertices, data))
-
-    def append_to_uv(self, data: np.typing.NDArray[np.float32]) -> None:
-        if self.uvs is None:
-            self.uvs = data
-            return
-        self.uvs = np.hstack((self.uvs, data))
-
     def is_air(self, x: int, y: int, z: int) -> bool:
         return self.terrain[x, y, z] == 0
 
-    def generate(self) -> None:
-        self.terrain[1:-1, 1:-2, 1:-1] = 1
+    def update_neighbour_terrain(self, world):
+        neighbour_dirs = {
+            (1, 0, 0): (slice(-1, None), slice(1, -1), slice(1, -1)),  
+            (-1, 0, 0): (slice(0, 1), slice(1, -1), slice(1, -1)),     
+            (0, 1, 0): (slice(1, -1), slice(-1, None), slice(1, -1)),  
+            (0, -1, 0): (slice(1, -1), slice(0, 1), slice(1, -1)),     
+            (0, 0, 1): (slice(1, -1), slice(1, -1), slice(-1, None)),  
+            (0, 0, -1): (slice(1, -1), slice(1, -1), slice(0, 1)),     
+        }
 
+        center = (slice(1, -1), slice(1, -1), slice(1, -1))
+
+        for (dx, dy, dz), dest_slice in neighbour_dirs.items():
+            neighbor_pos = (self.position[0] + dx, self.position[1] + dy, self.position[2] + dz)
+            if world.chunk_exists(neighbor_pos):
+                neighbor = world.chunks[neighbor_pos]
+                if dx == 1:  
+                    source = (slice(1, 2),) + center[1:]
+                elif dx == -1:  
+                    source = (slice(-2, -1),) + center[1:]
+                elif dy == 1:  
+                    source = (center[0], slice(1, 2), center[2])
+                elif dy == -1:  
+                    source = (center[0], slice(-2, -1), center[2])
+                elif dz == 1:
+                    source = center[:2] + (slice(1, 2),)
+                elif dz == -1:
+                    source = center[:2] + (slice(-2, -1),)
+
+                self.terrain[dest_slice] = neighbor.terrain[source]
+
+    def generate_terrain(self) -> None:
+        self.terrain[1:-1, 1:-2, 1:-1] = 1
+        self.state = TERRAIN_GENERATED
+
+    def generate_mesh(self, world) -> None:
+        if not np.any(self.terrain[1:-1, 1:-1, 1:-1]):
+            self.vertices = np.array([], dtype=np.float32)
+            self.uvs = np.array([], dtype=np.float32)
+            self.state = MESH_GENERATED
+            return
+
+        self.update_neighbour_terrain(world)
         offset = np.array(self.position) * (CHUNK_SIDE - 1)
         solid = self.terrain[1:-1, 1:-1, 1:-1] != 0
+
         face_data = []
         total_faces = 0
 
-        neighbors = {
-            (0, 0, 1): self.terrain[1:-1, 1:-1, 2:],    # front
-            (0, 0, -1): self.terrain[1:-1, 1:-1, :-2],  # back
-            (-1, 0, 0): self.terrain[:-2, 1:-1, 1:-1],  # right
-            (1, 0, 0): self.terrain[2:, 1:-1, 1:-1],    # left
-            (0, -1, 0): self.terrain[1:-1, :-2, 1:-1],  # top
-            (0, 1, 0): self.terrain[1:-1, 2:, 1:-1],    # bottom
-        }
-
         for (dx, dy, dz), face in FACES:
-            neighbor = neighbors[(dx, dy, dz)]
-            visible = (solid & (neighbor == 0))
-            visible_indices = np.argwhere(visible) + 1
-            if visible_indices.shape[0] == 0:
+            neighbor = self.terrain[
+                1 + dx : -1 + dx or None,
+                1 + dy : -1 + dy or None,
+                1 + dz : -1 + dz or None
+            ]
+
+            visible = solid & (neighbor == 0)
+            if not np.any(visible):
                 continue
 
-            positions = visible_indices.astype(np.float32) + offset
-            face = face.reshape((6, 3))
+            x, y, z = np.where(visible)
+            positions = np.stack((x + 1, y + 1, z + 1), axis=1).astype(np.float32) + offset
             translated_faces = face[np.newaxis, :, :] + positions[:, np.newaxis, :]
             face_data.append(translated_faces.reshape(-1))
             total_faces += positions.shape[0]
@@ -79,5 +107,5 @@ class Chunk:
             self.vertices = np.array([], dtype=np.float32)
             self.uvs = np.array([], dtype=np.float32)
 
-        self.generated = True
+        self.state = MESH_GENERATED
 

@@ -20,7 +20,6 @@ class SharedContext:
             )
         self.thread = threading.Thread(
             target=self.start,
-            daemon=True
         )
         self.thread.start()
 
@@ -37,7 +36,6 @@ class SharedContext:
 
         glfw.make_context_current(self.window)
 
-        time.sleep(1 / 10)
         while self.state.alive:
             self.step()
             time.sleep(1 / 60)
