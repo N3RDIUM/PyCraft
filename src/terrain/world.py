@@ -4,8 +4,9 @@ from core.mesh import Mesh
 import numpy as np
 import multiprocessing
 
-RENDER_DIST = 4
-RENDER_HEIGHT = 4
+RENDER_DIST = 5
+RENDER_HEIGHT = 2
+
 
 class ChunkStorage:
     def __init__(self) -> None:
@@ -16,9 +17,17 @@ class ChunkStorage:
         self.chunks[chunk.position] = chunk
         self.changed = True
     
-    def delete_chunk(self, position):
-        del self.chunks[position]
+    def cache_chunk(self, position):
+        if self.chunks[position].cached:
+            return
         self.changed = True
+        self.chunks[position].cached = True
+
+    def uncache_chunk(self, position):
+        if not self.chunks[position].cached:
+            return
+        self.changed = True
+        self.chunks[position].cached = False
 
     def chunk_exists(self, position) -> bool:
         return position in self.chunks
@@ -35,6 +44,9 @@ class ChunkStorage:
         for dx, dy, dz in directions:
             neighbour_id = (x + dx, y + dy, z + dz)
             if neighbour_id in self.chunks:
+                # Yes but no
+                # if self.chunks[neighbour_id].cached:
+                #    continue
                 neighbours.append(self.chunks[neighbour_id])
         
         return neighbours
@@ -60,6 +72,8 @@ class ChunkStorage:
             chunk = self.chunks[id]
 
             if chunk.state != MESH_GENERATED:
+                continue
+            if chunk.cached:
                 continue
             
             vertices.append(chunk.vertices)
@@ -87,6 +101,8 @@ class ChunkStorage:
             if required not in list(self.chunks.keys()):
                 chunk = Chunk(required)
                 self.add_chunk(chunk)
+                continue
+            self.uncache_chunk(required)
 
         to_delete = []
         for chunk in list(self.chunks.keys()):
@@ -94,7 +110,7 @@ class ChunkStorage:
                 to_delete.append(chunk)
         
         for chunk in to_delete:
-            self.delete_chunk(chunk)
+            self.cache_chunk(chunk)
 
 class ChunkHandler:
     def __init__(self):

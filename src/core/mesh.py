@@ -101,13 +101,11 @@ class Mesh:
             new_buffers.append(latest)
 
         for (vertex, uv) in self.buffers:
-            ready = vertex.ready and uv.ready
-
-            if not ready:
+            if not (vertex.ready and uv.ready):
                 new_buffers.append((vertex, uv))
-                continue
 
-        self.buffers = new_buffers
+        # self.buffers = new_buffers
+        # TODO: There's something wrong with this.
 
     def on_close(self) -> None:
         del self.buffers
