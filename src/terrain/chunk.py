@@ -66,7 +66,7 @@ class Chunk:
                 self.terrain[dest_slice] = neighbor.terrain[source]
 
     def generate_terrain(self) -> None:
-        self.terrain[1:-1, 1:-2, 1:-1] = 1
+        self.terrain[1:-1, 1:-1, 1:-1] = 1
         self.state = TERRAIN_GENERATED
 
     def generate_mesh(self, world) -> None:
