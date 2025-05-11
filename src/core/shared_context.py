@@ -40,6 +40,7 @@ class SharedContext:
             self.step()
             time.sleep(1 / 60)
 
+        self.state.world.on_close()
         self.state.mesh_handler.on_close()
         glfw.destroy_window(self.window)
         self.state.shared_context_alive = False

@@ -5,12 +5,7 @@ import numpy as np
 import multiprocessing
 
 RENDER_DIST = 8
-RENDER_HEIGHT = 4
-
-# TODO: Full rewrite. Do everything chunk-related on the worker process.
-# TODO: All the main thread's World class has to touch is the mesh data,
-# TODO: passed through a queue. The only thing the World gives the
-# TODO: worker process is the player position.
+RENDER_HEIGHT = 1
 
 class ChunkStorage:
     def __init__(self) -> None:
@@ -19,6 +14,10 @@ class ChunkStorage:
 
     def add_chunk(self, chunk):
         self.chunks[chunk.position] = chunk
+        self.changed = True
+    
+    def delete_chunk(self, position):
+        del self.chunks[position]
         self.changed = True
 
     def chunk_exists(self, position) -> bool:
@@ -73,12 +72,37 @@ class ChunkStorage:
         except ValueError:
             return None
 
+    def update(self, camera_chunk):
+        required_chunks = []
+
+        for x in range(-RENDER_DIST - 1, RENDER_DIST):
+            for z in range(-RENDER_DIST - 1, RENDER_DIST):
+                translated_x = x - camera_chunk[0]
+                translated_y = -1
+                translated_z = z - camera_chunk[2]
+                required_chunks.append((translated_x, translated_y, translated_z))
+
+        for required in required_chunks:
+            if required not in list(self.chunks.keys()):
+                chunk = Chunk(required)
+                self.add_chunk(chunk)
+
+        to_delete = []
+        for chunk in list(self.chunks.keys()):
+            if chunk not in required_chunks:
+                to_delete.append(chunk)
+        
+        for chunk in to_delete:
+            self.delete_chunk(chunk)
+
 class ChunkHandler:
     def __init__(self):
         self.manager = multiprocessing.Manager()
         self.namespace = self.manager.Namespace()
         self.namespace.mesh_data = None
         self.namespace.changed = False
+        self.namespace.camera_chunk = (0, 0, 0)
+        self.namespace.alive = True
 
         self.process = multiprocessing.Process(
             target=self.worker,
@@ -88,12 +112,13 @@ class ChunkHandler:
 
     def worker(self, namespace):
         storage = ChunkStorage()
-        chunk = Chunk((0, 0, 0))
-        storage.add_chunk(chunk)
 
-        while True:
+        while self.namespace.alive:
+            storage.update(namespace.camera_chunk)
+
             if not storage.changed:
                 continue
+
             storage.generate()
             namespace.mesh_data = storage.generate_mesh_data()
             namespace.changed = True
@@ -107,6 +132,13 @@ class ChunkHandler:
     def changed(self):
         return self.namespace.changed
 
+    def set_camera_chunk(self, position):
+        self.namespace.camera_chunk = position
+
+    def kill(self):
+        self.namespace.alive = False
+        self.process.terminate()
+
 class World:
     def __init__(self, state: State) -> None:
         self.state: State = state
@@ -115,6 +147,10 @@ class World:
         self.mesh: Mesh = self.state.mesh_handler.new_mesh("world")
 
     def update(self) -> None:
+        player_position = self.state.camera.position
+        camera_chunk = tuple((int(player_position[i] // (CHUNK_SIDE - 1)) for i in range(3)))
+        self.handler.set_camera_chunk(camera_chunk)
+
         if not self.handler.changed:
             return
 
@@ -123,4 +159,7 @@ class World:
             return
         
         self.mesh.set_data(*data)
+
+    def on_close(self):
+        self.handler.kill()
 
