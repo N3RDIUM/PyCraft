@@ -67,6 +67,7 @@ class Chunk:
 
     def generate_terrain(self) -> None:
         self.terrain[1:-1, 1:-1, 1:-1] = 1
+        self.terrain[4, 4, 4] = 0
         self.state = TERRAIN_GENERATED
 
     def generate_mesh(self, world) -> None:
