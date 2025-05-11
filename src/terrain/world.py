@@ -4,7 +4,8 @@ from core.mesh import Mesh
 import numpy as np
 import multiprocessing
 
-RENDER_DIST = 12
+RENDER_DIST = 2
+RENDER_HEIGHT = 1
 
 class ChunkStorage:
     def __init__(self) -> None:
@@ -75,11 +76,12 @@ class ChunkStorage:
         required_chunks = []
 
         for x in range(-RENDER_DIST - 1, RENDER_DIST):
-            for z in range(-RENDER_DIST - 1, RENDER_DIST):
-                translated_x = x - camera_chunk[0]
-                translated_y = -1
-                translated_z = z - camera_chunk[2]
-                required_chunks.append((translated_x, translated_y, translated_z))
+            for y in range(-RENDER_HEIGHT - 1, RENDER_HEIGHT):
+                for z in range(-RENDER_DIST - 1, RENDER_DIST):
+                    translated_x = x - camera_chunk[0]
+                    translated_y = y - camera_chunk[1]
+                    translated_z = z - camera_chunk[2]
+                    required_chunks.append((translated_x, translated_y, translated_z))
 
         for required in required_chunks:
             if required not in list(self.chunks.keys()):
