@@ -123,5 +123,4 @@ class World:
             return
         
         self.mesh.set_data(*data)
-        print("asdf")
 
