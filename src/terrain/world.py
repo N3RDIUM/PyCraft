@@ -51,9 +51,8 @@ class ChunkStorage:
     
     def generate(self):
         for id in self.chunks:
-            if self.chunks[id].state == TERRAIN_GENERATED:
-                continue
-            self.chunks[id].generate_terrain()
+            if self.chunks[id].state != TERRAIN_GENERATED:
+                self.chunks[id].generate_terrain()
 
         for id in self.chunks:
             if self.chunks[id].state != TERRAIN_GENERATED:
