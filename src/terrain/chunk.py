@@ -20,7 +20,6 @@ class Chunk:
     def __init__(self, position: tuple[int, int, int]):
         self.position = position
         self.state = NOT_GENERATED
-        self.cached = False
 
         self.terrain: np.typing.NDArray[np.uint8] = np.zeros(
             CHUNK_DIMS, dtype=np.uint8

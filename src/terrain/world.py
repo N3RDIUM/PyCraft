@@ -3,31 +3,34 @@ from core.state import State
 from core.mesh import Mesh
 import numpy as np
 import multiprocessing
+import time
 
-RENDER_DIST = 5
-RENDER_HEIGHT = 2
-
+RENDER_DIST = 4
+RENDER_HEIGHT = 8
 
 class ChunkStorage:
     def __init__(self) -> None:
         self.chunks = {}
+        self.cache = {}
         self.changed = False
 
-    def add_chunk(self, chunk):
-        self.chunks[chunk.position] = chunk
+    def ensure_chunk(self, position):
+        if position in self.cache:
+            self.uncache_chunk(position)
+            return
+        chunk = Chunk(position)
+        self.chunks[position] = chunk
         self.changed = True
     
     def cache_chunk(self, position):
-        if self.chunks[position].cached:
-            return
-        self.changed = True
-        self.chunks[position].cached = True
+        # TODO: Delete the cached chunk if its
+        # TODO: too far away, i.e. distance threshold
+        self.cache[position] = self.chunks[position]
+        del self.chunks[position]
 
     def uncache_chunk(self, position):
-        if not self.chunks[position].cached:
-            return
-        self.changed = True
-        self.chunks[position].cached = False
+        self.chunks[position] = self.cache[position]
+        del self.cache[position]
 
     def chunk_exists(self, position) -> bool:
         return position in self.chunks
@@ -44,9 +47,6 @@ class ChunkStorage:
         for dx, dy, dz in directions:
             neighbour_id = (x + dx, y + dy, z + dz)
             if neighbour_id in self.chunks:
-                # Yes but no
-                # if self.chunks[neighbour_id].cached:
-                #    continue
                 neighbours.append(self.chunks[neighbour_id])
         
         return neighbours
@@ -73,8 +73,6 @@ class ChunkStorage:
 
             if chunk.state != MESH_GENERATED:
                 continue
-            if chunk.cached:
-                continue
             
             vertices.append(chunk.vertices)
             uvs.append(chunk.uvs)
@@ -99,10 +97,8 @@ class ChunkStorage:
 
         for required in required_chunks:
             if required not in list(self.chunks.keys()):
-                chunk = Chunk(required)
-                self.add_chunk(chunk)
+                self.ensure_chunk(required)
                 continue
-            self.uncache_chunk(required)
 
         to_delete = []
         for chunk in list(self.chunks.keys()):
