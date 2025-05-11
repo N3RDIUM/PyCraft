@@ -17,8 +17,8 @@ class Chunk:
         self.position: list[int] = position
         self.generated: bool = False
 
-        self.terrain: np.typing.NDArray[np.uint8] = np.random.randint(
-            low=0, high=2, size=CHUNK_DIMS, dtype=np.uint8
+        self.terrain: np.typing.NDArray[np.uint8] = np.zeros(
+            CHUNK_DIMS, dtype=np.uint8
         )
         self.vertices: np.typing.NDArray[np.float32] | None = None
         self.uvs: np.typing.NDArray[np.float32] | None = None
@@ -43,6 +43,8 @@ class Chunk:
         return self.terrain[x, y, z] == 0
 
     def generate(self) -> None:
+        self.terrain[1:-1, 1:-2, 1:-1] = 1
+
         offset = np.array(self.position) * (CHUNK_SIDE - 1)
         solid = self.terrain[1:-1, 1:-1, 1:-1] != 0
         face_data = []
