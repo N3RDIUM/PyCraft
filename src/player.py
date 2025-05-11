@@ -33,7 +33,7 @@ class Player:
             "velocity": [0, 0, 0],
             "friction": 0.9,
             "gravity": 9.81,
-            "speed": 0.1,
+            "speed": 0.03,
             "zoom": False,
             "fly": False,
         }
@@ -61,9 +61,9 @@ class Player:
             self.state_map["velocity"][0] += dz*sens
             self.state_map["velocity"][2] += dx*sens
         if glfw.get_key(self.state.window.window, glfw.KEY_LEFT_CONTROL) == glfw.PRESS:
-            self.state_map["speed"] = 0.1
-        else:
             self.state_map["speed"] = 0.08
+        else:
+            self.state_map["speed"] = 0.03
 
         # ESC to release mouse
         if glfw.get_key(self.state.window.window, glfw.KEY_ESCAPE) == glfw.PRESS:

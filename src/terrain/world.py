@@ -3,9 +3,8 @@ from core.state import State
 from core.mesh import Mesh
 import numpy as np
 import multiprocessing
-import time
 
-RENDER_DIST = 4
+RENDER_DIST = 12
 RENDER_HEIGHT = 8
 
 class ChunkStorage:
