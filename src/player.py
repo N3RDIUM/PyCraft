@@ -61,7 +61,7 @@ class Player:
             self.state_map["velocity"][0] += dz*sens
             self.state_map["velocity"][2] += dx*sens
         if glfw.get_key(self.state.window.window, glfw.KEY_LEFT_CONTROL) == glfw.PRESS:
-            self.state_map["speed"] = 0.08
+            self.state_map["speed"] = 0.05
         else:
             self.state_map["speed"] = 0.03
 
