@@ -1,5 +1,6 @@
 import numpy as np
 from .block import front, back, left, right, top, bottom, uv
+import noise
 
 CHUNK_SIDE = 16
 CHUNK_DIMS = tuple(CHUNK_SIDE + 2 for _ in range(3))  # Padding of 2 for "obvious reasons"
@@ -66,8 +67,33 @@ class Chunk:
                 self.terrain[dest_slice] = neighbor.terrain[source]
 
     def generate_terrain(self) -> None:
-        self.terrain[1:-1, 1:-1, 1:-1] = 1
-        self.terrain[4, 4, 4] = 0
+        for i in range(CHUNK_SIDE):
+            for j in range(CHUNK_SIDE):
+                x, z = i + 1, j + 1
+                relative_y = self.position[1] * (CHUNK_SIDE - 1)
+                translated = (
+                    (x + self.position[0] * (CHUNK_SIDE - 1)) / 100,
+                    (z + self.position[2] * (CHUNK_SIDE - 1)) / 100,
+                )
+                terrain_height = int(noise.snoise2(*translated) * 10 - relative_y)
+
+                if terrain_height >= 0 and terrain_height <= CHUNK_SIDE:
+                    for k in range(terrain_height):
+                        self.terrain[x, k, z] = 1
+                elif terrain_height > CHUNK_SIDE:
+                    self.terrain[x, :, z] = 1
+
+                for l in range(CHUNK_SIDE):
+                    y = l + 1
+                    translated = (
+                        (x + self.position[0] * (CHUNK_SIDE - 1)) / 100,
+                        (y + self.position[1] * (CHUNK_SIDE - 1)) / 100,
+                        (z + self.position[2] * (CHUNK_SIDE - 1)) / 100,
+                    )
+                    cave_noise = noise.snoise3(*translated)
+                    if cave_noise > 0.3:
+                        self.terrain[x, y, z] = 0
+                    
         self.state = TERRAIN_GENERATED
 
     def generate_mesh(self, world) -> None:

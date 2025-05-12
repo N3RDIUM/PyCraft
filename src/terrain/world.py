@@ -4,7 +4,7 @@ from core.mesh import Mesh
 import numpy as np
 import multiprocessing
 
-RENDER_DIST = 5
+RENDER_DIST = 4
 
 class ChunkStorage:
     def __init__(self) -> None:
@@ -13,6 +13,8 @@ class ChunkStorage:
         self.changed = False
 
     def ensure_chunk(self, position):
+        if position in self.chunks:
+            return
         if position in self.cache:
             self.uncache_chunk(position)
             return
@@ -51,7 +53,7 @@ class ChunkStorage:
     
     def generate(self):
         for id in self.chunks:
-            if self.chunks[id].state != TERRAIN_GENERATED:
+            if self.chunks[id].state < TERRAIN_GENERATED:
                 self.chunks[id].generate_terrain()
 
         for id in self.chunks:

@@ -11,6 +11,7 @@ mkShell rec {
         python312Packages.pyglm
         python312Packages.numpy
         python312Packages.pillow
+        python312Packages.noise
     ];
     LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
 }
