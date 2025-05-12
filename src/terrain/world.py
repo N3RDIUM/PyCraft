@@ -55,11 +55,13 @@ class ChunkStorage:
         for id in self.chunks:
             if self.chunks[id].state < TERRAIN_GENERATED:
                 self.chunks[id].generate_terrain()
+                break
 
         for id in self.chunks:
             if self.chunks[id].state != TERRAIN_GENERATED:
                 continue
             self.chunks[id].generate_mesh(self)
+            break
 
         self.changed = False
 
