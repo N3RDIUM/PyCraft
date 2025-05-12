@@ -11,6 +11,8 @@ from .mesh import DELETE_UNNEEDED, MeshHandler
 from .shared_context import SharedContext
 from .state import State
 from .camera import Camera
+from terrain.world import RENDER_DIST
+from terrain.chunk import CHUNK_SIDE
 
 class Renderer:
     def __init__(self, state: State) -> None:
@@ -29,7 +31,7 @@ class Renderer:
 
     def drawcall(self) -> None:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glClearColor(0.15, 0.15, 0.15, 1.0)
+        glClearColor(*(0.15 for _ in range(3)), 1.0)
 
         glEnable(GL_DEPTH_TEST)
         glDepthFunc(GL_LESS)
@@ -48,11 +50,29 @@ class Renderer:
             return
         self.asset_manager.use_shader("main")
 
-        matrix = self.camera.get_matrix()
-        transform_loc = glGetUniformLocation(
-            self.asset_manager.get_shader_program("main"), "transform"
+        model = glm.mat4(1.0)
+        projection, view = self.camera.get_matrix()
+        camera = (
+            -self.camera.position[0],
+            -self.camera.position[1],
+            -self.camera.position[2],
         )
-        glUniformMatrix4fv(transform_loc, 1, GL_FALSE, glm.value_ptr(matrix))
+        model_pos = glGetUniformLocation(
+            self.asset_manager.get_shader_program("main"), "model"
+        )
+        view_pos = glGetUniformLocation(
+            self.asset_manager.get_shader_program("main"), "view"
+        )
+        projection_pos = glGetUniformLocation(
+            self.asset_manager.get_shader_program("main"), "projection"
+        )
+        glUniformMatrix4fv(model_pos, 1, GL_FALSE, glm.value_ptr(model))
+        glUniformMatrix4fv(view_pos, 1, GL_FALSE, glm.value_ptr(view))
+        glUniformMatrix4fv(projection_pos, 1, GL_FALSE, glm.value_ptr(projection))
+        glUniform3f(glGetUniformLocation(self.asset_manager.get_shader_program("main"), "fogColor"), *(0.15 for _ in range(3)))
+        glUniform1f(glGetUniformLocation(self.asset_manager.get_shader_program("main"), "fogStart"), 0.01)
+        glUniform1f(glGetUniformLocation(self.asset_manager.get_shader_program("main"), "fogEnd"), CHUNK_SIDE * (RENDER_DIST - 1.25))
+        glUniform3f(glGetUniformLocation(self.asset_manager.get_shader_program("main"), "camera"), *camera)
 
         self.asset_manager.bind_texture()
         self.mesh_handler.drawcall()

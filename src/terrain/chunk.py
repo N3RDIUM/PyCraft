@@ -72,10 +72,12 @@ class Chunk:
                 x, z = i + 1, j + 1
                 relative_y = self.position[1] * (CHUNK_SIDE - 1)
                 translated = (
-                    (x + self.position[0] * (CHUNK_SIDE - 1)) / 100,
-                    (z + self.position[2] * (CHUNK_SIDE - 1)) / 100,
+                    (x + self.position[0] * (CHUNK_SIDE - 1)) / 1000,
+                    (z + self.position[2] * (CHUNK_SIDE - 1)) / 1000,
                 )
-                terrain_height = int(noise.snoise2(*translated) * 10 - relative_y)
+                terrain_height = noise.snoise2(*translated) * 100
+                terrain_height += noise.snoise2(*(translated[i] * 10 for i in [0, 1])) * 10
+                terrain_height = int(terrain_height - relative_y)
 
                 if terrain_height >= 0 and terrain_height <= CHUNK_SIDE:
                     for k in range(terrain_height):

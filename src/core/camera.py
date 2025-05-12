@@ -29,6 +29,6 @@ class Camera:
 
         width, height = self.state.window.size
         self.aspect = width / height
-
-        matrix = glm.perspective(self.fov, self.aspect, self.near, self.far) * matrix
-        return matrix
+    
+        # model, view
+        return glm.perspective(self.fov, self.aspect, self.near, self.far), matrix
