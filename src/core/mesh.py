@@ -94,18 +94,20 @@ class Mesh:
 
         if mode != DELETE_UNNEEDED:
             return
-        new_buffers = []
+
             
+        to_delete = []
         latest = self.get_latest_buffer()
-        if latest is not None:
-            new_buffers.append(latest)
-
         for (vertex, uv) in self.buffers:
-            if not (vertex.ready and uv.ready):
-                new_buffers.append((vertex, uv))
+            if (vertex, uv) == latest:
+                continue
+            if vertex.ready and uv.ready:
+                to_delete.append((vertex, uv))
 
-        # self.buffers = new_buffers
-        # TODO: There's something wrong with this.
+        for (vertex, uv) in to_delete:
+            self.buffers.remove((vertex, uv))
+            del vertex
+            del uv
 
     def on_close(self) -> None:
         del self.buffers
