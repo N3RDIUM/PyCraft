@@ -1,8 +1,5 @@
 import numpy as np
 
-# BUG: FACES ARE INVERTED (FRONT IS BACK, BACK IS FRONT ETC)
-# WHICH IS WHY WE ARE HAVING TO TRANSLATE WITH +1 IN CHUNK.PY
-
 back = np.array([
     0, 1, 0,
     1, 1, 0,

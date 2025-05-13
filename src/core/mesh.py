@@ -3,15 +3,21 @@ from typing import TypeAlias
 import numpy as np
 from OpenGL.GL import (
     GL_ARRAY_BUFFER,
+    GL_FALSE,
+    GL_FLOAT,
     GL_STATIC_DRAW,
+    GL_TRIANGLES,
     glBindBuffer,
     glBufferData,
     glBufferSubData,
+    glDeleteBuffers,
+    glDisableVertexAttribArray,
+    glDrawArrays,
+    glEnableVertexAttribArray,
     glFlush,
     glGenBuffers,
-    glDeleteBuffers,
+    glVertexAttribPointer,
 )
-from OpenGL.GL import *
 
 from .state import State
 
@@ -22,13 +28,14 @@ SEND_TO_GPU = 1
 VERTEX = 2
 UV = 3
 
+
 class DisposableBuffer:
     def __init__(self, data: BufferData, type: int = VERTEX) -> None:
         self.data: BufferData = data
         self.type: int = type
         self.buffer: np.uint32 = glGenBuffers(1)
         self.ready: bool = False
-        
+
     def send_to_gpu(self) -> None:
         glBindBuffer(GL_ARRAY_BUFFER, self.buffer)
         glBufferData(GL_ARRAY_BUFFER, self.data.nbytes, None, GL_STATIC_DRAW)
@@ -39,6 +46,7 @@ class DisposableBuffer:
     def __del__(self) -> None:
         glDeleteBuffers(1, self.buffer)
         del self.data
+
 
 class Mesh:
     def __init__(
@@ -67,7 +75,7 @@ class Mesh:
         if buffers is None:
             return
         vertex, uv = buffers
-    
+
         glBindBuffer(GL_ARRAY_BUFFER, vertex.buffer)
         glEnableVertexAttribArray(0)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
@@ -83,10 +91,10 @@ class Mesh:
         glBindBuffer(GL_ARRAY_BUFFER, 0)
 
     def update_buffers(self, mode: int = SEND_TO_GPU) -> None:
-        for (vertex, uv) in self.buffers:
+        for vertex, uv in self.buffers:
             if not mode == SEND_TO_GPU:
                 continue
-            
+
             if not vertex.ready:
                 vertex.send_to_gpu()
             if not uv.ready:
@@ -95,22 +103,22 @@ class Mesh:
         if mode != DELETE_UNNEEDED:
             return
 
-            
         to_delete = []
         latest = self.get_latest_buffer()
-        for (vertex, uv) in self.buffers:
+        for vertex, uv in self.buffers:
             if (vertex, uv) == latest:
                 continue
             if vertex.ready and uv.ready:
                 to_delete.append((vertex, uv))
 
-        for (vertex, uv) in to_delete:
+        for vertex, uv in to_delete:
             self.buffers.remove((vertex, uv))
             del vertex
             del uv
 
     def on_close(self) -> None:
         del self.buffers
+
 
 MeshStore: TypeAlias = dict[str, Mesh]
 
@@ -133,7 +141,7 @@ class MeshHandler:
 
     def get_mesh(self, id: str) -> Mesh:
         return self.meshes[id]
-    
+
     def remove_buffer(self, id: str) -> None:
         del self.meshes[id]
 
@@ -161,4 +169,3 @@ class MeshHandler:
             self.on_close()
         except KeyError:
             self.on_close()
-

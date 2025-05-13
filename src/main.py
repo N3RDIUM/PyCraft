@@ -1,5 +1,5 @@
-from core.window import Window
 from core.asset_manager import AssetManager
+from core.window import Window
 from player import Player
 
 if __name__ == "__main__":

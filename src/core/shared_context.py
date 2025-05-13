@@ -1,7 +1,9 @@
-import time
-import glfw
 import threading
+import time
 from typing import Any
+
+import glfw
+
 
 class SharedContext:
     def __init__(self, state) -> None:

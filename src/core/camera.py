@@ -25,10 +25,9 @@ class Camera:
             thing = glm.vec3(0.0)
             thing[i] = 1.0
             matrix = glm.rotate(matrix, glm.radians(self.rotation[i]), thing)
-        matrix = glm.translate(matrix, glm.vec3(tuple(self.position)))
+        matrix = glm.translate(matrix, glm.vec3(self.position))
 
         width, height = self.state.window.size
         self.aspect = width / height
-    
-        # model, view
-        return glm.perspective(self.fov, self.aspect, self.near, self.far), matrix
+
+        return matrix, glm.perspective(self.fov, self.aspect, self.near, self.far)

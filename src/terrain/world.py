@@ -1,10 +1,14 @@
-from .chunk import Chunk, CHUNK_SIDE, TERRAIN_GENERATED, MESH_GENERATED
-from core.state import State
-from core.mesh import Mesh
-import numpy as np
 import multiprocessing
 
+import numpy as np
+
+from core.mesh import Mesh
+from core.state import State
+
+from .chunk import CHUNK_SIDE, MESH_GENERATED, TERRAIN_GENERATED, Chunk
+
 RENDER_DIST = 5
+
 
 class ChunkStorage:
     def __init__(self) -> None:
@@ -21,7 +25,7 @@ class ChunkStorage:
         chunk = Chunk(position)
         self.chunks[position] = chunk
         self.changed = True
-    
+
     def cache_chunk(self, position):
         # TODO: Delete the cached chunk if its
         # TODO: too far away, i.e. distance threshold
@@ -38,19 +42,22 @@ class ChunkStorage:
     def get_neighbours(self, id) -> list[Chunk]:
         x, y, z = id
         directions = [
-            (1, 0, 0), (-1, 0, 0),
-            (0, 1, 0), (0, -1, 0),
-            (0, 0, 1), (0, 0, -1),
+            (1, 0, 0),
+            (-1, 0, 0),
+            (0, 1, 0),
+            (0, -1, 0),
+            (0, 0, 1),
+            (0, 0, -1),
         ]
-        
+
         neighbours = []
         for dx, dy, dz in directions:
             neighbour_id = (x + dx, y + dy, z + dz)
             if neighbour_id in self.chunks:
                 neighbours.append(self.chunks[neighbour_id])
-        
+
         return neighbours
-    
+
     def generate(self):
         for id in self.chunks:
             if self.chunks[id].state < TERRAIN_GENERATED:
@@ -74,10 +81,10 @@ class ChunkStorage:
 
             if chunk.state != MESH_GENERATED:
                 continue
-            
+
             vertices.append(chunk.vertices)
             uvs.append(chunk.uvs)
-        
+
         try:
             vertices = np.hstack(vertices)
             uvs = np.hstack(uvs)
@@ -105,9 +112,10 @@ class ChunkStorage:
         for chunk in list(self.chunks.keys()):
             if chunk not in required_chunks:
                 to_delete.append(chunk)
-        
+
         for chunk in to_delete:
             self.cache_chunk(chunk)
+
 
 class ChunkHandler:
     def __init__(self):
@@ -119,8 +127,7 @@ class ChunkHandler:
         self.namespace.alive = True
 
         self.process = multiprocessing.Process(
-            target=self.worker,
-            args=(self.namespace, )
+            target=self.worker, args=(self.namespace,)
         )
         self.process.start()
 
@@ -153,6 +160,7 @@ class ChunkHandler:
         self.namespace.alive = False
         self.process.terminate()
 
+
 class World:
     def __init__(self, state: State) -> None:
         self.state: State = state
@@ -162,7 +170,9 @@ class World:
 
     def update(self) -> None:
         player_position = self.state.camera.position
-        camera_chunk = tuple((int(player_position[i] // (CHUNK_SIDE - 1)) for i in range(3)))
+        camera_chunk = tuple(
+            (int(player_position[i] // (CHUNK_SIDE - 1)) for i in range(3))
+        )
         self.handler.set_camera_chunk(camera_chunk)
 
         if not self.handler.changed:
@@ -171,9 +181,8 @@ class World:
         data = self.handler.mesh_data
         if data is None:
             return
-        
+
         self.mesh.set_data(*data)
 
     def on_close(self):
         self.handler.kill()
-

@@ -1,9 +1,11 @@
 import glfw
 from OpenGL.GL import GL_TRUE, glViewport
 
-from .state import State
-from .renderer import Renderer
 from terrain.world import World
+
+from .renderer import Renderer
+from .state import State
+
 
 class Window:
     def __init__(self) -> None:
@@ -12,7 +14,7 @@ class Window:
                 "[core.window.Window] Init failed: Could not initialize glfw"
             )
 
-        glfw.window_hint(glfw.SAMPLES, 1) # TODO Make configurable
+        glfw.window_hint(glfw.SAMPLES, 1)  # TODO Make configurable
         glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
         glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
         glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL_TRUE)

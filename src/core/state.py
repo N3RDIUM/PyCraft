@@ -1,6 +1,7 @@
 import time
 from typing import Any
 
+
 class State:
     def __init__(self, window: Any) -> None:
         self.frame: int = 0
