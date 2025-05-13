@@ -18,7 +18,7 @@ class Window:
         glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL_TRUE)
         glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
-        self.window = glfw.create_window(640, 480, "PyCraft", None, None)
+        self.window = glfw.create_window(640, 480, "Voxl", None, None)
         if not self.window:
             glfw.terminate()
             raise Exception(
