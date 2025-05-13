@@ -41,7 +41,7 @@ BACKGROUND = (0.15, 0.15, 0.15)
 
 class Renderer:
     def __init__(self, state: State) -> None:
-        self.state = state
+        self.state: State = state
         self.window = state.window
         self.shared: SharedContext = SharedContext(state)
 
@@ -51,7 +51,7 @@ class Renderer:
 
         self.asset_manager: AssetManager | None = None
 
-        self.mesh_handler = MeshHandler(state)
+        self.mesh_handler: MeshHandler = MeshHandler(state)
         self.camera: Camera = Camera(state)
 
     def set_uniforms(self) -> None:
@@ -65,6 +65,8 @@ class Renderer:
         fog_start = 0.1
         fog_end = CHUNK_SIDE * (RENDER_DIST - 1.25)
 
+        if self.asset_manager is None:
+            return
         shader = self.asset_manager.get_shader_program("main")
 
         model_pos = glGetUniformLocation(shader, "model")

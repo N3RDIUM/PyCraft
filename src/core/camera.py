@@ -27,7 +27,13 @@ class Camera:
             matrix = glm.rotate(matrix, glm.radians(self.rotation[i]), thing)
         matrix = glm.translate(matrix, glm.vec3(self.position))
 
-        width, height = self.state.window.size
-        self.aspect = width / height
-
-        return matrix, glm.perspective(self.fov, self.aspect, self.near, self.far)
+        size = self.state.window.size
+        width: int = size[0]
+        height: int = size[1]
+        self.aspect = 1
+        if height != 0:
+            self.aspect = width / height
+        
+        projection = glm.perspective(self.fov, self.aspect, self.near, self.far)
+        
+        return matrix, projection

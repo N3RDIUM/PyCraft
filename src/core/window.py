@@ -52,5 +52,5 @@ class Window:
         self.state.on_drawcall()
 
     @property
-    def size(self):
+    def size(self) -> tuple[int, int]:
         return glfw.get_window_size(self.window)

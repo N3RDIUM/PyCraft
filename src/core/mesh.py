@@ -47,16 +47,18 @@ class DisposableBuffer:
         glDeleteBuffers(1, self.buffer)
         del self.data
 
+BufferSet: TypeAlias = tuple[DisposableBuffer, DisposableBuffer]
+BufferList: TypeAlias = list[BufferSet]
 
 class Mesh:
     def __init__(
         self,
         state: State,
     ) -> None:
-        self.buffers = []
+        self.buffers: BufferList = []
         self.state: State = state
 
-    def get_latest_buffer(self) -> np.uint32 | None:
+    def get_latest_buffer(self) -> BufferSet | None:
         latest = None
         for buffer in self.buffers:
             if not buffer[0].ready or not buffer[1].ready:
@@ -65,7 +67,7 @@ class Mesh:
             break
         return latest
 
-    def set_data(self, vertices, uvs) -> None:
+    def set_data(self, vertices: BufferData, uvs: BufferData) -> None:
         vertex_buf = DisposableBuffer(vertices, VERTEX)
         uv_buf = DisposableBuffer(uvs, UV)
         self.buffers.insert(0, (vertex_buf, uv_buf))

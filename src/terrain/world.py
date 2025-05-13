@@ -2,7 +2,7 @@ import multiprocessing
 
 import numpy as np
 
-from core.mesh import Mesh
+from core.mesh import Mesh, BufferData
 from core.state import State
 
 from .chunk import CHUNK_SIDE, MESH_GENERATED, TERRAIN_GENERATED, Chunk
@@ -145,18 +145,18 @@ class ChunkHandler:
             namespace.changed = True
 
     @property
-    def mesh_data(self):
+    def mesh_data(self) -> tuple[BufferData, BufferData]:
         self.namespace.changed = False
         return self.namespace.mesh_data
 
     @property
-    def changed(self):
+    def changed(self) -> bool:
         return self.namespace.changed
 
-    def set_camera_chunk(self, position):
+    def set_camera_chunk(self, position) -> None:
         self.namespace.camera_chunk = position
 
-    def kill(self):
+    def kill(self) -> None:
         self.namespace.alive = False
         self.process.terminate()
 
@@ -184,5 +184,5 @@ class World:
 
         self.mesh.set_data(*data)
 
-    def on_close(self):
+    def on_close(self) -> None:
         self.handler.kill()

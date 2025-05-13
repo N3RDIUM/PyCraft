@@ -24,7 +24,7 @@ from OpenGL.GL import (
     glTexParameteri,
     glUseProgram,
 )
-from OpenGL.GL.shaders import compileProgram, compileShader
+from OpenGL.GL.shaders import compileProgram, compileShader, ShaderProgram
 from PIL import Image
 
 from .state import State
@@ -37,12 +37,12 @@ class AssetManager:
         self.state: State = state
         self.state.asset_manager = self
 
-        self.shaders = {}
-        self.texture = None
+        self.shaders: dict[str, ShaderProgram] = {}
+        self.texture: np.uint32 | None = None
 
     def load_assets(self, asset_dir: str = ASSET_DIR, name_prefix: str = "") -> None:
         shader_dir = os.path.join(asset_dir, "shaders/")
-        shader_pairs = set()
+        shader_pairs: set[str] = set()
 
         for file in os.listdir(shader_dir):
             name = file.split(".")[0]
@@ -50,18 +50,16 @@ class AssetManager:
 
         for name in shader_pairs:
             with open(os.path.join(shader_dir, name + ".vert")) as f:
-                vert = f.read()
+                vert: int = compileShader(f.read(), GL_VERTEX_SHADER)
             with open(os.path.join(shader_dir, name + ".frag")) as f:
-                frag = f.read()
-            self.shaders[name_prefix + name] = compileProgram(
-                compileShader(vert, GL_VERTEX_SHADER),
-                compileShader(frag, GL_FRAGMENT_SHADER),
-            )
+                frag: int = compileShader(f.read(), GL_FRAGMENT_SHADER)
+            program: ShaderProgram = compileProgram(vert, frag)
+            self.shaders[name_prefix + name] = program
 
         texture_dir = os.path.join(asset_dir, "textures/")
         for file in os.listdir(texture_dir):
             texture = Image.open(os.path.join(texture_dir, file))
-            data = np.array(texture.getdata())
+            data: np.typing.NDArray = np.array(texture.getdata())
 
             self.texture = glGenTextures(1)
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
@@ -104,4 +102,6 @@ class AssetManager:
         return self.shaders[name]
 
     def bind_texture(self) -> None:
+        if self.texture is None:
+            return
         glBindTexture(GL_TEXTURE_2D, self.texture)

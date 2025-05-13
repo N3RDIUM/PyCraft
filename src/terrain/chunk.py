@@ -1,5 +1,6 @@
 import noise
 import numpy as np
+from typing import TypeAlias
 
 from .block import back, bottom, front, left, right, top, uv
 
@@ -16,15 +17,17 @@ FACES = [
     ((0, 1, 0), bottom.reshape((6, 3))),
 ]
 
+# TODO: Use enums instead of whatever this is
 NOT_GENERATED = 0
 TERRAIN_GENERATED = 1
 MESH_GENERATED = 2
 
+PositionType: TypeAlias = tuple[int, int, int]
 
 class Chunk:
-    def __init__(self, position: tuple[int, int, int]):
-        self.position = position
-        self.state = NOT_GENERATED
+    def __init__(self, position: PositionType):
+        self.position: PositionType = position
+        self.state: int = NOT_GENERATED
 
         self.terrain: np.typing.NDArray[np.uint8] = np.zeros(CHUNK_DIMS, dtype=np.uint8)
         self.vertices: np.typing.NDArray[np.float32] | None = None
@@ -37,7 +40,7 @@ class Chunk:
     def is_air(self, x: int, y: int, z: int) -> bool:
         return self.terrain[x, y, z] == 0
 
-    def update_neighbour_terrain(self, world):
+    def update_neighbour_terrain(self, world) -> None:
         neighbour_dirs = {
             (1, 0, 0): (slice(-1, None), slice(1, -1), slice(1, -1)),
             (-1, 0, 0): (slice(0, 1), slice(1, -1), slice(1, -1)),
@@ -81,11 +84,11 @@ class Chunk:
                     (x + self.position[0] * (CHUNK_SIDE - 1)) / 1000,
                     (z + self.position[2] * (CHUNK_SIDE - 1)) / 1000,
                 )
-                terrain_height = noise.snoise2(*translated) * 100
+                terrain_height: float = noise.snoise2(*translated) * 100
                 terrain_height += (
                     noise.snoise2(*(translated[i] * 10 for i in [0, 1])) * 10
                 )
-                terrain_height = int(terrain_height - relative_y)
+                terrain_height: int = int(terrain_height - relative_y)
 
                 if terrain_height >= 0 and terrain_height <= CHUNK_SIDE:
                     for k in range(terrain_height):
@@ -100,7 +103,7 @@ class Chunk:
                         (y + self.position[1] * (CHUNK_SIDE - 1)) / 100,
                         (z + self.position[2] * (CHUNK_SIDE - 1)) / 100,
                     )
-                    cave_noise = noise.snoise3(*translated)
+                    cave_noise: float = noise.snoise3(*translated)
                     if cave_noise > 0.3:
                         self.terrain[x, y, z] = 0
 
