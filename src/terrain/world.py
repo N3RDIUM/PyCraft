@@ -1,3 +1,4 @@
+from time import sleep
 import multiprocessing
 
 import numpy as np
@@ -7,13 +8,14 @@ from core.state import State
 
 from .chunk import CHUNK_SIDE, MESH_GENERATED, TERRAIN_GENERATED, Chunk
 
-RENDER_DIST = 5
+RENDER_DIST = 4
 
 
 class ChunkStorage:
     def __init__(self) -> None:
         self.chunks = {}
         self.cache = {}
+        self.rebuild_queue = []
         self.changed = False
 
     def ensure_chunk(self, position):
@@ -58,12 +60,15 @@ class ChunkStorage:
 
         return neighbours
 
+    def notify_neighbours(self, id) -> None:
+        neighbours = self.get_neighbours(id)
+        for chunk in neighbours:
+            self.rebuild_queue.append(chunk.position)
+
     def generate(self):
         for id in self.chunks:
             if self.chunks[id].state < TERRAIN_GENERATED:
                 self.chunks[id].generate_terrain()
-
-        # TODO: Rebuild edge chunks!
 
         for id in self.chunks:
             if self.chunks[id].state != TERRAIN_GENERATED:
@@ -92,9 +97,21 @@ class ChunkStorage:
         except ValueError:
             return None
 
+    def rebuild_chunk_mesh(self, position) -> None:
+        chunk = None
+
+        if position in self.chunks:
+            chunk = self.chunks[position]
+        elif position in self.cache:
+            chunk = self.cache[position]
+
+        if chunk is None:
+            return
+        chunk.rebuild_mesh(self)
+        self.changed = True
+
     def update(self, camera_chunk):
         required_chunks = []
-
         for x in range(-RENDER_DIST - 1, RENDER_DIST):
             for y in range(-RENDER_DIST - 1, RENDER_DIST):
                 for z in range(-RENDER_DIST - 1, RENDER_DIST):
@@ -116,6 +133,9 @@ class ChunkStorage:
         for chunk in to_delete:
             self.cache_chunk(chunk)
 
+        if len(self.rebuild_queue) > 0:
+            position = self.rebuild_queue.pop(0)
+            self.rebuild_chunk_mesh(position)
 
 class ChunkHandler:
     def __init__(self):
@@ -137,6 +157,7 @@ class ChunkHandler:
         while self.namespace.alive:
             storage.update(namespace.camera_chunk)
 
+            sleep(0.1)
             if not storage.changed:
                 continue
 

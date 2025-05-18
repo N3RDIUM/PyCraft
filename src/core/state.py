@@ -14,17 +14,22 @@ class State:
         self.player: Any | None = None
         self.world: Any | None = None
 
-        self.last_frame_time: int = time.time_ns()
+        self.last_frame_time: float = time.time()
         self.fps = 0
-        self.n = 0
+        self.delta = 0
 
     def on_drawcall(self) -> None:
-        now = time.time_ns()
-        delta = now - self.last_frame_time
-        self.fps = 1_000_000_000 / delta
+        now = time.time()
+        self.delta = now - self.last_frame_time
         self.last_frame_time = now
 
+        self.fps = 1 / self.delta
+
         self.frame += 1
+        print(f"\r{self.fps} FPS", end="\t\t")
+
+        if self.delta < 1 / 128:
+            time.sleep(1 / 128 - self.delta)
 
     def on_close(self) -> None:
         self.alive = False

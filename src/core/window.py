@@ -14,7 +14,6 @@ class Window:
                 "[core.window.Window] Init failed: Could not initialize glfw"
             )
 
-        glfw.window_hint(glfw.SAMPLES, 1)  # TODO Make configurable
         glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
         glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
         glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL_TRUE)
@@ -27,6 +26,7 @@ class Window:
                 "[core.window.Window] Init failed: Could not create GLFW window"
             )
         glfw.make_context_current(self.window)
+        glfw.swap_interval(0)
 
         self.state: State = State(self)
         self.renderer: Renderer = Renderer(self.state)

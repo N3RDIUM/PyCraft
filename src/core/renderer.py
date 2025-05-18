@@ -103,11 +103,10 @@ class Renderer:
 
         if self.asset_manager is None:
             self.asset_manager = self.state.asset_manager
-            return
-        self.asset_manager.use_shader("main")
+            self.asset_manager.bind_texture()
+            self.asset_manager.use_shader("main")
 
         self.set_uniforms()
 
-        self.asset_manager.bind_texture()
         self.mesh_handler.drawcall()
         self.mesh_handler.update(DELETE_UNNEEDED)
