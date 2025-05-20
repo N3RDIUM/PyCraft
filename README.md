@@ -47,10 +47,11 @@ Lock mouse    : L
 Unlock mouse  : esc
 ```
 
+## Performance
+Coming soon! (benchmarks.md, optimizations.md)
+
 ## Screenshots
 Coming soon!
 
 ## Contributing
 Coming soon!
-
-
