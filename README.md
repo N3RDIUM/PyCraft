@@ -39,9 +39,12 @@ Move Forward  : W
 Move Left     : A
 Move Backward : S
 Move Right    : D
+Move Up       : space
+Move Down     : shift
+Sprint        : ctrl
+
 Lock mouse    : L
 Unlock mouse  : esc
-Sprint        : ctrl
 ```
 
 ## Screenshots
